@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:final_project/Customs/GradientButton.dart';
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
@@ -48,7 +48,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
               left: dw * 0.16,
               bottom: dh * 0.92,
               child: Text(
-                'Welcome Please Register below',
+                'Welcome, Please Register below',
                 style: GoogleFonts.acme(color: Colors.white, fontSize: 24),
               ),
             ),
@@ -83,7 +83,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                     width: 0.85 * dw,
                   ),
                 )),
-            Positioned(bottom: dh * 0.39, left: dw * 0.11, child: SlideTransition(position: slideAnimation, child: LoginTextFields())),
+            Positioned(bottom: dh * 0.39, left: dw * 0.11, child: SlideTransition(position: slideAnimation, child: null)),
             Positioned(
               top: dh * 0.06,
               width: 450,
