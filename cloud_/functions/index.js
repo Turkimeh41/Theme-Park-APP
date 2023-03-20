@@ -25,14 +25,13 @@ exports.addUser = functions.region("europe-west1")
       try {
         return admin.firestore().collection("users").
             add({username: username, password: encryptedpass})
-            .then((response) => {
-              return admin.auth().createCustomToken(response.id)
-                  .then((customToken) => {
-                    return {success: true, token: customToken,
-                    };
-                  }).catch((error) =>{
-                    return {error: error+"hello"};
-                  });
+            .then(async (response) => {
+              try {
+                const customToken = admin.auth().createCustomToken(response.id);
+                return {success: true, token: customToken};
+              } catch (error) {
+                return {error: error + "hello"};
+              }
             });
       } catch (error) {
         throw new functions.https.HttpsError("Failed", "Error");
@@ -46,30 +45,30 @@ exports.loginUser = functions.region("europe-west1")
       try {
         return admin.firestore()
             .collection("users").where("username", "==", username)
-            .get().then((document) =>{
+            .get().then(async (document) =>{
               if (document.empty) {
                 throw new functions.https
-                    .HttpsError("invalid-username", "password password");
+                    .HttpsError("invalid-username", "username doesn't exists");
               }
-              const SHA256 = hash(password);
-              const encryptedpass = SHA256.toString();
-              if (document.docs[0]["password"] == encryptedpass) {
-                return admin.auth().createCustomToken(document.docs[0].id).
-                    then(
-                        (customToken) => {
-                          return {sucess: true, token: customToken};
-                        }).
-                    catch((error) => {
-                      return {error: error+"hey"};
-                    });
+              const encryptedpass = hash(password).toString();
+              if (document.docs[0]["password"] != encryptedpass) {
+                throw new functions.https
+                    .HttpsError("invalid-password", "password incorrent");
               }
-              throw new functions.https
-                  .HttpsError("invalid-password", "password incorrent");
+
+              admin.auth().createCustomToken(document.docs[0].id)
+                  .then((customtoken)=>{
+                    return {sucess: true, token: customtoken};
+                  })
+                  .catch((error)=>{
+                    throw error;
+                  });
             }).catch((error)=> {
-              return {error: error+"hello"};
+              throw error;
             });
       } catch (error) {
-        throw new functions.https.HttpsError("Failed", "Error");
+        console.log(error);
+        throw error;
       }
     },
     )
