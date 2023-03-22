@@ -3,10 +3,10 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:final_project/Provider/useracc.dart';
-class LoginTextFields extends StatefulWidget {
- const LoginTextFields({super.key});
+import 'package:final_project/Provider/useraddProviders.dart';
 
+class LoginTextFields extends StatefulWidget {
+  const LoginTextFields({super.key});
 
   @override
   State<LoginTextFields> createState() => _LoginTextFieldsState();
@@ -34,18 +34,19 @@ class _LoginTextFieldsState extends State<LoginTextFields> {
   Widget build(BuildContext context) {
     final dh = MediaQuery.of(context).size.height;
     final dw = MediaQuery.of(context).size.width;
-    return Consumer<UserAdd>(builder: (context, insUserAdd, child) => 
-     Form(
+    return Consumer<LogUserAdd>(
+      builder: (context, insUserAdd, child) => Form(
         key: key,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-              height: 0.1 * dh,
+              height: 0.07 * dh,
               width: dw * 0.75,
-              child: TextFormField(onChanged: (value) {
-                insUserAdd.username = value;
-              },
+              child: TextFormField(
+                  onChanged: (value) {
+                    insUserAdd.username = value;
+                  },
                   style: GoogleFonts.alef(fontSize: 18),
                   focusNode: userFocus,
                   decoration: InputDecoration(
@@ -60,17 +61,19 @@ class _LoginTextFieldsState extends State<LoginTextFields> {
                     enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
                     focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
                     labelText: 'Username',
-                    labelStyle: GoogleFonts.acme(fontSize: userFocus.hasFocus ? 24 : 18, color: userFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : Colors.grey),
+                    labelStyle: GoogleFonts.acme(fontSize: userFocus.hasFocus ? 22 : 15, color: userFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : Colors.grey),
                   )),
             ),
             SizedBox(
               height: dh * 0.03,
             ),
             SizedBox(
+              height: 0.07 * dh,
               width: dw * 0.75,
-              child: TextFormField(onChanged: (value) {
-                insUserAdd.password = value;
-              },
+              child: TextFormField(
+                  onChanged: (value) {
+                    insUserAdd.password = value;
+                  },
                   style: GoogleFonts.alef(fontSize: 18),
                   obscureText: true,
                   focusNode: passFocus,
@@ -85,7 +88,7 @@ class _LoginTextFieldsState extends State<LoginTextFields> {
                     enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
                     focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
                     labelText: 'Password',
-                    labelStyle: GoogleFonts.acme(fontSize: passFocus.hasFocus ? 24 : 18, color: passFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : Colors.grey),
+                    labelStyle: GoogleFonts.acme(fontSize: passFocus.hasFocus ? 22 : 15, color: passFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : Colors.grey),
                   )),
             ),
             SizedBox(

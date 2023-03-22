@@ -1,16 +1,15 @@
 import 'dart:developer';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_project/Auth_Screens/Login_Screen/login_textfields.dart';
+import 'package:final_project/Auth_Screens/Register_Screen/register_screen.dart';
 import 'package:final_project/Customs/GradientButton.dart';
-import 'package:final_project/Provider/useracc.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:final_project/Provider/useraddProviders.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:final_project/Provider/useracc.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:get/get.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -49,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     final dh = MediaQuery.of(context).size.height;
     final dw = MediaQuery.of(context).size.width;
     return ChangeNotifierProvider(
-      create: (context) => UserAdd(),
+      create: (context) => LogUserAdd(),
       builder: (context, child) => Scaffold(
         resizeToAvoidBottomInset: false,
         extendBodyBehindAppBar: true,
@@ -62,8 +61,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight),
           ),
-          child: Consumer<UserAdd>(
-            builder: (context, insUserAdd, child) => Stack(
+          child: Consumer<LogUserAdd>(
+            builder: (context, logUserAdd, child) => Stack(
               children: [
                 Positioned(
                   left: dw * 0.16,
@@ -91,7 +90,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                   ),
                 ),
                 Positioned(
-                    bottom: dh * 0.34,
+                    bottom: dh * 0.385,
                     left: dw * 0.07,
                     child: SlideTransition(
                       position: slideAnimation,
@@ -100,11 +99,11 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                           color: const Color.fromARGB(255, 255, 255, 255),
                           borderRadius: BorderRadius.circular(25),
                         ),
-                        height: 0.4 * dh,
+                        height: 0.36 * dh,
                         width: 0.85 * dw,
                       ),
                     )),
-                Positioned(bottom: dh * 0.39, left: dw * 0.11, child: SlideTransition(position: slideAnimation, child: const LoginTextFields())),
+                Positioned(bottom: dh * 0.467, left: dw * 0.11, child: SlideTransition(position: slideAnimation, child: const LoginTextFields())),
                 Positioned(
                   top: dh * 0.06,
                   width: 450,
@@ -120,25 +119,25 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                       height: 132,
                     )), */
                 Positioned(
-                    bottom: dh * 0.31,
-                    left: dw * 0.135,
+                    bottom: dh * 0.36,
+                    left: dw * 0.141,
                     child: SlideTransition(
                       position: slideAnimation,
                       child: GradientButton(
                         style: GoogleFonts.acme(color: Colors.white, fontSize: 27),
                         width: dw * 0.7,
-                        height: dh * 0.06,
+                        height: dh * 0.05,
                         'Login',
                         onTap: () async {
                           final functions = FirebaseFunctions.instanceFor(region: "europe-west1");
-                          final result = await functions.httpsCallable('loginUser').call({'username': insUserAdd.username, 'password': insUserAdd.password}).catchError((error) {
-                            log(error.message);
-                            return error;
-                          });
-                          final response = result.data;
-                          log(response);
-                          log(result.toString());
-                          /* FirebaseAuth.instance.signInWithCustomToken(token); */
+                          try {
+                            final result = await functions.httpsCallable('loginUser').call({'username': logUserAdd.username, 'password': logUserAdd.password});
+                            FirebaseAuth.instance.signInWithCustomToken(result.data['token']);
+                          } on FirebaseFunctionsException catch (error) {
+                            setState(() {
+                              log(error.message!);
+                            });
+                          }
                         },
                         radius: 20,
                         gradient: LinearGradient(colors: [Colors.amber, Colors.amber[800]!]),
@@ -164,7 +163,9 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                   child: FadeTransition(
                     opacity: fadeAnimation,
                     child: InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        Get.off(() => const RegisterScreen(), transition: Transition.upToDown);
+                      },
                       child: Text(
                         'Not Registered?, Click here to Register now!',
                         style: GoogleFonts.acme(fontSize: 18, color: Colors.white, decoration: TextDecoration.underline),
