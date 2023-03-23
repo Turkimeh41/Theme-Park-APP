@@ -64,9 +64,6 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
     passFocus.addListener(() {
       setState(() {});
     });
-    userFocus.addListener(() {
-      setState(() {});
-    });
     firstFocus.addListener(() {
       setState(() {});
     });
@@ -147,31 +144,37 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                         SizedBox(
                           height: 0.08 * dh,
                           width: dw * 0.42,
-                          child: TextFormField(
-                              initialValue: insRegUserAdd.firstName,
-                              onChanged: (value) {
-                                insRegUserAdd.firstName = value;
-                              },
-                              style: GoogleFonts.alef(fontSize: 16),
-                              focusNode: firstFocus,
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                prefixIcon: Icon(
-                                  Icons.supervised_user_circle,
-                                  size: 28,
-                                  color: firstFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100),
-                                ),
-                                filled: true,
-                                fillColor: const Color.fromARGB(255, 224, 224, 224),
-                                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
-                                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
-                                errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
-                                focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
-                                labelText: 'First Name',
-                                hintStyle: const TextStyle(color: Color.fromARGB(255, 110, 30, 63)),
-                                labelStyle: GoogleFonts.acme(
-                                    fontSize: firstFocus.hasFocus ? 22 : 16, color: firstFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100)),
-                              )),
+                          child: StatefulBuilder(builder: (context, statefulState) {
+                            log('REBUILT');
+                            firstFocus.addListener(() {
+                              statefulState(() {});
+                            });
+                            return TextFormField(
+                                initialValue: insRegUserAdd.firstName,
+                                onChanged: (value) {
+                                  insRegUserAdd.firstName = value;
+                                },
+                                style: GoogleFonts.alef(fontSize: 16),
+                                focusNode: firstFocus,
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  prefixIcon: Icon(
+                                    Icons.supervised_user_circle,
+                                    size: 28,
+                                    color: firstFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100),
+                                  ),
+                                  filled: true,
+                                  fillColor: const Color.fromARGB(255, 224, 224, 224),
+                                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+                                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+                                  errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+                                  focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+                                  labelText: 'First Name',
+                                  hintStyle: const TextStyle(color: Color.fromARGB(255, 110, 30, 63)),
+                                  labelStyle: GoogleFonts.acme(
+                                      fontSize: firstFocus.hasFocus ? 22 : 16, color: firstFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100)),
+                                ));
+                          }),
                         ),
                         SizedBox(
                           width: dw * 0.03,
