@@ -2,14 +2,18 @@ import 'dart:developer';
 
 import 'package:final_project/Auth_Screens/Login_Screen/login_textfields.dart';
 import 'package:final_project/Auth_Screens/Register_Screen/register_screen.dart';
-import 'package:final_project/Customs/GradientButton.dart';
-import 'package:final_project/Provider/useraddProviders.dart';
+import 'package:final_project/Customs/gradientbutton.dart';
+import 'package:final_project/Provider/cloud_handler.dart';
+import 'package:final_project/Provider/userauth_provider.dart';
+import 'package:final_project/Main_Menu/mainmenu_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -23,7 +27,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   late AnimationController fadeController;
   late Animation<Offset> slideAnimation;
   late Animation<double> fadeAnimation;
-
+  bool loading = false;
+  bool rememberMe = false;
   @override
   void initState() {
     slideController = AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
@@ -43,12 +48,20 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     super.dispose();
   }
 
+  Future<void> storeShared() async {
+    log('beginning storing: $rememberMe on the device!');
+    final prefs = await SharedPreferences.getInstance();
+    log('saving value on-device...');
+    await prefs.setBool('log-out', !rememberMe);
+    log('Stored.!');
+  }
+
   @override
   Widget build(BuildContext context) {
     final dh = MediaQuery.of(context).size.height;
     final dw = MediaQuery.of(context).size.width;
     return ChangeNotifierProvider(
-      create: (context) => LogUserAdd(),
+      create: (context) => LogUser(),
       builder: (context, child) => Scaffold(
         resizeToAvoidBottomInset: false,
         extendBodyBehindAppBar: true,
@@ -61,8 +74,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight),
           ),
-          child: Consumer<LogUserAdd>(
-            builder: (context, logUserAdd, child) => Stack(
+          child: Consumer<LogUser>(
+            builder: (context, logUser, child) => Stack(
               children: [
                 Positioned(
                   left: dw * 0.16,
@@ -97,52 +110,96 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                       child: Container(
                         decoration: BoxDecoration(
                           color: const Color.fromARGB(255, 255, 255, 255),
-                          borderRadius: BorderRadius.circular(25),
+                          borderRadius: BorderRadius.circular(15),
                         ),
                         height: 0.36 * dh,
                         width: 0.85 * dw,
                       ),
                     )),
-                Positioned(bottom: dh * 0.467, left: dw * 0.11, child: SlideTransition(position: slideAnimation, child: const LoginTextFields())),
+                Positioned(
+                    bottom: dh * 0.41,
+                    left: dw * 0.11,
+                    child: SlideTransition(
+                        position: slideAnimation,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            //Don't change this to constant! because i want to rebuilt all the widget with all the children, if it's constant, i can't rebuilt it!
+                            // ignore: prefer_const_constructors
+                            LoginTextFields(),
+                            Row(
+                              children: [
+                                Transform.scale(
+                                  scaleX: 1.1,
+                                  scaleY: 1.1,
+                                  child: Checkbox(
+                                    activeColor: const Color.fromARGB(255, 110, 30, 63),
+                                    value: rememberMe,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        rememberMe = value!;
+                                        log('$rememberMe');
+                                      });
+                                    },
+                                  ),
+                                ),
+                                Text(
+                                  'Remember me?',
+                                  style: GoogleFonts.acme(fontSize: 18),
+                                )
+                              ],
+                            )
+                          ],
+                        ))),
                 Positioned(
                   top: dh * 0.06,
                   width: 450,
                   child: FadeTransition(opacity: fadeAnimation, child: Image.asset('assets/images/streamers.png')),
                 ),
-                //Ballon
-                /*  Positioned(
-                    bottom: dh * 0.75,
-                    left: dw * -0.04,
-                    child: Image.asset(
-                      'assets/images/ballon1.png',
-                      width: 132,
-                      height: 132,
-                    )), */
-                Positioned(
-                    bottom: dh * 0.36,
-                    left: dw * 0.141,
-                    child: SlideTransition(
-                      position: slideAnimation,
-                      child: GradientButton(
-                        style: GoogleFonts.acme(color: Colors.white, fontSize: 27),
-                        width: dw * 0.7,
-                        height: dh * 0.05,
-                        'Login',
-                        onTap: () async {
-                          final functions = FirebaseFunctions.instanceFor(region: "europe-west1");
-                          try {
-                            final result = await functions.httpsCallable('loginUser').call({'username': logUserAdd.username, 'password': logUserAdd.password});
-                            FirebaseAuth.instance.signInWithCustomToken(result.data['token']);
-                          } on FirebaseFunctionsException catch (error) {
-                            setState(() {
-                              log(error.message!);
-                            });
-                          }
-                        },
-                        radius: 20,
-                        gradient: LinearGradient(colors: [Colors.amber, Colors.amber[800]!]),
-                      ),
-                    )),
+                StatefulBuilder(builder: (context, builderState) {
+                  return Positioned(
+                      bottom: loading ? dh * 0.28 : dh * 0.36,
+                      left: loading ? dw * 0.27 : dw * 0.141,
+                      child: SlideTransition(
+                        position: slideAnimation,
+                        child: !loading
+                            ? GradientButton(
+                                style: GoogleFonts.acme(color: Colors.white, fontSize: 27),
+                                width: dw * 0.7,
+                                height: dh * 0.05,
+                                'Login',
+                                onTap: () async {
+                                  log('Signing in...');
+                                  builderState(() {
+                                    loading = true;
+                                  });
+                                  try {
+                                    String token = await CloudHandler.loginUser(logUser.username!, logUser.password!);
+                                    builderState(() {
+                                      loading = false;
+                                    });
+                                    log('Success!');
+
+                                    await FirebaseAuth.instance.signInWithCustomToken(token);
+                                    if (!rememberMe) {
+                                      await storeShared();
+                                    }
+                                    Get.off(() => const MainMenuScreen());
+                                  } on FirebaseFunctionsException catch (error) {
+                                    setState(() {
+                                      loading = false;
+                                      logUser.showErrors(error.message!, context);
+                                      log(error.code);
+                                      log(error.message!);
+                                    });
+                                  }
+                                },
+                                radius: 15,
+                                gradient: LinearGradient(colors: [Colors.amber, Colors.amber[800]!]),
+                              )
+                            : Lottie.asset('assets/animations/linear_loading.json', width: 170, height: 170),
+                      ));
+                }),
                 Positioned(
                   bottom: dh * 0.2,
                   left: dw * 0.24,

@@ -3,20 +3,18 @@ import 'package:get/get.dart';
 
 import 'package:regexpattern/regexpattern.dart';
 
-class RegUserAdd with ChangeNotifier {
+class RegUser with ChangeNotifier {
   String? username;
   String? firstName;
   String? lastName;
   String? emailAddress;
-  int? gender = 2;
+  int? gender;
   String? phonenumber;
   int? age;
   String? password;
   String? confirmedPass;
-  //Monitors the states of the screens
-  int state = 0;
 
-  //Displays the text error from the HTTPS thrown ERRORS or Client side error inputs
+  //Handles all the errors, it Displays the text error from the HTTPS thrown ERRORS or Client side error inputs
   String? userError;
   String? emailError;
   String? phoneError;
@@ -118,24 +116,41 @@ class RegUserAdd with ChangeNotifier {
   }
 }
 
-class LogUserAdd with ChangeNotifier {
+class LogUser with ChangeNotifier {
   String? username;
   String? password;
-  String? textError;
+  String? userError;
+  String? passError;
 
-  String? getTextError(int field) {
-    switch (field) {
-      //username
-      case 0:
-        if (textError == 'Username doesn\'t exists.') {
-          return textError;
-        }
-        break;
-      case 1:
-        if (textError == 'password incorrect') {
-          return textError;
-        }
+  void showErrors(String message, BuildContext context) {
+    if (message == 'Username doesn\'t exists.') {
+      userError = message;
+    } else if (message == "Password incorrect.") {
+      passError = message;
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(
+        'Error: $message',
+        style: const TextStyle(color: Colors.red),
+      )));
     }
+  }
+
+  String? validateUser() {
+    if (username == null || username!.isEmpty) {
+      userError = 'please fill in the username Field.';
+      return 'please fill in the username Field.';
+    }
+    userError = null;
+    return null;
+  }
+
+  String? validatePass() {
+    if (password == null || password!.isEmpty) {
+      passError = 'please fill in the Password Field.';
+      return 'please fill in the Password Field.';
+    }
+    passError = null;
     return null;
   }
 }

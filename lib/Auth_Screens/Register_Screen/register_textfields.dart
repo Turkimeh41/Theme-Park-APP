@@ -1,14 +1,16 @@
 import 'dart:developer';
 
-import 'package:final_project/Provider/useraddProviders.dart';
+import 'package:final_project/Auth_Screens/Register_Screen/verifynumberscreen.dart';
+import 'package:final_project/Provider/cloud_handler.dart';
+import 'package:final_project/Provider/userauth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import 'package:final_project/Customs/GradientButton.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:final_project/Customs/gradientbutton.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:lottie/lottie.dart';
+import 'package:get/get.dart';
 
 class RegisterTextFields extends StatefulWidget {
   const RegisterTextFields({required this.slideAnimation, super.key});
@@ -73,10 +75,10 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
     lastFocus.addListener(() {
       setState(() {});
     });
-    femaleController.addListener(() {
+    maleController.addListener(() {
       setState(() {});
     });
-    femalecolorAnimation.addListener(() {
+    femaleController.addListener(() {
       setState(() {});
     });
     super.initState();
@@ -88,14 +90,23 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
     maleController.dispose();
     firstFieldsController.dispose();
     secondFieldsController.dispose();
+
     super.dispose();
+  }
+
+  bool validateAndSave() {
+    if (!key.currentState!.validate()) {
+      return false;
+    }
+    key.currentState!.save();
+    return true;
   }
 
   @override
   Widget build(BuildContext context) {
     final dh = MediaQuery.of(context).size.height;
     final dw = MediaQuery.of(context).size.width;
-    final insRegUserAdd = Provider.of<RegUserAdd>(context, listen: false);
+    final insRegUser = Provider.of<RegUser>(context, listen: false);
     return SlideTransition(
       position: widget.slideAnimation,
       child: Form(
@@ -148,9 +159,9 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                           height: 0.08 * dh,
                           width: dw * 0.42,
                           child: TextFormField(
-                              initialValue: insRegUserAdd.firstName,
+                              initialValue: insRegUser.firstName,
                               onChanged: (value) {
-                                insRegUserAdd.firstName = value;
+                                insRegUser.firstName = value;
                               },
                               style: GoogleFonts.alef(fontSize: 16),
                               focusNode: firstFocus,
@@ -182,9 +193,9 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                           height: 0.08 * dh,
                           width: dw * 0.42,
                           child: TextFormField(
-                              initialValue: insRegUserAdd.lastName,
+                              initialValue: insRegUser.lastName,
                               onChanged: (value) {
-                                insRegUserAdd.lastName = value;
+                                insRegUser.lastName = value;
                               },
                               style: GoogleFonts.alef(fontSize: 16),
                               focusNode: lastFocus,
@@ -220,32 +231,39 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
 
                           SizedBox(
                             height: dh * 0.1,
-                            child: TextFormField(
-                                validator: (value) => insRegUserAdd.validateUser(),
-                                initialValue: insRegUserAdd.username,
-                                onChanged: (value) {
-                                  insRegUserAdd.username = value;
-                                },
-                                style: GoogleFonts.alef(fontSize: 18),
-                                focusNode: userFocus,
-                                decoration: InputDecoration(
-                                  errorText: insRegUserAdd.userError,
-                                  prefixIcon: Icon(
-                                    Icons.verified_user_outlined,
-                                    size: 28,
-                                    color: userFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100),
-                                  ),
-                                  filled: true,
-                                  fillColor: const Color.fromARGB(255, 224, 224, 224),
-                                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
-                                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
-                                  errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
-                                  focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
-                                  labelText: 'Username',
-                                  errorStyle: const TextStyle(fontSize: 10),
-                                  labelStyle: GoogleFonts.acme(
-                                      fontSize: userFocus.hasFocus ? 22 : 16, color: userFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100)),
-                                )),
+                            child: StatefulBuilder(builder: (context, buildState) {
+                              return TextFormField(
+                                  validator: (value) => insRegUser.validateUser(),
+                                  initialValue: insRegUser.username,
+                                  onChanged: (value) {
+                                    if (insRegUser.userError != null) {
+                                      buildState(() {
+                                        insRegUser.userError = null;
+                                      });
+                                    }
+                                    insRegUser.username = value;
+                                  },
+                                  style: GoogleFonts.alef(fontSize: 18),
+                                  focusNode: userFocus,
+                                  decoration: InputDecoration(
+                                    errorText: insRegUser.userError,
+                                    prefixIcon: Icon(
+                                      Icons.verified_user_outlined,
+                                      size: 28,
+                                      color: userFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100),
+                                    ),
+                                    filled: true,
+                                    fillColor: const Color.fromARGB(255, 224, 224, 224),
+                                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+                                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+                                    errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+                                    focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+                                    labelText: 'Username',
+                                    errorStyle: const TextStyle(fontSize: 10),
+                                    labelStyle: GoogleFonts.acme(
+                                        fontSize: userFocus.hasFocus ? 22 : 16, color: userFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100)),
+                                  ));
+                            }),
                           ),
 
                           SizedBox(
@@ -253,74 +271,85 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                           ),
 
                           //PASSWORD
-
                           SizedBox(
                             height: dh * 0.09,
-                            child: TextFormField(
-                                validator: (value) => insRegUserAdd.validatePass(),
-                                initialValue: insRegUserAdd.password,
-                                onChanged: (value) {
-                                  insRegUserAdd.password = value;
-                                },
-                                style: GoogleFonts.alef(fontSize: 18),
-                                obscureText: true,
-                                focusNode: passFocus,
-                                decoration: InputDecoration(
-                                  errorText: insRegUserAdd.passError,
-                                  prefixIcon: Icon(
-                                    Icons.lock_sharp,
-                                    size: 28,
-                                    color: passFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100),
-                                  ),
-                                  filled: true,
-                                  fillColor: const Color.fromARGB(255, 224, 224, 224),
-                                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
-                                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
-                                  errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
-                                  focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
-                                  errorStyle: const TextStyle(fontSize: 9),
-                                  labelText: 'Password',
-                                  labelStyle: GoogleFonts.acme(
-                                      fontSize: passFocus.hasFocus ? 22 : 16, color: passFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100)),
-                                )),
+                            child: StatefulBuilder(builder: (context, buildState) {
+                              return TextFormField(
+                                  validator: (value) => insRegUser.validatePass(),
+                                  initialValue: insRegUser.password,
+                                  onChanged: (value) {
+                                    if (insRegUser.passError != null) {
+                                      buildState(() {
+                                        insRegUser.passError = null;
+                                      });
+                                    }
+                                    insRegUser.password = value;
+                                  },
+                                  style: GoogleFonts.alef(fontSize: 18),
+                                  obscureText: true,
+                                  focusNode: passFocus,
+                                  decoration: InputDecoration(
+                                    errorText: insRegUser.passError,
+                                    prefixIcon: Icon(
+                                      Icons.lock_sharp,
+                                      size: 28,
+                                      color: passFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100),
+                                    ),
+                                    filled: true,
+                                    fillColor: const Color.fromARGB(255, 224, 224, 224),
+                                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+                                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+                                    errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+                                    focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+                                    errorStyle: const TextStyle(fontSize: 9),
+                                    labelText: 'Password',
+                                    labelStyle: GoogleFonts.acme(
+                                        fontSize: passFocus.hasFocus ? 22 : 16, color: passFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100)),
+                                  ));
+                            }),
                           ),
 
                           SizedBox(
                             height: dh * 0.03,
                           ),
-
                           //CONFIRM PASSWORD
-
                           SizedBox(
                             height: dh * 0.09,
-                            child: TextFormField(
-                                initialValue: insRegUserAdd.confirmedPass,
-                                validator: (value) => insRegUserAdd.validateConfirmPass(),
-                                onChanged: (value) {
-                                  insRegUserAdd.confirmedPass = value;
-                                },
-                                style: GoogleFonts.alef(fontSize: 18),
-                                obscureText: true,
-                                focusNode: confirmpassFocus,
-                                decoration: InputDecoration(
-                                  errorText: insRegUserAdd.rePassError,
-                                  prefixIcon: Icon(
-                                    Icons.lock_sharp,
-                                    size: 28,
-                                    color: confirmpassFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100),
-                                  ),
-                                  filled: true,
-                                  fillColor: const Color.fromARGB(255, 224, 224, 224),
-                                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
-                                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
-                                  errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
-                                  focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
-                                  labelText: 'Confirm Password',
-                                  errorStyle: const TextStyle(fontSize: 9),
-                                  labelStyle: GoogleFonts.acme(
-                                      fontSize: confirmpassFocus.hasFocus ? 22 : 16,
-                                      color: confirmpassFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100)),
-                                )),
+                            child: StatefulBuilder(builder: (context, buildState) {
+                              return TextFormField(
+                                  initialValue: insRegUser.confirmedPass,
+                                  validator: (value) => insRegUser.validateConfirmPass(),
+                                  onChanged: (value) {
+                                    if (insRegUser.rePassError != null) {
+                                      buildState(() {
+                                        insRegUser.rePassError = null;
+                                      });
+                                    }
+                                    insRegUser.confirmedPass = value;
+                                  },
+                                  style: GoogleFonts.alef(fontSize: 18),
+                                  obscureText: true,
+                                  focusNode: confirmpassFocus,
+                                  decoration: InputDecoration(
+                                    errorText: insRegUser.rePassError,
+                                    prefixIcon: Icon(
+                                      Icons.lock_sharp,
+                                      size: 28,
+                                      color: confirmpassFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100),
+                                    ),
+                                    filled: true,
+                                    fillColor: const Color.fromARGB(255, 224, 224, 224),
+                                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+                                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+                                    errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+                                    focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+                                    labelText: 'Confirm Password',
+                                    errorStyle: const TextStyle(fontSize: 9),
+                                    labelStyle: GoogleFonts.acme(
+                                        fontSize: confirmpassFocus.hasFocus ? 22 : 16,
+                                        color: confirmpassFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100)),
+                                  ));
+                            }),
                           ),
                         ]),
                       ),
@@ -344,33 +373,40 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                           SizedBox(
                             height: dh * 0.11,
                             //EMAIL ADDRESS
-                            child: TextFormField(
-                                validator: (value) => insRegUserAdd.validateEmail(),
-                                keyboardType: TextInputType.emailAddress,
-                                initialValue: insRegUserAdd.emailAddress,
-                                onChanged: (value) {
-                                  insRegUserAdd.emailAddress = value;
-                                },
-                                style: GoogleFonts.alef(fontSize: 18),
-                                focusNode: emailFocus,
-                                decoration: InputDecoration(
-                                  errorText: insRegUserAdd.emailError,
-                                  prefixIcon: Icon(
-                                    Icons.email,
-                                    size: 28,
-                                    color: emailFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100),
-                                  ),
-                                  filled: true,
-                                  fillColor: const Color.fromARGB(255, 224, 224, 224),
-                                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
-                                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
-                                  errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
-                                  focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
-                                  errorStyle: const TextStyle(fontSize: 10),
-                                  labelText: 'Email Address',
-                                  labelStyle: GoogleFonts.acme(
-                                      fontSize: emailFocus.hasFocus ? 22 : 16, color: emailFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100)),
-                                )),
+                            child: StatefulBuilder(builder: (context, buildState) {
+                              return TextFormField(
+                                  validator: (value) => insRegUser.validateEmail(),
+                                  keyboardType: TextInputType.emailAddress,
+                                  initialValue: insRegUser.emailAddress,
+                                  onChanged: (value) {
+                                    if (insRegUser.emailError != null) {
+                                      buildState(() {
+                                        insRegUser.emailError = null;
+                                      });
+                                    }
+                                    insRegUser.emailAddress = value;
+                                  },
+                                  style: GoogleFonts.alef(fontSize: 18),
+                                  focusNode: emailFocus,
+                                  decoration: InputDecoration(
+                                    errorText: insRegUser.emailError,
+                                    prefixIcon: Icon(
+                                      Icons.email,
+                                      size: 28,
+                                      color: emailFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100),
+                                    ),
+                                    filled: true,
+                                    fillColor: const Color.fromARGB(255, 224, 224, 224),
+                                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+                                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+                                    errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+                                    focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+                                    errorStyle: const TextStyle(fontSize: 10),
+                                    labelText: 'Email Address',
+                                    labelStyle: GoogleFonts.acme(
+                                        fontSize: emailFocus.hasFocus ? 22 : 16, color: emailFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100)),
+                                  ));
+                            }),
                           ),
                           SizedBox(
                             height: dh * 0.015,
@@ -378,19 +414,24 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                           //Phone Number
                           SizedBox(
                             height: dh * 0.11,
-                            child: StatefulBuilder(builder: (context, setStater) {
+                            child: StatefulBuilder(builder: (context, buildState) {
                               return TextFormField(
-                                  validator: (value) => insRegUserAdd.validatePhoneNumber(),
+                                  validator: (value) => insRegUser.validatePhoneNumber(),
                                   inputFormatters: [maskFormatter],
                                   keyboardType: TextInputType.number,
-                                  initialValue: insRegUserAdd.phonenumber,
+                                  initialValue: insRegUser.phonenumber,
                                   onChanged: (value) {
-                                    insRegUserAdd.phonenumber = value;
+                                    if (insRegUser.phoneError != null) {
+                                      buildState(() {
+                                        insRegUser.phoneError = null;
+                                      });
+                                    }
+                                    insRegUser.phonenumber = value;
                                   },
                                   style: GoogleFonts.alef(fontSize: 18),
                                   focusNode: phoneFocus,
                                   decoration: InputDecoration(
-                                    errorText: insRegUserAdd.phoneError,
+                                    errorText: insRegUser.phoneError,
                                     prefix: Text(
                                       '+966  ',
                                       style: TextStyle(color: phoneFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 0, 0, 0)),
@@ -426,53 +467,54 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                           ),
                           //Gender SWITCHER
                           SizedBox(
-                              child: Row(children: [
-                            InkWell(
-                              onTap: () {
-                                setState(() {
-                                  insRegUserAdd.gender = 0;
-                                  maleController.forward();
-                                  femaleController.reverse();
-                                });
-                              },
-                              child: Column(children: [
-                                Icon(
-                                  Icons.male,
-                                  color: malecolorAnimation.value,
-                                ),
-                                Image.asset(
-                                  'assets/images/male.png',
-                                  color: malecolorAnimation.value,
-                                  width: 96,
-                                  height: 96,
-                                )
-                              ]),
-                            ),
-                            SizedBox(
-                              width: dw * 0.3,
-                            ),
-                            SizedBox(
-                              child: InkWell(
+                            child: Row(children: [
+                              InkWell(
                                 onTap: () {
-                                  insRegUserAdd.gender = 1;
-                                  femaleController.forward();
-                                  maleController.reverse();
+                                  setState(() {
+                                    insRegUser.gender = 0;
+                                    maleController.forward();
+                                    femaleController.reverse();
+                                  });
                                 },
                                 child: Column(children: [
                                   Icon(
-                                    Icons.female,
-                                    color: femalecolorAnimation.value,
+                                    Icons.male,
+                                    color: malecolorAnimation.value,
                                   ),
                                   Image.asset(
-                                    'assets/images/female.png',
-                                    color: femalecolorAnimation.value,
+                                    'assets/images/male.png',
+                                    color: malecolorAnimation.value,
                                     width: 96,
                                     height: 96,
                                   )
                                 ]),
                               ),
-                            )
-                          ])),
+                              SizedBox(
+                                width: dw * 0.3,
+                              ),
+                              SizedBox(
+                                child: InkWell(
+                                  onTap: () {
+                                    insRegUser.gender = 1;
+                                    femaleController.forward();
+                                    maleController.reverse();
+                                  },
+                                  child: Column(children: [
+                                    Icon(
+                                      Icons.female,
+                                      color: femalecolorAnimation.value,
+                                    ),
+                                    Image.asset(
+                                      'assets/images/female.png',
+                                      color: femalecolorAnimation.value,
+                                      width: 96,
+                                      height: 96,
+                                    )
+                                  ]),
+                                ),
+                              )
+                            ]),
+                          ),
                         ],
                       ),
                     ),
@@ -578,34 +620,28 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                                   height: dh * 0.05,
                                   'Register',
                                   onTap: () async {
+                                    //set state of the statefulbuilder
                                     changeLoading(
                                       () {
                                         loading = true;
                                       },
                                     );
-                                    final isValid = key.currentState!.validate();
-                                    if (isValid) {
-                                      key.currentState!.save();
-                                      final functions = FirebaseFunctions.instanceFor(region: "europe-west1");
+                                    if (validateAndSave()) {
                                       try {
-                                        final response = await functions.httpsCallable('addUser').call({
-                                          'username': insRegUserAdd.username,
-                                          'password': insRegUserAdd.password,
-                                          'first_name': insRegUserAdd.firstName,
-                                          'last_name': insRegUserAdd.lastName,
-                                          'emailAddress': insRegUserAdd.emailAddress,
-                                          'gender': insRegUserAdd.gender,
-                                          'number': insRegUserAdd.phonenumber
-                                        });
-                                        FirebaseAuth.instance.signInWithCustomToken(response.data['token']);
+                                        await CloudHandler.userExists(insRegUser.username!, insRegUser.emailAddress!, insRegUser.phonenumber!);
+                                        log('User doesn\'nt exists!, good.');
+                                        String smsCode = await CloudHandler.sendSMSTwilio(insRegUser.phonenumber!);
+                                        log('Message should be sent!');
+                                        Get.to(() => VerifyNumber(insRegUser, smsCode));
                                       } on FirebaseFunctionsException catch (error) {
                                         setState(() {
                                           log(error.message!);
                                           log(error.code);
-                                          insRegUserAdd.showErrors(error.message!);
+                                          insRegUser.showErrors(error.message!);
                                         });
                                       }
                                     }
+                                    //set state of the statefulbuilder
                                     changeLoading(
                                       () {
                                         loading = false;

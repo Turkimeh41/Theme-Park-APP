@@ -46,6 +46,9 @@ dependencies:
   mask_text_input_formatter: ^2.4.0
   regexpattern: ^2.1.0
   lottie: ^2.3.0
+  glassmorphism: ^3.0.0
+  flutter_keyboard_visibility: ^5.4.0
+  nice_buttons: ^0.0.2
 
 dev_dependencies:
   flutter_test:

@@ -1,15 +1,13 @@
+// ignore: unused_import
 import 'dart:developer';
 
 import 'package:final_project/Auth_Screens/Login_Screen/login_screen.dart';
 import 'package:final_project/Auth_Screens/Register_Screen/register_textfields.dart';
-import 'package:final_project/Provider/useraddProviders.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:final_project/Provider/userauth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:final_project/Customs/GradientButton.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -48,7 +46,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
     final dh = MediaQuery.of(context).size.height;
     final dw = MediaQuery.of(context).size.width;
     return ChangeNotifierProvider(
-        create: (context) => RegUserAdd(),
+        create: (context) => RegUser(),
         builder: (context, child) => Scaffold(
             resizeToAvoidBottomInset: false,
             extendBodyBehindAppBar: true,
@@ -97,7 +95,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                   RegisterTextFields(
                     slideAnimation: slideAnimation,
                   ),
-
+                  //Change to LoginPage
                   Positioned(
                     bottom: dh * 0.03,
                     left: dw * 0.04,
