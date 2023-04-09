@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -33,7 +35,7 @@ class _LoginTextFieldsState extends State<LoginTextFields> {
     final dw = MediaQuery.of(context).size.width;
     return Consumer<LogUser>(
       builder: (context, insLogUser, child) => Form(
-        key: key,
+        key: insLogUser.formKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -42,6 +44,7 @@ class _LoginTextFieldsState extends State<LoginTextFields> {
               width: dw * 0.75,
               child: StatefulBuilder(builder: (context, buildState) {
                 return TextFormField(
+                    validator: (value) => insLogUser.validateUser(),
                     onChanged: (value) {
                       if (insLogUser.userError != null) {
                         buildState(() {
@@ -80,8 +83,10 @@ class _LoginTextFieldsState extends State<LoginTextFields> {
               width: dw * 0.75,
               child: StatefulBuilder(builder: (context, buildState) {
                 return TextFormField(
+                    validator: (value) => insLogUser.validatePass(),
                     onChanged: (value) {
                       if (insLogUser.passError != null) {
+                        log('hi');
                         buildState(() {
                           insLogUser.passError = null;
                         });
@@ -92,7 +97,7 @@ class _LoginTextFieldsState extends State<LoginTextFields> {
                     obscureText: true,
                     focusNode: passFocus,
                     decoration: InputDecoration(
-                      errorText: insLogUser.passError,
+                      errorText: null,
                       prefixIcon: Icon(
                         Icons.lock_sharp,
                         size: passFocus.hasFocus ? 36 : 28,
@@ -109,9 +114,6 @@ class _LoginTextFieldsState extends State<LoginTextFields> {
                       labelStyle: GoogleFonts.acme(fontSize: passFocus.hasFocus ? 26 : 20, color: passFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : Colors.grey),
                     ));
               }),
-            ),
-            SizedBox(
-              height: dh * 0.001,
             ),
           ],
         ),

@@ -121,6 +121,7 @@ class LogUser with ChangeNotifier {
   String? password;
   String? userError;
   String? passError;
+  final formKey = GlobalKey<FormState>();
 
   void showErrors(String message, BuildContext context) {
     if (message == 'Username doesn\'t exists.') {
@@ -152,5 +153,13 @@ class LogUser with ChangeNotifier {
     }
     passError = null;
     return null;
+  }
+
+  bool validateForm() {
+    if (!formKey.currentState!.validate()) {
+      return false;
+    }
+    formKey.currentState!.save();
+    return true;
   }
 }

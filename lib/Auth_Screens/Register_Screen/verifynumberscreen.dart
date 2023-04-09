@@ -1,6 +1,6 @@
-import 'package:final_project/Customs/gradientbutton.dart';
+import 'package:final_project/Handler/api_handler.dart';
 import 'package:final_project/Page_View/pageview_screen.dart';
-import 'package:final_project/Provider/cloud_handler.dart';
+import 'package:final_project/Handler/cloud_handler.dart';
 import 'package:final_project/Main_Menu/mainmenu_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:final_project/Provider/userauth_provider.dart';
@@ -9,6 +9,7 @@ import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
+import 'package:nice_buttons/nice_buttons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:ui';
@@ -31,8 +32,13 @@ class _VerifyNumberState extends State<VerifyNumber> with TickerProviderStateMix
   String? digit2;
   String? digit3;
   String? digit4;
+  bool error1 = false;
+  bool error2 = false;
+  bool error3 = false;
+  bool error4 = false;
   bool visible = false;
   bool loading = false;
+
   String smsInput = '';
   late StreamSubscription<bool> keyboardlistener;
   late AnimationController fadeController;
@@ -42,6 +48,7 @@ class _VerifyNumberState extends State<VerifyNumber> with TickerProviderStateMix
   double textMargin = 0;
   double otpMargin = 0;
   double buttonMargin = 0;
+
   @override
   void initState() {
     // var dw = (window.physicalSize.shortestSide / window.devicePixelRatio);
@@ -51,7 +58,7 @@ class _VerifyNumberState extends State<VerifyNumber> with TickerProviderStateMix
     sizeController = AnimationController(vsync: this, duration: const Duration(milliseconds: 600));
     sizeAnimation = Tween<Size>(begin: Size(double.infinity, dh), end: Size(double.infinity, dh * 0.4)).animate(CurvedAnimation(parent: sizeController, curve: Curves.linear));
 
-    KeyboardVisibilityController().onChange.listen((visible) {
+    keyboardlistener = KeyboardVisibilityController().onChange.listen((visible) {
       if (visible) {
         log('Running forward animations');
         fadeController.forward();
@@ -67,11 +74,11 @@ class _VerifyNumberState extends State<VerifyNumber> with TickerProviderStateMix
       if (sizeController.status == AnimationStatus.forward) {
         textMargin = textMargin + 0.8;
         otpMargin = otpMargin + 2.8;
-        buttonMargin = buttonMargin + 3.4;
+        buttonMargin = buttonMargin + 4.2;
       } else if (sizeController.status == AnimationStatus.reverse) {
         textMargin = textMargin - 0.8;
         otpMargin = otpMargin - 2.8;
-        buttonMargin = buttonMargin - 3.4;
+        buttonMargin = buttonMargin - 4.2;
       }
     });
     //invokes whenever the status changes
@@ -79,6 +86,7 @@ class _VerifyNumberState extends State<VerifyNumber> with TickerProviderStateMix
       if (sizeController.status == AnimationStatus.dismissed) {
         textMargin = 0;
         otpMargin = 0;
+        buttonMargin = 0;
       }
     });
     super.initState();
@@ -88,15 +96,18 @@ class _VerifyNumberState extends State<VerifyNumber> with TickerProviderStateMix
   void dispose() {
     fadeController.dispose();
     sizeController.dispose();
+    keyboardlistener.cancel();
+
     super.dispose();
   }
 
-  bool validateAndSave() {
+  bool validate() {
     bool isvalid = key.currentState!.validate();
     if (!isvalid) {
+      log('user validation: wrong');
       return false;
     }
-    key.currentState!.save();
+    log('user validation: correct');
     return true;
   }
 
@@ -104,6 +115,35 @@ class _VerifyNumberState extends State<VerifyNumber> with TickerProviderStateMix
     final last4Digits = phone.substring(phone.length - 4);
     final asterisks = '*' * (phone.length - 4);
     return '$asterisks$last4Digits';
+  }
+
+  String? fieldValidator(int field, digit) {
+    switch (field) {
+      case 1:
+        if (digit!.isEmpty) {
+          error1 = true;
+          return '';
+        }
+        break;
+      case 2:
+        if (digit!.isEmpty) {
+          error2 = true;
+          return '';
+        }
+        break;
+      case 3:
+        if (digit!.isEmpty) {
+          error3 = true;
+          return '';
+        }
+        break;
+      case 4:
+        if (digit!.isEmpty) {
+          error4 = true;
+          return '';
+        }
+    }
+    return null;
   }
 
   @override
@@ -125,18 +165,21 @@ class _VerifyNumberState extends State<VerifyNumber> with TickerProviderStateMix
           child: Stack(
             children: [
               Positioned(
-                top: 0 * dh * 0.04,
-                left: 0,
+                top: dh * 0.05,
+                left: dw * 0.03,
                 child: Row(
                   children: [
                     IconButton(
                         onPressed: () {
                           Get.back();
                         },
-                        icon: const Icon(
-                          Icons.arrow_back,
-                          color: Colors.white,
-                          size: 36,
+                        icon: Transform.scale(
+                          scaleX: -1,
+                          child: const Icon(
+                            Icons.arrow_right_alt_sharp,
+                            color: Colors.white,
+                            size: 48,
+                          ),
                         )),
                   ],
                 ),
@@ -178,9 +221,9 @@ class _VerifyNumberState extends State<VerifyNumber> with TickerProviderStateMix
                       left: dw * 0.07,
                       child: RichText(
                           text: TextSpan(children: [
-                        TextSpan(text: 'We\'ve Sent a verifcation code to the number: ', style: GoogleFonts.roboto(fontSize: 18)),
-                        const TextSpan(text: '\n'), //${formatphone(widget.user.phonenumber!)}
-                        TextSpan(text: '(+966) 549664323', style: GoogleFonts.acme(color: const Color.fromARGB(255, 245, 228, 172), fontSize: 24))
+                        TextSpan(text: 'We\'ve Sent a verifcation code to number: ', style: GoogleFonts.roboto(fontSize: 18)),
+                        const TextSpan(text: '\n'), //
+                        TextSpan(text: '(+966) ${formatphone(widget.user.phonenumber!)}', style: GoogleFonts.acme(color: const Color.fromARGB(255, 245, 228, 172), fontSize: 24))
                       ])),
                     );
                   }),
@@ -194,114 +237,120 @@ class _VerifyNumberState extends State<VerifyNumber> with TickerProviderStateMix
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Container(
-                            alignment: Alignment.center,
-                            width: dw * 0.16,
-                            height: dh * 0.09,
-                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-                            child: TextFormField(
-                              onSaved: (value) {
-                                digit1 = value;
-                              },
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return '';
-                                }
-                                return null;
-                              },
-                              keyboardType: TextInputType.number,
-                              textAlign: TextAlign.center,
-                              decoration: const InputDecoration(border: UnderlineInputBorder(borderSide: BorderSide.none)),
-                              inputFormatters: [maskFormatter],
-                              style: const TextStyle(fontSize: 36),
-                              onChanged: (value) {
-                                if (value.length == 1) {
-                                  FocusScope.of(context).nextFocus();
-                                }
-                              },
-                            ),
+                          StatefulBuilder(builder: (context, setStateful) {
+                            return Container(
+                              width: dw * 0.16,
+                              height: dh * 0.09,
+                              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: error1 ? Border.all(color: Colors.red, width: 2.5) : null),
+                              child: TextFormField(
+                                initialValue: digit1,
+                                validator: (value) => fieldValidator(1, value),
+                                keyboardType: TextInputType.number,
+                                textAlign: TextAlign.center,
+                                decoration: const InputDecoration(border: UnderlineInputBorder(borderSide: BorderSide.none)),
+                                inputFormatters: [maskFormatter],
+                                style: GoogleFonts.acme(fontSize: 42),
+                                onChanged: (value) {
+                                  digit1 = value;
+                                  if (error1) {
+                                    setStateful(() {
+                                      error1 = false;
+                                    });
+                                  }
+                                  if (value.length == 1) {
+                                    FocusScope.of(context).nextFocus();
+                                  }
+                                },
+                              ),
+                            );
+                          }),
+                          StatefulBuilder(
+                            builder: (context, setStateful) {
+                              return Container(
+                                width: dw * 0.16,
+                                height: dh * 0.09,
+                                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: error2 ? Border.all(color: Colors.red, width: 2.5) : null),
+                                child: TextFormField(
+                                  initialValue: digit2,
+                                  validator: (value) => fieldValidator(2, value),
+                                  keyboardType: TextInputType.number,
+                                  textAlign: TextAlign.center,
+                                  decoration: const InputDecoration(
+                                    border: UnderlineInputBorder(borderSide: BorderSide.none),
+                                  ),
+                                  inputFormatters: [maskFormatter],
+                                  style: GoogleFonts.acme(fontSize: 42),
+                                  onChanged: (value) {
+                                    digit2 = value;
+                                    if (error2) {
+                                      setStateful(() {
+                                        error2 = false;
+                                      });
+                                    }
+                                    if (value.length == 1) {
+                                      FocusScope.of(context).nextFocus();
+                                    }
+                                  },
+                                ),
+                              );
+                            },
                           ),
-                          Container(
-                            alignment: Alignment.center,
-                            width: dw * 0.16,
-                            height: dh * 0.09,
-                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-                            child: TextFormField(
-                              onSaved: (value) {
-                                digit2 = value;
-                              },
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return '';
-                                }
-                                return null;
-                              },
-                              keyboardType: TextInputType.number,
-                              textAlign: TextAlign.center,
-                              decoration: const InputDecoration(border: UnderlineInputBorder(borderSide: BorderSide.none)),
-                              inputFormatters: [maskFormatter],
-                              style: const TextStyle(fontSize: 36),
-                              onChanged: (value) {
-                                if (value.length == 1) {
-                                  FocusScope.of(context).nextFocus();
-                                }
-                              },
-                            ),
-                          ),
-                          Container(
-                            alignment: Alignment.center,
-                            width: dw * 0.16,
-                            height: dh * 0.09,
-                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-                            child: TextFormField(
-                              onSaved: (value) {
-                                digit3 = value;
-                              },
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return '';
-                                }
-                                return null;
-                              },
-                              keyboardType: TextInputType.number,
-                              textAlign: TextAlign.center,
-                              decoration: const InputDecoration(border: UnderlineInputBorder(borderSide: BorderSide.none)),
-                              inputFormatters: [maskFormatter],
-                              style: const TextStyle(fontSize: 36),
-                              onChanged: (value) {
-                                if (value.length == 1) {
-                                  FocusScope.of(context).nextFocus();
-                                }
-                              },
-                            ),
-                          ),
-                          Container(
-                            alignment: Alignment.center,
-                            width: dw * 0.16,
-                            height: dh * 0.09,
-                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-                            child: TextFormField(
-                              onSaved: (value) {
-                                digit4 = value;
-                              },
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return '';
-                                }
-                                return null;
-                              },
-                              keyboardType: TextInputType.number,
-                              textAlign: TextAlign.center,
-                              decoration: const InputDecoration(border: UnderlineInputBorder(borderSide: BorderSide.none)),
-                              inputFormatters: [maskFormatter],
-                              style: const TextStyle(fontSize: 36),
-                              onChanged: (value) {
-                                if (value.length == 1) {
-                                  FocusScope.of(context).nextFocus();
-                                }
-                              },
-                            ),
-                          ),
+                          StatefulBuilder(builder: (context, setStateful) {
+                            return Container(
+                              width: dw * 0.16,
+                              height: dh * 0.09,
+                              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: error3 ? Border.all(color: Colors.red, width: 2.5) : null),
+                              child: TextFormField(
+                                validator: (value) => fieldValidator(3, value),
+                                initialValue: digit3,
+                                keyboardType: TextInputType.number,
+                                textAlign: TextAlign.center,
+                                decoration: const InputDecoration(border: UnderlineInputBorder(borderSide: BorderSide.none)),
+                                inputFormatters: [maskFormatter],
+                                style: GoogleFonts.acme(fontSize: 42),
+                                onChanged: (value) {
+                                  digit3 = value;
+                                  if (error3) {
+                                    setStateful(() {
+                                      error3 = false;
+                                    });
+                                  }
+                                  if (value.length == 1) {
+                                    FocusScope.of(context).nextFocus();
+                                  }
+                                },
+                              ),
+                            );
+                          }),
+                          StatefulBuilder(builder: (context, setStateful) {
+                            return Container(
+                              width: dw * 0.16,
+                              height: dh * 0.09,
+                              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: error4 ? Border.all(color: Colors.red, width: 2.5) : null),
+                              child: TextFormField(
+                                initialValue: digit4,
+                                validator: (value) => fieldValidator(4, value),
+                                keyboardType: TextInputType.number,
+                                textAlign: TextAlign.center,
+                                decoration: const InputDecoration(
+                                  border: UnderlineInputBorder(borderSide: BorderSide.none),
+                                ),
+                                inputFormatters: [maskFormatter],
+                                style: GoogleFonts.acme(fontSize: 42),
+                                onChanged: (value) {
+                                  digit4 = value;
+                                  if (error4) {
+                                    setStateful(() {
+                                      error4 = false;
+                                    });
+                                  }
+                                  if (value.length == 1) {
+                                    FocusScope.of(context).nextFocus();
+                                  }
+                                },
+                              ),
+                            );
+                          }),
                         ],
                       ));
                 },
@@ -311,63 +360,71 @@ class _VerifyNumberState extends State<VerifyNumber> with TickerProviderStateMix
                   animation: sizeController,
                   builder: (context, child) {
                     return Positioned(
-                      top: sizeAnimation.value.height * 0.7 + buttonMargin,
-                      left: dw * 0.3,
+                      top: sizeAnimation.value.height * 0.85 + buttonMargin,
+                      left: dw * 0.245,
                       child: StatefulBuilder(builder: (context, builderState) {
                         return !loading
-                            ? Column(
-                                children: [
-                                  SizedBox(
-                                    height: dh * 0.15,
-                                  ),
-                                  GradientButton(
-                                    style: GoogleFonts.acme(fontSize: 28, color: Colors.white),
-                                    gradient: LinearGradient(colors: [Colors.amber, Colors.amber[700]!]),
-                                    height: 50,
-                                    width: 150,
-                                    radius: 15,
-                                    'Submit',
-                                    onTap: () async {
-                                      if (validateAndSave()) {
+                            ? NiceButtons(
+                                borderColor: Colors.amber[900]!,
+                                gradientOrientation: GradientOrientation.Horizontal,
+                                startColor: Colors.amber,
+                                endColor: Colors.amber[800]!,
+                                stretch: false,
+                                height: 50,
+                                width: 200,
+                                child: Text(
+                                  'Submit',
+                                  style: GoogleFonts.acme(color: Colors.white, fontSize: 28),
+                                ),
+                                onTap: (_) async {
+                                  if (validate()) {
+                                    builderState(() {
+                                      loading = true;
+                                    });
+                                    smsInput = digit1! + digit2! + digit3! + digit4!;
+                                    log(smsInput);
+                                    log(widget.smsCode);
+                                    if (smsInput == widget.smsCode) {
+                                      log('adding User...');
+                                      try {
+                                        //add user function, will add user then logs
+                                        Map<String, dynamic> returned = await CloudHandler.addUser(widget.user.username!, widget.user.password!, widget.user.firstName!, widget.user.lastName!,
+                                            widget.user.emailAddress!, widget.user.phonenumber!, widget.user.gender!);
+                                        log('Success!');
                                         builderState(() {
-                                          loading = true;
+                                          loading = false;
                                         });
-                                        smsInput = digit1! + digit2! + digit3! + digit4!;
-                                        log(smsInput);
-                                        log(widget.smsCode);
-                                        if (smsInput == widget.smsCode) {
-                                          log('adding User...');
-                                          try {
-                                            String token = await CloudHandler.addUser(widget.user.username!, widget.user.password!, widget.user.firstName!, widget.user.lastName!,
-                                                widget.user.emailAddress!, widget.user.phonenumber!, widget.user.gender!);
-                                            log('Success!');
-                                            builderState(() {
-                                              loading = false;
-                                            });
-                                            await FirebaseAuth.instance.signInWithCustomToken(token);
-                                            log('Signing in...');
-                                            final _pref = await SharedPreferences.getInstance();
-                                            bool intro = _pref.getBool('intro') ?? false;
-                                            if (intro) {
-                                              Get.off(() => const PageViewScreen());
-                                            } else {
-                                              Get.off(() => const MainMenuScreen());
-                                            }
-                                          } on FirebaseAuthException catch (error) {
-                                            log("Code: ${error.code}");
-                                            log("Message: ${error.message!}");
-                                          }
+                                        await CloudHandler.login(returned['token']!);
+                                        log('Signing in...');
+                                        ApiHandler.setMetaData(returned['key']!, returned['iv']);
+                                        final pref = await SharedPreferences.getInstance();
+                                        // ignore: non_constant_identifier_names
+                                        bool intro_done = pref.getBool('intro-done') ?? false;
+                                        log('intro-done: $intro_done');
+                                        if (intro_done) {
+                                          Get.off(() => const MainMenuScreen());
+                                        } else {
+                                          Get.off(() => const PageViewScreen());
                                         }
+                                      } on FirebaseAuthException catch (error) {
+                                        log("Code: ${error.code}");
+                                        log("Message: ${error.message!}");
                                       }
-                                    },
-                                  ),
-                                ],
+                                    } else {
+                                      log('error wrong sms');
+                                      setState(() {
+                                        loading = false;
+                                      });
+                                    }
+                                  } else {
+                                    log('some digit is empty');
+                                    setState(() {
+                                      loading = false;
+                                    });
+                                  }
+                                },
                               )
-                            : Column(
-                                children: [
-                                  Lottie.asset('assets/animations/linear_loading.json', width: 140, height: 140),
-                                ],
-                              );
+                            : Lottie.asset('assets/animations/linear_loading.json', width: 140, height: 140);
                       }),
                     );
                   }),

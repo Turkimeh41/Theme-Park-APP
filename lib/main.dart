@@ -1,9 +1,7 @@
 import 'dart:developer';
 
 import 'package:final_project/Auth_Screens/Login_Screen/login_screen.dart';
-import 'package:final_project/Auth_Screens/Register_Screen/verifynumberscreen.dart';
 import 'package:final_project/Main_Menu/mainmenu_screen.dart';
-import 'package:final_project/Provider/userauth_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -15,19 +13,19 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await checkPref();
+  final pref = await SharedPreferences.getInstance();
+  await pref.clear();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(const MyApp());
 }
 
 Future<void> checkPref() async {
   final pref = await SharedPreferences.getInstance();
-  bool stored = pref.getBool('log-out') ?? false;
-  if (stored) {
+  bool store = pref.getBool('log-out') ?? false;
+  if (store) {
     log('Logging out...');
     FirebaseAuth.instance.signOut();
     pref.remove('log-out');
-  } else {
-    log('No SharedPref');
   }
 }
 

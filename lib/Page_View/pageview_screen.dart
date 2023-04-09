@@ -5,6 +5,7 @@ import 'package:glassmorphism/glassmorphism.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:developer';
 
 class PageViewScreen extends StatefulWidget {
   const PageViewScreen({super.key});
@@ -349,8 +350,9 @@ class _PageViewScreenState extends State<PageViewScreen> {
               'Done',
               style: GoogleFonts.acme(fontSize: 28, color: Colors.white),
               onTap: () async {
-                final _pref = await SharedPreferences.getInstance();
-                _pref.setBool('intro', true);
+                final pref = await SharedPreferences.getInstance();
+                pref.setBool('intro-done', true);
+                log('intro-done: ${true}');
                 Get.off(() => const MainMenuScreen());
               },
               gradient: LinearGradient(colors: [Colors.amber, Colors.amber[700]!]),

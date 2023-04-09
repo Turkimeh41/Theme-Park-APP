@@ -2,13 +2,13 @@ import 'dart:developer';
 
 import 'package:final_project/Auth_Screens/Login_Screen/login_textfields.dart';
 import 'package:final_project/Auth_Screens/Register_Screen/register_screen.dart';
-import 'package:final_project/Customs/gradientbutton.dart';
-import 'package:final_project/Provider/cloud_handler.dart';
+import 'package:final_project/Handler/cloud_handler.dart';
 import 'package:final_project/Provider/userauth_provider.dart';
 import 'package:final_project/Main_Menu/mainmenu_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:nice_buttons/nice_buttons.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:get/get.dart';
@@ -138,7 +138,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                     onChanged: (value) {
                                       setState(() {
                                         rememberMe = value!;
-                                        log('$rememberMe');
                                       });
                                     },
                                   ),
@@ -163,39 +162,45 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                       child: SlideTransition(
                         position: slideAnimation,
                         child: !loading
-                            ? GradientButton(
-                                style: GoogleFonts.acme(color: Colors.white, fontSize: 27),
+                            ? NiceButtons(
+                                borderColor: Colors.amber[900]!,
+                                startColor: Colors.amber,
+                                endColor: Colors.amber[800]!,
+                                stretch: false,
                                 width: dw * 0.7,
                                 height: dh * 0.05,
-                                'Login',
-                                onTap: () async {
-                                  log('Signing in...');
-                                  builderState(() {
-                                    loading = true;
-                                  });
-                                  try {
-                                    String token = await CloudHandler.loginUser(logUser.username!, logUser.password!);
+                                onTap: (_) async {
+                                  if (logUser.validateForm()) {
+                                    log('Signing in...');
                                     builderState(() {
-                                      loading = false;
+                                      loading = true;
                                     });
-                                    log('Success!');
+                                    try {
+                                      String token = await CloudHandler.loginUser(logUser.username!, logUser.password!);
+                                      builderState(() {
+                                        loading = false;
+                                      });
+                                      log('Success!');
 
-                                    await FirebaseAuth.instance.signInWithCustomToken(token);
-                                    if (!rememberMe) {
-                                      await storeShared();
+                                      await FirebaseAuth.instance.signInWithCustomToken(token);
+                                      if (!rememberMe) {
+                                        await storeShared();
+                                      }
+                                      Get.off(() => const MainMenuScreen());
+                                    } on FirebaseFunctionsException catch (error) {
+                                      setState(() {
+                                        loading = false;
+                                        logUser.showErrors(error.message!, context);
+                                        log(error.code);
+                                        log(error.message!);
+                                      });
                                     }
-                                    Get.off(() => const MainMenuScreen());
-                                  } on FirebaseFunctionsException catch (error) {
-                                    setState(() {
-                                      loading = false;
-                                      logUser.showErrors(error.message!, context);
-                                      log(error.code);
-                                      log(error.message!);
-                                    });
                                   }
                                 },
-                                radius: 15,
-                                gradient: LinearGradient(colors: [Colors.amber, Colors.amber[800]!]),
+                                child: Text(
+                                  'Login',
+                                  style: GoogleFonts.acme(color: Colors.white, fontSize: 27),
+                                ),
                               )
                             : Lottie.asset('assets/animations/linear_loading.json', width: 170, height: 170),
                       ));
@@ -206,7 +211,11 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                   child: FadeTransition(
                     opacity: fadeAnimation,
                     child: InkWell(
-                      onTap: () {},
+                      onTap: () async {
+                        log('sending email...');
+                        await FirebaseAuth.instance.sendPasswordResetEmail(email: 'trky-almhini@hotmail.com');
+                        log('sucess!');
+                      },
                       child: Text(
                         'Forgot password?, Click here',
                         style: GoogleFonts.acme(fontSize: 18, color: Colors.white, decoration: TextDecoration.underline),

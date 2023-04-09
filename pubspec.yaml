@@ -49,6 +49,8 @@ dependencies:
   glassmorphism: ^3.0.0
   flutter_keyboard_visibility: ^5.4.0
   nice_buttons: ^0.0.2
+  firebase_storage: ^11.1.0
+  cached_network_image: ^3.2.3
 
 dev_dependencies:
   flutter_test:

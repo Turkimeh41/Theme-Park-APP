@@ -1,10 +1,11 @@
 import 'dart:developer';
 
 import 'package:final_project/Auth_Screens/Register_Screen/verifynumberscreen.dart';
-import 'package:final_project/Provider/cloud_handler.dart';
+import 'package:final_project/Handler/cloud_handler.dart';
 import 'package:final_project/Provider/userauth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:nice_buttons/nice_buttons.dart';
 import 'package:provider/provider.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:final_project/Customs/gradientbutton.dart';
@@ -573,12 +574,9 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                           splashColor: Colors.red,
                           onTap: buttonState == 0
                               ? () async {
-                                  changeState(
-                                    () {
-                                      buttonState = 1;
-                                    },
-                                  );
-
+                                  changeState(() {
+                                    buttonState = 1;
+                                  });
                                   firstFieldsController.forward().then((_) => {
                                         setState(() {
                                           state = 1;
@@ -611,15 +609,20 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
               state == 1
                   ? StatefulBuilder(builder: (context, changeLoading) {
                       return Positioned(
-                          bottom: loading == false ? dh * 0.11 : dh * 0.05,
-                          right: loading == false ? dw * 0.04 : dw * 0.1,
+                          bottom: loading == false ? dh * 0.10 : dh * 0.05,
+                          right: loading == false ? dw * 0.07 : dw * 0.1,
                           child: loading == false
-                              ? GradientButton(
-                                  style: GoogleFonts.acme(color: Colors.white, fontSize: 27),
-                                  width: dw * 0.6,
-                                  height: dh * 0.05,
-                                  'Register',
-                                  onTap: () async {
+                              //
+                              ? NiceButtons(
+                                  progress: false,
+                                  borderColor: Colors.amber[800]!,
+                                  startColor: Colors.amber,
+                                  endColor: Colors.amber[800]!,
+                                  gradientOrientation: GradientOrientation.Horizontal,
+                                  stretch: false,
+                                  width: dw * 0.56,
+                                  height: dh * 0.06,
+                                  onTap: (_) async {
                                     //set state of the statefulbuilder
                                     changeLoading(
                                       () {
@@ -628,8 +631,9 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                                     );
                                     if (validateAndSave()) {
                                       try {
+                                        log('checking if an account exists...');
                                         await CloudHandler.userExists(insRegUser.username!, insRegUser.emailAddress!, insRegUser.phonenumber!);
-                                        log('User doesn\'nt exists!, good.');
+                                        log('User doesn\'t exists!, good.');
                                         String smsCode = await CloudHandler.sendSMSTwilio(insRegUser.phonenumber!);
                                         log('Message should be sent!');
                                         Get.to(() => VerifyNumber(insRegUser, smsCode));
@@ -648,8 +652,10 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                                       },
                                     );
                                   },
-                                  radius: 20,
-                                  gradient: LinearGradient(colors: [Colors.amber, Colors.amber[800]!]),
+                                  child: Text(
+                                    'Register',
+                                    style: GoogleFonts.acme(color: Colors.white, fontSize: 27),
+                                  ),
                                 )
                               : Lottie.asset('assets/animations/linear_loading.json', width: 140, height: 140));
                     })
