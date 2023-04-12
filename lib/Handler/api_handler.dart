@@ -1,14 +1,10 @@
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+// ignore_for_file: non_constant_identifier_names
+
+import 'package:permission_handler/permission_handler.dart';
 
 class ApiHandler {
-  static Future<void> setMetaData(String key, Map<Object?, Object?> iv) async {
-    final refList = await FirebaseStorage.instance.ref('qr-codes/users/${FirebaseAuth.instance.currentUser!.uid}').listAll();
-    final ref = refList.items.first;
-    final newMetadata = SettableMetadata(
-      contentType: "image/png",
-      customMetadata: {'key': key, 'iv': iv.toString()},
-    );
-    await ref.updateMetadata(newMetadata);
+  static Future<PermissionStatus> requestCameraPermission() async {
+    final status = await Permission.camera.request();
+    return status;
   }
 }

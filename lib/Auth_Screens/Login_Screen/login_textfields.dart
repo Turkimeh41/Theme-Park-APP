@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:final_project/Provider/userauth_provider.dart';
+import 'package:final_project/Provider/auth_provider.dart';
 
 class LoginTextFields extends StatefulWidget {
   const LoginTextFields({super.key});

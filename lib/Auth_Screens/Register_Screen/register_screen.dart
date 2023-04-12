@@ -3,7 +3,7 @@ import 'dart:developer';
 
 import 'package:final_project/Auth_Screens/Login_Screen/login_screen.dart';
 import 'package:final_project/Auth_Screens/Register_Screen/register_textfields.dart';
-import 'package:final_project/Provider/userauth_provider.dart';
+import 'package:final_project/Provider/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';

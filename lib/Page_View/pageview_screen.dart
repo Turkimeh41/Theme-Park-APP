@@ -1,9 +1,9 @@
-import 'package:final_project/Customs/gradientbutton.dart';
-import 'package:final_project/Main_Menu/mainmenu_screen.dart';
+import 'package:final_project/stream_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
+import 'package:nice_buttons/nice_buttons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer';
 
@@ -346,19 +346,21 @@ class _PageViewScreenState extends State<PageViewScreen> {
         Positioned(
             bottom: dh * 0.05,
             left: 0.1 * dw,
-            child: GradientButton(
-              'Done',
-              style: GoogleFonts.acme(fontSize: 28, color: Colors.white),
-              onTap: () async {
+            child: NiceButtons(
+              borderColor: Colors.amber[900]!,
+              startColor: Colors.amber,
+              endColor: Colors.amber[800]!,
+              borderRadius: 15,
+              stretch: false,
+              onTap: (_) async {
                 final pref = await SharedPreferences.getInstance();
                 pref.setBool('intro-done', true);
                 log('intro-done: ${true}');
-                Get.off(() => const MainMenuScreen());
+                Get.off(() => const StreamListener());
               },
-              gradient: LinearGradient(colors: [Colors.amber, Colors.amber[700]!]),
               width: dw * 0.8,
-              radius: 7,
               height: dh * 0.05,
+              child: Text('Done', style: GoogleFonts.acme(fontSize: 28, color: Colors.white)),
             )),
         //VALUE LISTENABLE BUILDER, this widget listens to a value, and then will rebuilt whenever that value changes, USEFUL :D
         Positioned(

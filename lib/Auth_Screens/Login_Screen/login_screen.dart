@@ -3,8 +3,8 @@ import 'dart:developer';
 import 'package:final_project/Auth_Screens/Login_Screen/login_textfields.dart';
 import 'package:final_project/Auth_Screens/Register_Screen/register_screen.dart';
 import 'package:final_project/Handler/cloud_handler.dart';
-import 'package:final_project/Provider/userauth_provider.dart';
-import 'package:final_project/Main_Menu/mainmenu_screen.dart';
+import 'package:final_project/Provider/auth_provider.dart';
+import 'package:final_project/data_container.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -157,7 +157,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                 ),
                 StatefulBuilder(builder: (context, builderState) {
                   return Positioned(
-                      bottom: loading ? dh * 0.28 : dh * 0.36,
+                      bottom: loading ? dh * 0.24 : dh * 0.36,
                       left: loading ? dw * 0.27 : dw * 0.141,
                       child: SlideTransition(
                         position: slideAnimation,
@@ -186,7 +186,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                       if (!rememberMe) {
                                         await storeShared();
                                       }
-                                      Get.off(() => const MainMenuScreen());
+                                      Get.off(() => const DataContainer());
                                     } on FirebaseFunctionsException catch (error) {
                                       setState(() {
                                         loading = false;
@@ -202,7 +202,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                   style: GoogleFonts.acme(color: Colors.white, fontSize: 27),
                                 ),
                               )
-                            : Lottie.asset('assets/animations/linear_loading.json', width: 170, height: 170),
+                            : Lottie.asset('assets/animations/linear_loading_amber.json', width: 170, height: 170),
                       ));
                 }),
                 Positioned(

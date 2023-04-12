@@ -1,14 +1,14 @@
 import 'dart:developer';
 
-import 'package:final_project/Auth_Screens/Register_Screen/verifynumberscreen.dart';
+import 'package:final_project/Handler/verify_handler.dart';
+import 'package:final_project/Auth_Screens/Register_Screen/verifynumber_screen.dart';
 import 'package:final_project/Handler/cloud_handler.dart';
-import 'package:final_project/Provider/userauth_provider.dart';
+import 'package:final_project/Provider/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 import 'package:provider/provider.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import 'package:final_project/Customs/gradientbutton.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:lottie/lottie.dart';
 import 'package:get/get.dart';
@@ -612,7 +612,6 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                           bottom: loading == false ? dh * 0.10 : dh * 0.05,
                           right: loading == false ? dw * 0.07 : dw * 0.1,
                           child: loading == false
-                              //
                               ? NiceButtons(
                                   progress: false,
                                   borderColor: Colors.amber[800]!,
@@ -636,7 +635,9 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                                         log('User doesn\'t exists!, good.');
                                         String smsCode = await CloudHandler.sendSMSTwilio(insRegUser.phonenumber!);
                                         log('Message should be sent!');
-                                        Get.to(() => VerifyNumber(insRegUser, smsCode));
+                                        VerifyHandler.user = insRegUser;
+                                        VerifyHandler.smsCode = smsCode;
+                                        Get.to(() => const VerifyNumber());
                                       } on FirebaseFunctionsException catch (error) {
                                         setState(() {
                                           log(error.message!);
@@ -657,7 +658,7 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                                     style: GoogleFonts.acme(color: Colors.white, fontSize: 27),
                                   ),
                                 )
-                              : Lottie.asset('assets/animations/linear_loading.json', width: 140, height: 140));
+                              : Lottie.asset('assets/animations/linear_loading_amber.json', width: 140, height: 140));
                     })
                   : const SizedBox()
             ]),
