@@ -236,7 +236,7 @@ class _VerifyNumberState extends State<VerifyNumber> with TickerProviderStateMix
                               height: dh * 0.09,
                               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: VerifyHandler.error3 ? Border.all(color: Colors.red, width: 2.5) : null),
                               child: TextFormField(
-                                validator: (value) => VerifyHandler.fieldValidator(3, value),
+                                validator: (value) => VerifyHandler.fieldValidator(3, value!),
                                 initialValue: VerifyHandler.digit3,
                                 keyboardType: TextInputType.number,
                                 textAlign: TextAlign.center,

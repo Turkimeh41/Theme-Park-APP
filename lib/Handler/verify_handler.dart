@@ -33,28 +33,44 @@ class VerifyHandler {
     return true;
   }
 
-  static String? fieldValidator(int field, digit) {
+  static String? fieldValidator(int field, String? digit) {
     switch (field) {
       case 1:
-        if (digit!.isEmpty) {
+        if (digit == null) {
+          error1 = true;
+          return '';
+        }
+        if (digit.isEmpty) {
           error1 = true;
           return '';
         }
         break;
       case 2:
-        if (digit!.isEmpty) {
-          error2 = true;
+        if (digit == null) {
+          error1 = true;
+          return '';
+        }
+        if (digit.isEmpty) {
+          error1 = true;
           return '';
         }
         break;
       case 3:
-        if (digit!.isEmpty) {
-          error3 = true;
+        if (digit == null) {
+          error1 = true;
+          return '';
+        }
+        if (digit.isEmpty) {
+          error1 = true;
           return '';
         }
         break;
       case 4:
-        if (digit!.isEmpty) {
+        if (digit == null) {
+          error1 = true;
+          return '';
+        }
+        if (digit.isEmpty) {
           error4 = true;
           return '';
         }

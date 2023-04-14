@@ -1,7 +1,4 @@
 // ignore_for_file: non_constant_identifier_names
-
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -25,4 +22,6 @@ class User with ChangeNotifier {
     registered = (documentReference['registered'] as Timestamp).toDate();
     gender = documentReference['gender'];
   }
+
+  Future<void> editProfile(String first_name, String last_name) async {}
 }

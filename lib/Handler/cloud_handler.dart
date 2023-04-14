@@ -5,11 +5,8 @@ import 'dart:developer';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:final_project/Exception/balance_exception.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import '../Handler/crypto_functions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:provider/provider.dart';
-import '../Provider/transactions_provider.dart';
 
 //This is the instance of my firebase cloud functions object, which has all the functions i've created
 final function = FirebaseFunctions.instanceFor(region: "europe-west1");
