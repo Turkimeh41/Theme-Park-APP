@@ -63,7 +63,7 @@ class CloudHandler {
 
     log('fetching user, and activity docs, to check balance and update it...');
     final results = await Future.wait(
-        {FirebaseFirestore.instance.collection('Activites').doc(decryptedID).get(), FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid).get()});
+        [FirebaseFirestore.instance.collection('Activites').doc(decryptedID).get(), FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid).get()]);
     log('fetched!');
     final actvResult = results[0].data();
     final userResult = results[1].data();
@@ -72,6 +72,12 @@ class CloudHandler {
       log('deducing balance');
       final newBalance = userResult['balance'] - actvResult['price'];
       FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid).update({'balance': newBalance});
+      if (actvResult["played"] != null) {
+        int value = actvResult["played"];
+        FirebaseFirestore.instance.collection("Activites").doc(decryptedID).set({"played": value + 1}, SetOptions(merge: true));
+      } else {
+        FirebaseFirestore.instance.collection("Activites").doc(decryptedID).set({"played": 0}, SetOptions(merge: true));
+      }
     }
     //we throw our own error exception which is an object instantiation, we could catch this error, and workaround that in our widget to make user add balance
     else if (actvResult['price'] > userResult['balance']) {

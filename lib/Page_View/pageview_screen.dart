@@ -71,14 +71,6 @@ class _PageViewScreenState extends State<PageViewScreen> {
                           ],
                         ),
                       ),
-                      /*           Container(
-                      width: dw * 0.8,
-                      height: dh * 0.45,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(25),
-                        color: const Color.fromARGB(255, 240, 225, 225),
-                      ),
-                    ), */
                       Positioned(
                         top: dh * 0.63,
                         left: dw * 0.16,

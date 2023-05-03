@@ -9,9 +9,8 @@ class StreamListener extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: StreamBuilder(
-      stream: FirebaseFirestore.instance.collection('User_Status').doc(FirebaseAuth.instance.currentUser!.uid).snapshots(),
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance.collection('User_Engaged').doc(FirebaseAuth.instance.currentUser!.uid).snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
@@ -24,6 +23,6 @@ class StreamListener extends StatelessWidget {
         }
         return const MainMenuScreen();
       },
-    ));
+    );
   }
 }

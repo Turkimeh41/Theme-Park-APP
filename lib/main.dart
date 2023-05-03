@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:final_project/Auth_Screens/Login_Screen/login_screen.dart';
+import 'package:final_project/data_container.dart';
 import 'package:final_project/stream_listener.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -14,7 +15,6 @@ Future<void> main() async {
   await Firebase.initializeApp();
   await checkPref();
   final pref = await SharedPreferences.getInstance();
-  await pref.clear();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(const MyApp());
 }
@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return const LoginScreen();
+              return const DataContainer();
             } else {
               return const LoginScreen();
             }

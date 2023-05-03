@@ -57,6 +57,9 @@ dependencies:
   qr_code_scanner: ^1.0.1
   connectivity_plus: ^3.0.4
   persistent_bottom_nav_bar: ^5.0.2
+  image_picker: ^0.8.7+4
+  uuid: ^3.0.7
+  align_positioned: ^3.0.0
 
 dev_dependencies:
   flutter_test:

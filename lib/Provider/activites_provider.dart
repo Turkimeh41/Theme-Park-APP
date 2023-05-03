@@ -14,11 +14,14 @@ class Activites with ChangeNotifier {
   }
 
   Future<void> fetchActivites() async {
+    log('fetching activity');
     final List<Activity> loadedActivites = [];
 
     final documentReference = await FirebaseFirestore.instance.collection('Activites').orderBy('name').get();
     final activityDoc = documentReference.docs;
-
+    if (documentReference.size == 0) {
+      return;
+    }
     for (int i = 0; i < documentReference.docs.length; i++) {
       loadedActivites.add(Activity(
           activityDoc[i]['name'], activityDoc[i]['price'], (activityDoc[i]['createdAt'] as Timestamp).toDate(), activityDoc[i]['description'], activityDoc[i]['duration'], activityDoc[i]['type']));

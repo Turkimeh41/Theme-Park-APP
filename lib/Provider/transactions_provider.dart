@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 
 import '../Model/transaction.dart';
@@ -12,19 +13,17 @@ class Transactions with ChangeNotifier {
   }
 
   Future<void> fetchTransactions() async {
+    log('fetching transactions..');
     List<Transaction> loadedTransactions = [];
     final documentReferenceTransactions =
         await firestore.FirebaseFirestore.instance.collection("Transactions").doc(FirebaseAuth.instance.currentUser!.uid).collection('User_Transactions').orderBy('Transaction_date').get();
-    final documentReferenceActivites = await firestore.FirebaseFirestore.instance.collection("Activites").get();
-
+    if (documentReferenceTransactions.size == 0) {
+      return;
+    }
     final transactionDocs = documentReferenceTransactions.docs;
-    //sort the list with ascending order =>
-    // transactionDocs.sort((a, b) => (a["Transaction_date"] as firestore.Timestamp).compareTo(b["Transaction_date"]));
-
-    for (int i = 0; i < documentReferenceTransactions.docs.length; i++) {
-      final activityDoc = documentReferenceActivites.docs.singleWhere((element) => transactionDocs[i]['actID'] == element.id);
-      loadedTransactions
-          .add(Transaction(transactionDocs[i].id, activityDoc['name'], (transactionDocs[i]['Transaction_date'] as firestore.Timestamp).toDate(), activityDoc['price'], activityDoc['type']));
+    for (int i = 0; i < transactionDocs.length; i++) {
+      loadedTransactions.add(Transaction(transactionDocs[i].id, transactionDocs[i]['actID'], transactionDocs[i]['actName'], (transactionDocs[i]['date'] as firestore.Timestamp).toDate(),
+          transactionDocs[i]['amount'], transactionDocs[i]['type']));
     }
 
     _userTransactions = loadedTransactions;
@@ -38,7 +37,7 @@ class Transactions with ChangeNotifier {
         .collection('User_Transactions')
         .add({'actID': actvID, 'Transaction_date': timestamp});
     final documentReferenceActivites = await firestore.FirebaseFirestore.instance.collection("Activites").doc(actvID).get();
-    _userTransactions.add(Transaction(response.id, documentReferenceActivites['name'], timestamp.toDate(), documentReferenceActivites['price'], documentReferenceActivites['type']));
-    notifyListeners();
+    _userTransactions.add(Transaction(response.id, documentReferenceActivites.id, documentReferenceActivites['name'], (documentReferenceActivites['date'] as firestore.Timestamp).toDate(),
+        documentReferenceActivites['price'], documentReferenceActivites['type']));
   }
 }

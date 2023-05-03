@@ -86,7 +86,6 @@ class _LoginTextFieldsState extends State<LoginTextFields> {
                     validator: (value) => insLogUser.validatePass(),
                     onChanged: (value) {
                       if (insLogUser.passError != null) {
-                        log('hi');
                         buildState(() {
                           insLogUser.passError = null;
                         });
