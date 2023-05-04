@@ -82,7 +82,6 @@ exports.addUser = functions.region("europe-west1")
     .https.onCall(async (data, context) => {
       const hash = require("crypto-js/sha256");
       const QRCode = require("qrcode");
-      const crypto = require("crypto");
       const {v4: uuidv4} = require("uuid");
 
       const username = data.username;
@@ -103,23 +102,15 @@ exports.addUser = functions.region("europe-west1")
       await admin.firestore().collection("User_Engaged").doc(response.id).set({engaged: false,
       });
 
-      // Stream Cipher encryption cryptosystem, encrypting The qr code, then decrypting that qr code whenever user scans the scan to deduce balance.
-      const key = crypto.randomBytes(32);
-      const iv = crypto.randomBytes(16);
-      const cipher = crypto.createCipheriv("aes-256-ctr", key, iv);
-      let encryptedMessage = cipher.update(response.id, "utf8", "hex");
-      encryptedMessage += cipher.final("hex");
       const uuidname = uuidv4();
       const filename = uuidname + ".png";
       // generate the QR code image as a buffer
-      const qrdata = await QRCode.toDataURL("USER-"+encryptedMessage, {margin: 2});
+      const qrdata = await QRCode.toDataURL("USER-"+response.id, {margin: 2});
       const buffer = Buffer.from(qrdata.split(",")[1], "base64");
       const metadata = {contentType: "image/png"};
       const bucket = admin.storage().bucket();
-      const file = bucket.file("users/qr-codes/"+response.id+"/"+filename);
+      const file = bucket.file("users/qr_codes/"+response.id+"/"+filename);
 
-
-      await admin.firestore().collection("User_Keys").doc("USER-"+encryptedMessage).set({key: key.toString("hex"), iv: iv.toString("hex")});
 
       const writeStream = file.createWriteStream({metadata: metadata});
       writeStream.end(buffer);
@@ -140,7 +131,6 @@ exports.restAddUser = functions.region("europe-west1")
     .https.onRequest(async (req, res) => {
       const hash = require("crypto-js/sha256");
       const QRCode = require("qrcode");
-      const crypto = require("crypto");
       const {v4: uuidv4} = require("uuid");
 
       const username = req.body.username;
@@ -159,22 +149,14 @@ exports.restAddUser = functions.region("europe-west1")
             phone_number: number, email_address: emailAddress, imguser_link: "null"});
       await admin.firestore().collection("User_Engaged").doc(response.id).set({engaged: false});
 
-      // Stream Cipher encryption cryptosystem, encrypting The qr code, then decrypting that qr code whenever user scans the scan to deduce balance.
-      const key = crypto.randomBytes(32);
-      const iv = crypto.randomBytes(16);
-      const cipher = crypto.createCipheriv("aes-256-ctr", key, iv);
-      let encryptedMessage = cipher.update(response.id, "utf8", "hex");
-      encryptedMessage += cipher.final("hex");
-
       const filename = uuidv4() + ".png";
       // generate the QR code image as a buffer
-      const qrdata = await QRCode.toDataURL("USER-"+encryptedMessage, {margin: 2});
+      const qrdata = await QRCode.toDataURL("USER-"+response.id, {margin: 2});
       const buffer = Buffer.from(qrdata.split(",")[1], "base64");
       const metadata = {contentType: "image/png"};
       const bucket = admin.storage().bucket();
-      const file = bucket.file("users/qr-codes/"+response.id+"/"+filename);
+      const file = bucket.file("users/qr_codes/"+response.id+"/"+filename);
 
-      await admin.firestore().collection("User_Keys").doc("USER-"+encryptedMessage).set({key: key.toString("hex"), iv: iv.toString("hex")});
 
       const writeStream = file.createWriteStream({metadata: metadata});
       writeStream.end(buffer);
@@ -265,7 +247,6 @@ exports.setgetTime = functions.region("europe-west1")
 exports.addActivity = functions.region("europe-west1")
     .https.onRequest(async (req, res) => {
       const QRCode = require("qrcode");
-      const crypto = require("crypto");
       const {v4: uuidv4} = require("uuid");
       const request = JSON.parse(req.body);
 
@@ -285,26 +266,19 @@ exports.addActivity = functions.region("europe-west1")
 
 
       // create a qr code that is encrypted with, stream Cipher, which is fast to execute, but not safer compared to other algorithms like CBC Block cipher
-      const key = crypto.randomBytes(32);
-      const iv = crypto.randomBytes(16);
-      const cipher = crypto.createCipheriv("aes-256-ctr", key, iv);
-      let encryptedMessage = cipher.update(response.id, "utf8", "hex");
-      encryptedMessage += cipher.final("hex");
-
       let filename = uuidv4() + ".png";
       // generate the QR code image as a buffer of data bytes
-      const qrdata = await QRCode.toDataURL("ACTV-"+encryptedMessage, {margin: 2});
+      const qrdata = await QRCode.toDataURL("ACTV-"+response.id, {margin: 2});
       // create a qrcode buffer data
       const qrCodebuffer = Buffer.from(qrdata.split(",")[1], "base64");
       const metadata = {contentType: "image/png"};
       const bucket = admin.storage().bucket();
-      const qrFile = bucket.file("activites/qr-codes/"+response.id+"/"+filename);
+      const qrFile = bucket.file("activites/qr_codes/"+response.id+"/"+filename);
       filename = uuidv4() + ".png";
-      await admin.firestore().collection("Activity_Keys").doc("ACTV-"+encryptedMessage).set({key: key.toString("hex"), iv: iv.toString("hex")});
       const qrwriteStream = qrFile.createWriteStream({metadata: metadata});
       qrwriteStream.end(qrCodebuffer);
 
-      const imageFile = bucket.file("activites/activity_images/" + response.id + "/" + filename);
+      const imageFile = bucket.file("activites/activity_images/" +response.id +"/" + filename);
       const writeStream = imageFile.createWriteStream({metadata: metadata});
       writeStream.end(image_bytes);
       // Upload the image picture
@@ -361,21 +335,6 @@ exports.editActivity = functions.region("europe-west1").https.onRequest(async (r
     const imgURL = await file.getSignedUrl({expires: "01-16-2026", action: "read"});
     await admin.firestore().collection("Activites").doc(id).update({img_link: imgURL});
     res.status(200).send({imgURL: imgURL});
-  }
-});
-
-
-exports.getSecret = functions.region("europe-west1").https.onCall(async (data, context) => {
-  if (data.id.includes("USER-")) {
-    let result = await admin.firestore().collection("User_Keys").doc(data.id).get();
-    result = result.data();
-    return {key: result["key"], iv: result["iv"]};
-  } else if (data.id.includes("ACTV-")) {
-    let result = await admin.firestore().collection("Activity_Keys").doc(data.id).get();
-    result = result.data();
-    return {key: result["key"], iv: result["iv"]};
-  } else {
-    throw new functions.https.HttpsError("not-found", "Document not found!");
   }
 });
 

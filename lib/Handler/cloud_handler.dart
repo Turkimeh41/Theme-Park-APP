@@ -5,7 +5,6 @@ import 'dart:developer';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:final_project/Exception/balance_exception.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../Handler/crypto_functions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 //This is the instance of my firebase cloud functions object, which has all the functions i've created
@@ -26,7 +25,7 @@ class CloudHandler {
         .httpsCallable('addUser')
         .call({'username': username, 'password': password, 'first_name': firstName, 'last_name': lastName, 'emailAddress': email, 'gender': gender, 'number': phone});
 
-    return {'token': response.data['token'], 'key': response.data['key'], 'iv': response.data['iv']};
+    return {'token': response.data['token']};
   }
 
   static Future<String> loginUser(String username, String password) async {
@@ -38,12 +37,6 @@ class CloudHandler {
     await FirebaseAuth.instance.signInWithCustomToken(token);
   }
 
-  static Future<Map<String, dynamic>> getActivitySecret(String prefix_docID) async {
-    final result = await function.httpsCallable('getSecret').call({"id": prefix_docID});
-    log(result.data['key']);
-    log(result.data['iv']);
-    return result.data;
-  }
 
   static Future<void> rechargeBalance(double amount) async {
     final documentReference = FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid);
@@ -54,38 +47,35 @@ class CloudHandler {
     });
   }
 
-  static Future<String> attemptPayment(String prefix_ActvID) async {
+  static Future<void> attemptPayment(String prefix_ActvID) async {
     log('fetching secret keys...');
-    var response = await getActivitySecret(prefix_ActvID);
     log('fetched!');
     log('decrypting...');
-    final String decryptedID = Crypto.decryptActivityID(prefix_ActvID.substring(5), response['key']!, response['iv']!);
 
     log('fetching user, and activity docs, to check balance and update it...');
     final results = await Future.wait(
-        [FirebaseFirestore.instance.collection('Activites').doc(decryptedID).get(), FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid).get()]);
+        [FirebaseFirestore.instance.collection('Activites').doc(prefix_ActvID.substring(5)).get(), FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid).get()]);
     log('fetched!');
     final actvResult = results[0].data();
     final userResult = results[1].data();
-    //payment should be done, user's lost balance
     if (actvResult!['price'] < userResult!['balance']) {
-      log('deducing balance');
+      log('deducing balance...');
       final newBalance = userResult['balance'] - actvResult['price'];
       FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid).update({'balance': newBalance});
       if (actvResult["played"] != null) {
         int value = actvResult["played"];
-        FirebaseFirestore.instance.collection("Activites").doc(decryptedID).set({"played": value + 1}, SetOptions(merge: true));
+        FirebaseFirestore.instance.collection("Activites").doc(prefix_ActvID.substring(5)).set({"played": value + 1}, SetOptions(merge: true));
       } else {
-        FirebaseFirestore.instance.collection("Activites").doc(decryptedID).set({"played": 0}, SetOptions(merge: true));
+        FirebaseFirestore.instance.collection("Activites").doc(prefix_ActvID.substring(5)).set({"played": 0}, SetOptions(merge: true));
       }
+          log('done!');
     }
     //we throw our own error exception which is an object instantiation, we could catch this error, and workaround that in our widget to make user add balance
     else if (actvResult['price'] > userResult['balance']) {
       log('not enough balance...');
       throw BalanceException();
     }
-    log('done!');
-    return decryptedID;
+
   }
 
   static Future<void> newParticipation(String actvID) async {
