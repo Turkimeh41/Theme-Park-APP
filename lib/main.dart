@@ -1,7 +1,9 @@
 import 'dart:developer';
 
 import 'package:final_project/Auth_Screens/Login_Screen/login_screen.dart';
+import 'package:final_project/Main_Menu/tab_screen.dart';
 import 'package:final_project/data_container.dart';
+import 'package:final_project/splash_screen.dart';
 import 'package:final_project/stream_listener.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -14,18 +16,23 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await checkPref();
-  final pref = await SharedPreferences.getInstance();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(const MyApp());
 }
 
 Future<void> checkPref() async {
   final pref = await SharedPreferences.getInstance();
-  bool store = pref.getBool('log-out') ?? false;
-  if (store) {
-    log('Logging out...');
-    FirebaseAuth.instance.signOut();
-    pref.remove('log-out');
+  bool? value = pref.getBool('remember-me') ?? true;
+  //remember me is true!
+  if (value) {
+    log('remember me is true or null');
+    log('no logging out');
+    return;
+  } else if (!value) {
+    log('remember me is false');
+    log('procceding, logging out..');
+    await FirebaseAuth.instance.signOut();
+    pref.remove('remember-me');
   }
 }
 
@@ -38,6 +45,8 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'SWIPEZ',
         theme: ThemeData(
+            appBarTheme: const AppBarTheme(
+                backgroundColor: Color.fromARGB(255, 87, 0, 41), shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15), bottomRight: Radius.circular(15)))),
             textSelectionTheme:
                 const TextSelectionThemeData(cursorColor: Color.fromARGB(255, 100, 21, 62), selectionColor: Color.fromARGB(255, 78, 23, 51), selectionHandleColor: Color.fromARGB(255, 78, 23, 51))),
         home: StreamBuilder<User?>(
@@ -46,7 +55,7 @@ class MyApp extends StatelessWidget {
             if (snapshot.hasData) {
               return const DataContainer();
             } else {
-              return const LoginScreen();
+              return const TabScreen();
             }
           },
         ));

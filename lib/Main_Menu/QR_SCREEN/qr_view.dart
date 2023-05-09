@@ -1,8 +1,9 @@
+
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:final_project/Exception/balance_exception.dart';
 import 'package:final_project/Handler/cloud_handler.dart';
-import 'package:final_project/Main_Menu/mainmenu_screen.dart';
+import 'package:final_project/Main_Menu/tab_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
@@ -37,6 +38,13 @@ class _QRViewScreenState extends State<QRViewScreen> with SingleTickerProviderSt
   }
 
   @override
+  dispose() {
+    scanController.dispose();
+    qrcontroller!.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final dw = MediaQuery.of(context).size.width;
     final dh = MediaQuery.of(context).size.height;
@@ -62,7 +70,7 @@ class _QRViewScreenState extends State<QRViewScreen> with SingleTickerProviderSt
                   final String prefix_ID = result!.code!;
                   try {
                     await CloudHandler.attemptPayment(prefix_ID);
-                    Get.off(() => const MainMenuScreen());
+                    Get.off(() => const TabScreen());
                   } on BalanceException catch (e) {
                     log(e.code);
                     log(e.details);
@@ -115,11 +123,5 @@ class _QRViewScreenState extends State<QRViewScreen> with SingleTickerProviderSt
         const SnackBar(content: Text('no Permission')),
       );
     }
-  }
-
-  @override
-  void dispose() {
-    qrcontroller?.dispose();
-    super.dispose();
   }
 }

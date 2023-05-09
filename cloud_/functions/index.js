@@ -173,7 +173,6 @@ exports.restAddUser = functions.region("europe-west1")
       res.status(200).send({success: true, id: response.id});
     });
 
-
 exports.loginUser = functions.region("europe-west1")
     .https.onCall(async (data, context) => {
       const hash = require("crypto-js/sha256");

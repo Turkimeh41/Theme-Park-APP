@@ -48,12 +48,11 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     super.dispose();
   }
 
-  Future<void> storeShared() async {
+  Future<void> storeRememberMe() async {
     log('beginning storing: $rememberMe on the device!');
     final prefs = await SharedPreferences.getInstance();
-    log('saving value on-device...');
-    await prefs.setBool('log-out', !rememberMe);
-    log('Stored.!');
+    await prefs.setBool('remember-me', rememberMe);
+    log('Stored as $rememberMe');
   }
 
   @override
@@ -181,12 +180,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                         loading = false;
                                       });
                                       log('Success!');
-
+                                      await storeRememberMe();
                                       await FirebaseAuth.instance.signInWithCustomToken(token);
-                                      if (!rememberMe) {
-                                        await storeShared();
-                                      }
-                                      Get.off(() => const DataContainer());
                                     } on FirebaseFunctionsException catch (error) {
                                       setState(() {
                                         loading = false;

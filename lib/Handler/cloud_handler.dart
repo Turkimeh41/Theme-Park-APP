@@ -37,7 +37,6 @@ class CloudHandler {
     await FirebaseAuth.instance.signInWithCustomToken(token);
   }
 
-
   static Future<void> rechargeBalance(double amount) async {
     final documentReference = FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid);
     FirebaseFirestore.instance.runTransaction((transaction) async {
@@ -68,14 +67,13 @@ class CloudHandler {
       } else {
         FirebaseFirestore.instance.collection("Activites").doc(prefix_ActvID.substring(5)).set({"played": 0}, SetOptions(merge: true));
       }
-          log('done!');
+      log('done!');
     }
     //we throw our own error exception which is an object instantiation, we could catch this error, and workaround that in our widget to make user add balance
     else if (actvResult['price'] > userResult['balance']) {
       log('not enough balance...');
       throw BalanceException();
     }
-
   }
 
   static Future<void> newParticipation(String actvID) async {

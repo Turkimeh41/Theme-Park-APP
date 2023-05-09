@@ -60,6 +60,8 @@ dependencies:
   image_picker: ^0.8.7+4
   uuid: ^3.0.7
   align_positioned: ^3.0.0
+  chalkdart: ^2.0.9
+  flutter_svg: ^2.0.5
 
 dev_dependencies:
   flutter_test:
@@ -88,6 +90,7 @@ flutter:
      - assets/animations/
      - assets/audios/
      - assets/images/
+     - assets/svg_images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
