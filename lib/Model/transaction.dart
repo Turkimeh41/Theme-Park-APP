@@ -2,10 +2,10 @@
 
 class Transaction {
   final String transID;
-  final String actID;
-  final String activityName;
+  final String actName;
   final DateTime transaction_date;
-  final double amount;
-  final String type;
-  Transaction(this.transID, this.actID, this.activityName, this.transaction_date, this.amount, this.type);
+  final double actAmount;
+  final String actType;
+  final int actDuration;
+  Transaction({required this.transID, required this.actName, required this.transaction_date, required this.actAmount, required this.actType, required this.actDuration});
 }

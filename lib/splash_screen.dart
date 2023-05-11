@@ -16,10 +16,18 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+  late AnimationController controller;
   ValueNotifier dotNotifier = ValueNotifier<String>('.');
   @override
   void initState() {
+    rocketNotifier.addListener(() {
+      if (rocketNotifier.value == 1) {
+        controller.forward();
+      }
+    });
+
+    controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200));
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Timer.periodic(const Duration(milliseconds: 650), (timer) {
         if (dotNotifier.value == '.') {
@@ -32,7 +40,18 @@ class _SplashScreenState extends State<SplashScreen> {
       });
     });
 
+    controller.addListener(() {
+      setState(() {});
+    });
+
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    dotNotifier.removeListener(() {});
+    controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -51,24 +70,16 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            Positioned(
-              top: dh * 0.1,
-              child: Image.asset(
-                'assets/images/logo.png',
-                height: 192,
-                width: 192,
-              ),
-            ),
             ValueListenableBuilder(
                 valueListenable: rocketNotifier,
                 builder: (context, choice, child) {
                   if (choice == 0) {
-                    return Positioned(bottom: 0.4 * dh, child: Lottie.asset('assets/animations/rocket_loading.json', width: 384));
+                    return Positioned(bottom: 0.45 * dh, child: Lottie.asset('assets/animations/rocket_loading.json', width: 384));
                   }
-                  return Positioned(bottom: 0.4 * dh, child: Lottie.asset('assets/animations/rocket_done.json', width: 384));
+                  return Positioned(bottom: 0.45 * dh, child: Lottie.asset('assets/animations/rocket_done.json', width: 384, controller: controller));
                 }),
             Positioned(
-                bottom: dh * 0.35,
+                bottom: dh * 0.3,
                 child: ValueListenableBuilder(
                   valueListenable: textNotifier,
                   builder: (context, text, child) {

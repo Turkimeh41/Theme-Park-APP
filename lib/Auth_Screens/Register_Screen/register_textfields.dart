@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:final_project/Handler/verify_handler.dart';
 import 'package:final_project/Auth_Screens/Register_Screen/verifynumber_screen.dart';
-import 'package:final_project/Handler/cloud_handler.dart';
+import 'package:final_project/Handler/firebase_handler.dart';
 import 'package:final_project/Provider/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -164,7 +164,7 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                               onChanged: (value) {
                                 insRegUser.firstName = value;
                               },
-                              style: GoogleFonts.alef(fontSize: 16),
+                              style: GoogleFonts.signika(fontSize: 16),
                               focusNode: firstFocus,
                               decoration: InputDecoration(
                                 border: InputBorder.none,
@@ -180,7 +180,7 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                                 errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
                                 focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
                                 labelText: 'First Name',
-                                hintStyle: const TextStyle(color: Color.fromARGB(255, 110, 30, 63)),
+                                hintStyle: GoogleFonts.signika(color: const Color.fromARGB(255, 110, 30, 63)),
                                 labelStyle: GoogleFonts.acme(
                                     fontSize: firstFocus.hasFocus ? 22 : 16, color: firstFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100)),
                               )),
@@ -198,7 +198,7 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                               onChanged: (value) {
                                 insRegUser.lastName = value;
                               },
-                              style: GoogleFonts.alef(fontSize: 16),
+                              style: GoogleFonts.signika(fontSize: 16),
                               focusNode: lastFocus,
                               decoration: InputDecoration(
                                 border: InputBorder.none,
@@ -214,7 +214,7 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                                 errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
                                 focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
                                 labelText: 'Last Name',
-                                hintStyle: const TextStyle(color: Color.fromARGB(255, 110, 30, 63)),
+                                hintStyle: GoogleFonts.signika(color: const Color.fromARGB(255, 110, 30, 63)),
                                 labelStyle: GoogleFonts.acme(
                                     fontSize: lastFocus.hasFocus ? 22 : 16, color: lastFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100)),
                               )),
@@ -244,7 +244,7 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                                     }
                                     insRegUser.username = value;
                                   },
-                                  style: GoogleFonts.alef(fontSize: 18),
+                                  style: GoogleFonts.signika(fontSize: 18),
                                   focusNode: userFocus,
                                   decoration: InputDecoration(
                                     errorText: insRegUser.userError,
@@ -260,7 +260,7 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                                     errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
                                     focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
                                     labelText: 'Username',
-                                    errorStyle: const TextStyle(fontSize: 10),
+                                    errorStyle: GoogleFonts.signika(fontSize: 11.5),
                                     labelStyle: GoogleFonts.acme(
                                         fontSize: userFocus.hasFocus ? 22 : 16, color: userFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100)),
                                   ));
@@ -286,7 +286,7 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                                     }
                                     insRegUser.password = value;
                                   },
-                                  style: GoogleFonts.alef(fontSize: 18),
+                                  style: GoogleFonts.signika(fontSize: 18),
                                   obscureText: true,
                                   focusNode: passFocus,
                                   decoration: InputDecoration(
@@ -302,7 +302,7 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                                     focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
                                     errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
                                     focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
-                                    errorStyle: const TextStyle(fontSize: 9),
+                                    errorStyle: GoogleFonts.signika(fontSize: 11.5),
                                     labelText: 'Password',
                                     labelStyle: GoogleFonts.acme(
                                         fontSize: passFocus.hasFocus ? 22 : 16, color: passFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100)),
@@ -328,7 +328,7 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                                     }
                                     insRegUser.confirmedPass = value;
                                   },
-                                  style: GoogleFonts.alef(fontSize: 18),
+                                  style: GoogleFonts.signika(fontSize: 18),
                                   obscureText: true,
                                   focusNode: confirmpassFocus,
                                   decoration: InputDecoration(
@@ -345,7 +345,7 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                                     errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
                                     focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
                                     labelText: 'Confirm Password',
-                                    errorStyle: const TextStyle(fontSize: 9),
+                                    errorStyle: GoogleFonts.signika(fontSize: 11.5),
                                     labelStyle: GoogleFonts.acme(
                                         fontSize: confirmpassFocus.hasFocus ? 22 : 16,
                                         color: confirmpassFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100)),
@@ -387,7 +387,7 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                                     }
                                     insRegUser.emailAddress = value;
                                   },
-                                  style: GoogleFonts.alef(fontSize: 18),
+                                  style: GoogleFonts.signika(fontSize: 18),
                                   focusNode: emailFocus,
                                   decoration: InputDecoration(
                                     errorText: insRegUser.emailError,
@@ -402,7 +402,7 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                                     focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
                                     errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
                                     focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
-                                    errorStyle: const TextStyle(fontSize: 10),
+                                    errorStyle: GoogleFonts.signika(fontSize: 11.5),
                                     labelText: 'Email Address',
                                     labelStyle: GoogleFonts.acme(
                                         fontSize: emailFocus.hasFocus ? 22 : 16, color: emailFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100)),
@@ -429,13 +429,13 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                                     }
                                     insRegUser.phonenumber = value;
                                   },
-                                  style: GoogleFonts.alef(fontSize: 18),
+                                  style: GoogleFonts.signika(fontSize: 18),
                                   focusNode: phoneFocus,
                                   decoration: InputDecoration(
                                     errorText: insRegUser.phoneError,
                                     prefix: Text(
                                       '+966  ',
-                                      style: TextStyle(color: phoneFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 0, 0, 0)),
+                                      style: GoogleFonts.signika(color: phoneFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 0, 0, 0)),
                                     ),
                                     prefixIcon: Icon(
                                       Icons.phone_android_rounded,
@@ -448,7 +448,7 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                                     focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
                                     errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
                                     focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
-                                    errorStyle: const TextStyle(fontSize: 9),
+                                    errorStyle: GoogleFonts.signika(fontSize: 11.5),
                                     labelText: 'Phone Number',
                                     labelStyle: GoogleFonts.acme(
                                         fontSize: phoneFocus.hasFocus ? 22 : 16, color: phoneFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100)),
@@ -631,9 +631,9 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                                     if (validateAndSave()) {
                                       try {
                                         log('checking if an account exists...');
-                                        await CloudHandler.userExists(insRegUser.username!, insRegUser.emailAddress!, insRegUser.phonenumber!);
+                                        await FirebaseHandler.userExists(insRegUser.username!, insRegUser.emailAddress!, insRegUser.phonenumber!);
                                         log('User doesn\'t exists!, good.');
-                                        String smsCode = await CloudHandler.sendSMSTwilio(insRegUser.phonenumber!);
+                                        String smsCode = await FirebaseHandler.sendSMSTwilio(insRegUser.phonenumber!);
                                         log('Message should be sent!');
                                         VerifyHandler.user = insRegUser;
                                         VerifyHandler.smsCode = smsCode;

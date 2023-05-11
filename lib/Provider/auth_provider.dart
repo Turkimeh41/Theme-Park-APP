@@ -149,7 +149,7 @@ class LogUser with ChangeNotifier {
   String? validatePass() {
     if (password == null || password!.isEmpty) {
       passError = 'please fill in the Password Field.';
-      return 'please fill in the Password Field.';
+      return '';
     }
     passError = null;
     return null;

@@ -1,18 +1,17 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:final_project/Main_Menu/ACCOUNT_SCREEN/account_screen.dart';
+import 'package:final_project/Main_Menu/TRANSACTION_SCREEN/transaction_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:final_project/Provider/user_provider.dart' as u;
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class UserDrawer extends StatelessWidget {
   const UserDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
-    u.User user = u.User();
-    user.first_name = 'Turki';
-    user.last_name = 'Mehaini';
-    final dh = MediaQuery.of(context).size.height;
-    final dw = MediaQuery.of(context).size.width;
+    final user = Provider.of<u.User>(context, listen: true);
     return Column(
       children: [
         Container(
@@ -24,7 +23,12 @@ class UserDrawer extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const CircleAvatar(foregroundImage: AssetImage('assets/images/placeholder.png'), radius: 32),
+              user.userImg_link.length < 7
+                  ? const CircleAvatar(radius: 36, backgroundImage: AssetImage('assets/images/placeholder.png'))
+                  : CircleAvatar(
+                      radius: 36,
+                      backgroundImage: CachedNetworkImageProvider(user.userImg_link),
+                    ),
               Text(
                 "${user.first_name} ${user.last_name}",
                 style: GoogleFonts.signika(color: Colors.white, fontSize: 24),
@@ -34,7 +38,7 @@ class UserDrawer extends StatelessWidget {
         ),
         InkWell(
           onTap: () {
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => AccountScreen(user: user)));
+            Navigator.of(context).pushNamed(AccountScreen.routeName);
           },
           child: Padding(
             padding: const EdgeInsets.only(top: 10, left: 24, right: 24, bottom: 10),
@@ -81,7 +85,7 @@ class UserDrawer extends StatelessWidget {
           thickness: 1.25,
         ),
         InkWell(
-          onTap: () {},
+          onTap: () => Navigator.of(context).pushNamed(TransactionScreen.route),
           child: Padding(
             padding: const EdgeInsets.only(top: 10, left: 24, right: 24, bottom: 10),
             child: Row(

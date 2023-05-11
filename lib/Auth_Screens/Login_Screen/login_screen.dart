@@ -1,10 +1,11 @@
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:final_project/Auth_Screens/Login_Screen/forget_password.dart';
 import 'package:final_project/Auth_Screens/Login_Screen/login_textfields.dart';
 import 'package:final_project/Auth_Screens/Register_Screen/register_screen.dart';
-import 'package:final_project/Handler/cloud_handler.dart';
+import 'package:final_project/Handler/firebase_handler.dart';
 import 'package:final_project/Provider/auth_provider.dart';
-import 'package:final_project/data_container.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -143,7 +144,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                 ),
                                 Text(
                                   'Remember me?',
-                                  style: GoogleFonts.acme(fontSize: 18),
+                                  style: GoogleFonts.acme(fontSize: 15.5),
                                 )
                               ],
                             )
@@ -175,13 +176,14 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                       loading = true;
                                     });
                                     try {
-                                      String token = await CloudHandler.loginUser(logUser.username!, logUser.password!);
+                                      String token = await FirebaseHandler.loginUser(logUser.username!, logUser.password!);
                                       builderState(() {
                                         loading = false;
                                       });
                                       log('Success!');
                                       await storeRememberMe();
                                       await FirebaseAuth.instance.signInWithCustomToken(token);
+                                      await FirebaseFirestore.instance.collection("Users").doc(FirebaseAuth.instance.currentUser!.uid).set({"last_login": Timestamp.now()}, SetOptions(merge: true));
                                     } on FirebaseFunctionsException catch (error) {
                                       setState(() {
                                         loading = false;
@@ -206,11 +208,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                   child: FadeTransition(
                     opacity: fadeAnimation,
                     child: InkWell(
-                      onTap: () async {
-                        log('sending email...');
-                        await FirebaseAuth.instance.sendPasswordResetEmail(email: 'trky-almhini@hotmail.com');
-                        log('sucess!');
-                      },
+                      onTap: () => Get.to(() => const ForgetPassword(), transition: Transition.zoom),
                       child: Text(
                         'Forgot password?, Click here',
                         style: GoogleFonts.acme(fontSize: 18, color: Colors.white, decoration: TextDecoration.underline),

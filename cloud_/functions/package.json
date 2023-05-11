@@ -18,8 +18,13 @@
     "crypto-js": "^4.1.1",
     "firebase-admin": "^11.5.0",
     "firebase-functions": "^4.2.1",
+    "handlebars": "^4.7.7",
+    "nodemailer": "^6.9.1",
+    "nodemailer-sendgrid": "^1.0.3",
+    "nodemailer-sendgrid-transport": "^0.2.0",
     "qr-image": "^3.2.0",
     "qrcode": "^1.5.1",
+    "request": "^2.88.2",
     "twilio": "^4.9.0",
     "uuid": "^9.0.0"
   },

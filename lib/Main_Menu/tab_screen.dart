@@ -1,13 +1,16 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:developer';
-
+import 'package:final_project/Main_Menu/HOME_SCREEN/home_screen.dart';
 import 'package:final_project/Main_Menu/QR_SCREEN/qr_view.dart';
+import 'package:final_project/Main_Menu/WALLET_SCREEN/wallet_screen.dart';
 import 'package:final_project/Main_Menu/drawer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:final_project/Provider/user_provider.dart' as u;
 
 class TabScreen extends StatefulWidget {
   const TabScreen({super.key});
@@ -20,11 +23,12 @@ class _TabScreenState extends State<TabScreen> {
   int navChoice = 0;
   @override
   Widget build(BuildContext context) {
+    Provider.of<u.User>(context, listen: true);
     final dh = MediaQuery.of(context).size.height;
     final dw = MediaQuery.of(context).size.width;
     return Scaffold(
         drawer: const Drawer(
-          backgroundColor:  Color.fromARGB(255, 236, 220, 220),
+          backgroundColor: Color.fromARGB(255, 243, 235, 235),
           width: 180,
           child: UserDrawer(),
         ),
@@ -55,6 +59,8 @@ class _TabScreenState extends State<TabScreen> {
                         ),
                         PopupMenuItem<int>(
                             onTap: () async {
+                              final pref = await SharedPreferences.getInstance();
+                              await pref.remove('remember-me');
                               await FirebaseAuth.instance.signOut();
                             },
                             child: Row(
@@ -71,19 +77,26 @@ class _TabScreenState extends State<TabScreen> {
           ],
         ),
         body: Container(
-          color: const Color.fromARGB(255, 236, 220, 220),
+          color: const Color.fromARGB(255, 243, 235, 235),
           height: dh,
           width: dw,
           child: Stack(
             alignment: Alignment.center,
             children: [
+              // NAVIGATION TO THE OTHER SCREENS
+              if (navChoice == 0)
+                Container(padding: const EdgeInsets.only(bottom: 60), child: const HomeScreen())
+              else if (navChoice == 1)
+                Container(padding: const EdgeInsets.only(bottom: 60), child: const WalletScreen()),
+
+//CONTAINER THAT DOES THE SHADERMASK
               Positioned(
                   bottom: 0,
                   width: dw,
                   height: 120,
                   child: ShaderMask(
                     shaderCallback: (bounds) {
-                      return const LinearGradient(colors: [Color.fromARGB(255, 109, 8, 55), Color.fromARGB(255, 138, 4, 73), Color.fromARGB(255, 87, 0, 41)]).createShader(bounds);
+                      return const LinearGradient(colors: [Color.fromARGB(255, 87, 0, 41), Color.fromARGB(255, 39, 1, 19), Color.fromARGB(255, 87, 0, 41)]).createShader(bounds);
                     },
                     child: Stack(
                       alignment: Alignment.center,
@@ -92,7 +105,7 @@ class _TabScreenState extends State<TabScreen> {
                           bottom: 0,
                           child: Container(
                             width: dw,
-                            height: 75,
+                            height: 60,
                             decoration: const BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
@@ -100,21 +113,23 @@ class _TabScreenState extends State<TabScreen> {
                           ),
                         ),
                         Positioned(
-                          bottom: -35,
+                          bottom: -50,
                           child: Container(
-                            width: 156,
-                            height: 156,
+                            width: 142,
+                            height: 142,
                             decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
                           ),
                         ),
                       ],
                     ),
                   )),
+
+              //HOME AND WALLET BUTTONS
               Positioned(
                 bottom: 0,
                 width: dw,
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 55, right: 55),
+                  padding: const EdgeInsets.only(left: 50, right: 50),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -126,8 +141,9 @@ class _TabScreenState extends State<TabScreen> {
                           },
                           child: SizedBox(
                             height: 75,
+                            width: 50,
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 AnimatedSwitcher(
                                   duration: const Duration(milliseconds: 250),
@@ -135,14 +151,20 @@ class _TabScreenState extends State<TabScreen> {
                                     return ScaleTransition(scale: animation, child: child);
                                   },
                                   child: navChoice == 0
-                                      ? Image.asset(key: const ValueKey("0"), 'assets/images/home.png', width: 26, color: Colors.white)
+                                      ? Image.asset(key: const ValueKey("0"), 'assets/images/home.png', width: 24, color: Colors.white)
                                       : Image.asset(
+                                          color: const Color.fromARGB(255, 134, 132, 132),
                                           key: const ValueKey("1"),
                                           'assets/images/home_outlined.png',
-                                          width: 26,
+                                          width: 22,
                                         ),
                                 ),
-                                Text('Home', style: GoogleFonts.actor(color: const Color.fromARGB(255, 173, 170, 170), fontSize: 16)),
+                                const SizedBox(height: 5),
+                                Text(
+                                  'Home',
+                                  style: GoogleFonts.signika(fontSize: navChoice == 0 ? 16 : 13, color: navChoice == 0 ? Colors.white : const Color.fromARGB(255, 173, 170, 170)),
+                                ),
+                                const SizedBox(height: 5)
                               ],
                             ),
                           )),
@@ -154,8 +176,9 @@ class _TabScreenState extends State<TabScreen> {
                           },
                           child: SizedBox(
                             height: 75,
+                            width: 50,
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 AnimatedSwitcher(
                                   duration: const Duration(milliseconds: 250),
@@ -163,14 +186,20 @@ class _TabScreenState extends State<TabScreen> {
                                     return ScaleTransition(scale: animation, child: child);
                                   },
                                   child: navChoice == 1
-                                      ? Image.asset(key: const ValueKey("0"), 'assets/images/wallet.png', width: 26, color: Colors.white)
+                                      ? Image.asset(key: const ValueKey("2"), 'assets/images/wallet.png', width: 24, color: Colors.white)
                                       : Image.asset(
-                                          key: const ValueKey("1"),
+                                          color: const Color.fromARGB(255, 134, 132, 132),
+                                          key: const ValueKey("3"),
                                           'assets/images/wallet_outlined.png',
-                                          width: 26,
+                                          width: 22,
                                         ),
                                 ),
-                                Text('Wallet', style: GoogleFonts.actor(color: Colors.white, fontSize: 16)),
+                                const SizedBox(height: 5),
+                                Text(
+                                  'Wallet',
+                                  style: GoogleFonts.signika(fontSize: navChoice == 1 ? 16 : 13, color: navChoice == 1 ? Colors.white : const Color.fromARGB(255, 134, 132, 132)),
+                                ),
+                                const SizedBox(height: 5)
                               ],
                             ),
                           )),
@@ -178,8 +207,10 @@ class _TabScreenState extends State<TabScreen> {
                   ),
                 ),
               ),
+
+              //QR SCAN
               Positioned(
-                  bottom: 10,
+                  bottom: 25,
                   child: GestureDetector(
                       onTap: () {
                         Get.to(const QRViewScreen());
@@ -188,14 +219,11 @@ class _TabScreenState extends State<TabScreen> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Image.asset(
-                            'assets/images/camera_v2.png',
-                            width: 96,
-                            height: 96,
+                            width: 60,
+                            height: 60,
+                            color: Colors.blue,
+                            'assets/images/qr.png',
                           ),
-                          Text(
-                            'Scan',
-                            style: GoogleFonts.signika(color: Colors.white, fontSize: 18),
-                          )
                         ],
                       ))),
             ],
@@ -203,19 +231,6 @@ class _TabScreenState extends State<TabScreen> {
         ));
   }
 }
-       /*        Provider.of<Activites>(context, listen: false).printActivites();
-                Provider.of<Transactions>(context, listen: false).printTransactions();
-                Provider.of<u.User>(context, listen: false).displayUser(); */
+ /*      */
 
-
-
-
-
-
-
-
-                /*           ElevatedButton(
-              child: const Text('Camera QR'),
-              onPressed: () async {
-              
-              }), */
+   /*   , */

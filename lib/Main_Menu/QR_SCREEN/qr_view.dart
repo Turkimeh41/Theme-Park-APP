@@ -1,11 +1,13 @@
-
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:final_project/Exception/balance_exception.dart';
-import 'package:final_project/Handler/cloud_handler.dart';
-import 'package:final_project/Main_Menu/tab_screen.dart';
+import 'package:final_project/Handler/firebase_handler.dart';
+import 'package:final_project/Provider/activites_provider.dart';
+import 'package:final_project/Provider/participations_provider.dart';
+import 'package:final_project/Provider/transactions_provider.dart';
+import 'package:final_project/Provider/user_provider.dart' as u;
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'dart:developer';
 import 'package:lottie/lottie.dart';
@@ -46,6 +48,10 @@ class _QRViewScreenState extends State<QRViewScreen> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
+    final insActivites = Provider.of<Activites>(context, listen: false);
+    final user = Provider.of<u.User>(context, listen: false);
+    final transaction = Provider.of<Transactions>(context, listen: false);
+    final participation = Provider.of<Participations>(context, listen: false);
     final dw = MediaQuery.of(context).size.width;
     final dh = MediaQuery.of(context).size.height;
     var scanArea = (MediaQuery.of(context).size.width < 400 || MediaQuery.of(context).size.height < 400) ? 250.0 : 400.0;
@@ -68,15 +74,25 @@ class _QRViewScreenState extends State<QRViewScreen> with SingleTickerProviderSt
 
                 if (result!.code!.substring(0, 5) == 'ACTV-') {
                   final String prefix_ID = result!.code!;
+                  final actID = prefix_ID.substring(5);
+                  final activity = insActivites.getActivityByID(actID);
+
                   try {
-                    await CloudHandler.attemptPayment(prefix_ID);
-                    Get.off(() => const TabScreen());
+                    await user.attemptPayment(activity);
+                    //payment should have deduced
+                    await user.switchEngagement(activity.duration);
+
+                    //we will attempt a payment first, if user has insufficent balance, a balanceException error will be thrown, where we won't add a transaction if that happened
+                    transaction.addTransaction(activity);
+                    participation.addParticipation(activity);
+                    //increment one played activity to activites database
+                    FirebaseHandler.incrementOnePlayedActivity(actID);
                   } on BalanceException catch (e) {
                     log(e.code);
                     log(e.details);
                   }
                 } else {
-                  //HANDLE ERROR
+                  //HANDLE ERROR IF QR CODE IS FROM OUR APP
                 }
               });
             },

@@ -1,7 +1,7 @@
 import 'package:final_project/data_container.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer';
-import 'package:final_project/Handler/cloud_handler.dart';
+import 'package:final_project/Handler/firebase_handler.dart';
 import 'package:final_project/Provider/auth_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -94,13 +94,13 @@ class VerifyHandler {
         log('adding User...');
         try {
           //add user function, will return
-          Map<String, dynamic> result = await CloudHandler.addUser(user.username!, user.password!, user.firstName!, user.lastName!, user.emailAddress!, user.phonenumber!, user.gender!);
+          Map<String, dynamic> result = await FirebaseHandler.addUser(user.username!, user.password!, user.firstName!, user.lastName!, user.emailAddress!, user.phonenumber!, user.gender!);
           log('Success!');
           builderState(() {
             loading = false;
           });
           log('Signing in...');
-          await CloudHandler.loginToken(result['token']!);
+          await FirebaseHandler.loginToken(result['token']!);
           log('done!');
           final pref = await SharedPreferences.getInstance();
           // ignore: non_constant_identifier_names

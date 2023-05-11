@@ -29,6 +29,7 @@ class Activites with ChangeNotifier {
     for (int i = 0; i < documentReference.docs.length; i++) {
       data = activityDoc[i].data();
       loadedActivites.add(Activity(
+          img: data['img_link'],
           id: activityDoc[i].id,
           name: data['name'],
           price: data['price'].runtimeType == int ? data['price'].toDouble() : data['price'],
@@ -56,5 +57,11 @@ class Activites with ChangeNotifier {
       log(chalk.green.bold("Type: ${_activites[i].type}"));
     }
     log(chalk.yellowBright.bold("=================================================="));
+  }
+
+  Activity getActivityByID(String id) {
+    final activity = _activites.firstWhere((element) => element.id == id);
+
+    return activity;
   }
 }

@@ -42,38 +42,37 @@ class _LoginTextFieldsState extends State<LoginTextFields> {
             SizedBox(
               height: 0.1 * dh,
               width: dw * 0.75,
-              child: StatefulBuilder(builder: (context, buildState) {
-                return TextFormField(
-                    validator: (value) => insLogUser.validateUser(),
-                    onChanged: (value) {
-                      if (insLogUser.userError != null) {
-                        buildState(() {
-                          insLogUser.userError = null;
-                        });
-                      }
-                      insLogUser.username = value;
-                    },
-                    style: GoogleFonts.alef(fontSize: 18),
-                    focusNode: userFocus,
-                    decoration: InputDecoration(
-                      errorText: insLogUser.userError,
-                      border: InputBorder.none,
-                      prefixIcon: Icon(
-                        Icons.supervised_user_circle,
-                        size: userFocus.hasFocus ? 36 : 28,
-                        color: userFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : Colors.grey,
-                      ),
-                      filled: true,
-                      fillColor: const Color.fromARGB(255, 224, 224, 224),
-                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(25), borderSide: BorderSide.none),
-                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(25), borderSide: BorderSide.none),
-                      errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(25), borderSide: const BorderSide(color: Colors.red, width: 1)),
-                      focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(25), borderSide: const BorderSide(color: Colors.red, width: 1)),
-                      errorStyle: const TextStyle(fontSize: 13),
-                      labelText: 'Username',
-                      labelStyle: GoogleFonts.acme(fontSize: userFocus.hasFocus ? 28 : 20, color: userFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : Colors.grey),
-                    ));
-              }),
+              child: TextFormField(
+                  validator: (value) => insLogUser.validateUser(),
+                  onChanged: (value) {
+                    if (insLogUser.userError != null) {
+                      setState(() {
+                        log('setting userError to null');
+                        insLogUser.userError = null;
+                      });
+                    }
+                    insLogUser.username = value;
+                  },
+                  style: GoogleFonts.signika(fontSize: 18),
+                  focusNode: userFocus,
+                  decoration: InputDecoration(
+                    errorText: insLogUser.userError,
+                    border: InputBorder.none,
+                    prefixIcon: Icon(
+                      Icons.supervised_user_circle,
+                      size: userFocus.hasFocus ? 36 : 28,
+                      color: userFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : Colors.grey,
+                    ),
+                    filled: true,
+                    fillColor: const Color.fromARGB(255, 224, 224, 224),
+                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(25), borderSide: BorderSide.none),
+                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(25), borderSide: BorderSide.none),
+                    errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(25), borderSide: const BorderSide(color: Colors.red, width: 0.8)),
+                    focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(25), borderSide: const BorderSide(color: Colors.red, width: 0.8)),
+                    errorStyle: GoogleFonts.signika(fontSize: 11.5),
+                    labelText: 'Username',
+                    labelStyle: GoogleFonts.signika(fontSize: userFocus.hasFocus ? 28 : 20, color: userFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : Colors.grey),
+                  )),
             ),
             SizedBox(
               height: dh * 0.02,
@@ -81,38 +80,36 @@ class _LoginTextFieldsState extends State<LoginTextFields> {
             SizedBox(
               height: 0.1 * dh,
               width: dw * 0.75,
-              child: StatefulBuilder(builder: (context, buildState) {
-                return TextFormField(
-                    validator: (value) => insLogUser.validatePass(),
-                    onChanged: (value) {
-                      if (insLogUser.passError != null) {
-                        buildState(() {
-                          insLogUser.passError = null;
-                        });
-                      }
-                      insLogUser.password = value;
-                    },
-                    style: GoogleFonts.alef(fontSize: 18),
-                    obscureText: true,
-                    focusNode: passFocus,
-                    decoration: InputDecoration(
-                      errorText: null,
-                      prefixIcon: Icon(
-                        Icons.lock_sharp,
-                        size: passFocus.hasFocus ? 36 : 28,
-                        color: passFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : Colors.grey,
-                      ),
-                      filled: true,
-                      fillColor: const Color.fromARGB(255, 224, 224, 224),
-                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(25), borderSide: BorderSide.none),
-                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(25), borderSide: BorderSide.none),
-                      errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(25), borderSide: const BorderSide(color: Colors.red, width: 1)),
-                      focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(25), borderSide: const BorderSide(color: Colors.red, width: 1)),
-                      errorStyle: const TextStyle(fontSize: 13),
-                      labelText: 'Password',
-                      labelStyle: GoogleFonts.acme(fontSize: passFocus.hasFocus ? 26 : 20, color: passFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : Colors.grey),
-                    ));
-              }),
+              child: TextFormField(
+                  validator: (value) => insLogUser.validatePass(),
+                  onChanged: (value) {
+                    if (insLogUser.passError != null) {
+                      setState(() {
+                        log('setting passError to null');
+                        insLogUser.passError = null;
+                      });
+                    }
+                    insLogUser.password = value;
+                  },
+                  style: GoogleFonts.signika(fontSize: 18),
+                  obscureText: true,
+                  focusNode: passFocus,
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(
+                      Icons.lock_sharp,
+                      size: passFocus.hasFocus ? 36 : 28,
+                      color: passFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : Colors.grey,
+                    ),
+                    filled: true,
+                    fillColor: const Color.fromARGB(255, 224, 224, 224),
+                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(25), borderSide: BorderSide.none),
+                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(25), borderSide: BorderSide.none),
+                    errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(25), borderSide: const BorderSide(color: Colors.red, width: 0.8)),
+                    focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(25), borderSide: const BorderSide(color: Colors.red, width: 0.8)),
+                    errorStyle: GoogleFonts.signika(fontSize: 11.5),
+                    labelText: 'Password',
+                    labelStyle: GoogleFonts.signika(fontSize: passFocus.hasFocus ? 26 : 20, color: passFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : Colors.grey),
+                  )),
             ),
           ],
         ),
