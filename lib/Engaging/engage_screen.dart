@@ -10,8 +10,10 @@ class EngagingScreen extends StatefulWidget {
 class _EngagingScreenState extends State<EngagingScreen> {
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('ENGAGED!'),
+    return const Scaffold(
+      body: Center(
+        child: Text('ENGAGED!'),
+      ),
     );
   }
 }

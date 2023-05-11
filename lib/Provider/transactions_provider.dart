@@ -19,7 +19,7 @@ class Transactions with ChangeNotifier {
     log('fetching transactions..');
     List<Transaction> loadedTransactions = [];
     final documentReferenceTransactions =
-        await firestore.FirebaseFirestore.instance.collection("Users").doc(FirebaseAuth.instance.currentUser!.uid).collection('Transactions').orderBy('Transaction_date').get();
+        await firestore.FirebaseFirestore.instance.collection("Users").doc(FirebaseAuth.instance.currentUser!.uid).collection('Transactions').orderBy('transaction_date').get();
     if (documentReferenceTransactions.size == 0) {
       log('no transactions...');
       return;
@@ -31,7 +31,7 @@ class Transactions with ChangeNotifier {
       loadedTransactions.add(Transaction(
           transID: transactionDocs[i].id,
           actName: data["actName"],
-          transaction_date: data["transaction_date"],
+          transaction_date: (data["transaction_date"] as firestore.Timestamp).toDate(),
           actAmount: data["actAmount"],
           actType: data["actType"],
           actDuration: data["actDuration"]));

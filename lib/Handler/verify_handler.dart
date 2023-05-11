@@ -101,6 +101,8 @@ class VerifyHandler {
           });
           log('Signing in...');
           await FirebaseHandler.loginToken(result['token']!);
+          FirebaseHandler.setLastLogin();
+
           log('done!');
           final pref = await SharedPreferences.getInstance();
           // ignore: non_constant_identifier_names

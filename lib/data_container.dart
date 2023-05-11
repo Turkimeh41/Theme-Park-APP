@@ -22,10 +22,12 @@ ValueNotifier<int> rocketNotifier = ValueNotifier(0);
 ValueNotifier<String> textNotifier = ValueNotifier('Fetching Activites');
 
 Future<void> fetchDataContainers(BuildContext context) async {
-  log('Fetching data Containers...');
+  log('Fetching Activites...');
   await Provider.of<Activites>(context, listen: false).fetchActivites();
+  log('Fetching Participations...');
+  await Provider.of<Participations>(context, listen: false).fetchParticipations();
   await Future.delayed(const Duration(milliseconds: 1300));
-  textNotifier.value = ("Fetching Transactions");
+  textNotifier.value = ("Fetching Transactions...");
   await Future.delayed(const Duration(milliseconds: 600));
   await Provider.of<Transactions>(context, listen: false).fetchTransactions();
   textNotifier.value = ("fetching and setting\n up user information");

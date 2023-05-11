@@ -1,6 +1,4 @@
 import 'dart:developer';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_project/Auth_Screens/Login_Screen/forget_password.dart';
 import 'package:final_project/Auth_Screens/Login_Screen/login_textfields.dart';
 import 'package:final_project/Auth_Screens/Register_Screen/register_screen.dart';
@@ -183,7 +181,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                       log('Success!');
                                       await storeRememberMe();
                                       await FirebaseAuth.instance.signInWithCustomToken(token);
-                                      await FirebaseFirestore.instance.collection("Users").doc(FirebaseAuth.instance.currentUser!.uid).set({"last_login": Timestamp.now()}, SetOptions(merge: true));
+                                      FirebaseHandler.setLastLogin();
                                     } on FirebaseFunctionsException catch (error) {
                                       setState(() {
                                         loading = false;

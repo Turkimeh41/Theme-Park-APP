@@ -1,4 +1,4 @@
-import 'package:final_project/stream_listener.dart';
+import 'package:final_project/data_container.dart';
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -348,7 +348,7 @@ class _PageViewScreenState extends State<PageViewScreen> {
                 final pref = await SharedPreferences.getInstance();
                 pref.setBool('intro-done', true);
                 log('intro-done: ${true}');
-                Get.off(() => const StreamListener());
+                Get.off(() => const DataContainer());
               },
               width: dw * 0.8,
               height: dh * 0.05,

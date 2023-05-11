@@ -35,6 +35,10 @@ class FirebaseHandler {
     await FirebaseAuth.instance.signInWithCustomToken(token);
   }
 
+  static Future<void> setLastLogin() async {
+    await FirebaseFirestore.instance.collection("Users").doc(FirebaseAuth.instance.currentUser!.uid).set({"last_login": Timestamp.now()}, SetOptions(merge: true));
+  }
+
   static Future<void> deduceBalance(String userID, double balance) async {
     await FirebaseFirestore.instance.collection("Users").doc(userID).update({"balance": balance});
   }
@@ -45,19 +49,8 @@ class FirebaseHandler {
       final snapshot = await transaction.get(documentReference);
       final data = snapshot.data();
       int played = data!['played'];
-      await documentReference.update(
-        {"played": played + 1},
-      );
+      transaction.set(documentReference, {"played": played + 1}, SetOptions(merge: true));
     });
-  }
-
-  static Future<String> newTransaction(Activity activity) async {
-    final response = await FirebaseFirestore.instance
-        .collection("Users")
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection("Transactions")
-        .add({"actName": activity.name, "actAmount": activity.price, "transaction_date": Timestamp.now(), 'actType': activity.type, "actIMG": activity.img, "actDuration": activity.duration});
-    return response.id;
   }
 
   static Future<int> newParticipation(Activity activity) async {
@@ -70,9 +63,7 @@ class FirebaseHandler {
       if (data == null) {
         value = 1;
         transaction.set(
-            documentReference,
-            {"actName": activity.name, "actAmount": activity.price, "transaction_date": Timestamp.now(), 'actType': activity.type, "user_played": value, "actDuration": activity.duration},
-            SetOptions(merge: true));
+            documentReference, {"actName": activity.name, "actAmount": activity.price, 'actType': activity.type, "user_played": value, "actDuration": activity.duration}, SetOptions(merge: true));
 // if the user has played the same game previously
       } else {
         value = data['user_played'] + 1;
@@ -82,5 +73,14 @@ class FirebaseHandler {
     });
 
     return value;
+  }
+
+  static Future<String> newTransaction(Activity activity) async {
+    final response = await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection("Transactions")
+        .add({"actName": activity.name, "actAmount": activity.price, "transaction_date": Timestamp.now(), 'actType': activity.type, "actIMG": activity.img, "actDuration": activity.duration});
+    return response.id;
   }
 }

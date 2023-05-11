@@ -61,7 +61,7 @@ class _WalletScreenState extends State<WalletScreen> {
                         style: GoogleFonts.signika(color: const Color.fromARGB(255, 167, 157, 157), fontSize: 16),
                       ),
                       Text(
-                        "${user.balance} SAR",
+                        "${user.balance.toStringAsFixed(2)} SAR",
                         style: GoogleFonts.signika(
                           color: const Color.fromARGB(255, 255, 255, 255),
                           fontSize: 24.5,

@@ -32,8 +32,6 @@ class _VerifyNumberState extends State<VerifyNumber> with TickerProviderStateMix
 
   @override
   void initState() {
-    MediaQuery.of(context).size.height;
-    View.of(context).physicalSize.height;
     var dh = (window.physicalSize.longestSide / window.devicePixelRatio);
     fadeController = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200));
     fadeAnimation = Tween<double>(begin: 1, end: 0).animate(CurvedAnimation(parent: fadeController, curve: Curves.linear));

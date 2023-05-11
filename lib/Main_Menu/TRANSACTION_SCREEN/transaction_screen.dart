@@ -34,7 +34,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
               separatorBuilder: (context, index) => const Divider(
                     height: 1,
                     color: Color.fromARGB(255, 211, 198, 198),
-                    thickness: 1.25,
+                    thickness: 1.75,
                   ),
               itemCount: transactionList.length),
         ));

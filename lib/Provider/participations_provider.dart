@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_project/Handler/firebase_handler.dart';
 import 'package:final_project/Model/activity.dart';
@@ -34,7 +36,10 @@ class Participations with ChangeNotifier {
   Future<void> fetchParticipations() async {
     final List<Participation> loadedParticipations = [];
     final querySnapshot = await FirebaseFirestore.instance.collection("Users").doc(FirebaseAuth.instance.currentUser!.uid).collection("Participations").get();
-
+    if (querySnapshot.docs.isEmpty) {
+      log('no participations');
+      return;
+    }
     final docList = querySnapshot.docs;
     Map<String, dynamic> data;
     String id;

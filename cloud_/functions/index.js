@@ -253,7 +253,7 @@ exports.addActivity = functions.region("europe-west1")
       const type = request["type"];
       const createdAt = admin.firestore.FieldValue.serverTimestamp();
       const response = await admin.firestore().collection("Activites")
-          .add({name: name, duration: duration, price: price, createdAt: createdAt, type: type, multiplier: 1, played: 0});
+          .add({name: name, duration: duration, price: price, createdAt: createdAt, type: type, multiplier: 1, played: 0, enabled: true});
 
 
       // i'll create a collection data that is realtime, which shows which users are engaged at that point of time

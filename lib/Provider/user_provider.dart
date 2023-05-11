@@ -238,7 +238,6 @@ class User with ChangeNotifier {
                                     backgroundColor: const MaterialStatePropertyAll(Color.fromARGB(255, 102, 5, 50))),
                                 onPressed: () async {
                                   await editPicture(setStateful, ImageSource.gallery);
-                                  timer.cancel();
                                   Navigator.of(context).pop();
                                 },
                                 child: Text('Gallery', style: GoogleFonts.signika(fontSize: 18)))
