@@ -1,16 +1,14 @@
 # final_project
 
-A new Flutter project.
+A flutter project that is excepted to be delivered for the CSC497 PROJECT IN KSU UNIVERSITY
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+Project Name: Theme Park User Management and Cashless Payment System
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Description: The Theme Park User Management and Cashless Payment System is a project aimed at providing a streamlined solution for managing users within a theme park environment.
+ The system allows park visitors to recharge their accounts with money and make purchases using a cashless payment method.
+ 
+ 
+ The core functionality includes user registration, account balance management, QR code scanning for seamless transactions, and transaction history tracking.
+ By leveraging this system, theme parks can enhance the overall visitor experience, reduce cash handling, and improve operational efficiency.
