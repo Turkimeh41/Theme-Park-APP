@@ -462,7 +462,7 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
                             width: dw * 0.8,
                             height: dh * 0.05,
                             child: Text(
-                              'About You?',
+                              'Gender',
                               style: GoogleFonts.acme(fontSize: 16),
                             ),
                           ),

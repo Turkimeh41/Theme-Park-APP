@@ -3,6 +3,7 @@ import 'package:final_project/Main_Menu/ACCOUNT_SCREEN/account_screen.dart';
 import 'package:final_project/Main_Menu/TRANSACTION_SCREEN/transaction_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:final_project/Provider/user_provider.dart' as u;
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
@@ -37,9 +38,7 @@ class UserDrawer extends StatelessWidget {
           ),
         ),
         InkWell(
-          onTap: () {
-            Navigator.of(context).pushNamed(AccountScreen.routeName);
-          },
+          onTap: () => Get.to(() => const AccountScreen(), transition: Transition.leftToRight),
           child: Padding(
             padding: const EdgeInsets.only(top: 10, left: 24, right: 24, bottom: 10),
             child: Row(
@@ -85,7 +84,7 @@ class UserDrawer extends StatelessWidget {
           thickness: 1.25,
         ),
         InkWell(
-          onTap: () => Navigator.of(context).pushNamed(TransactionScreen.route),
+          onTap: () => Get.to(() => const TransactionScreen(), transition: Transition.leftToRight),
           child: Padding(
             padding: const EdgeInsets.only(top: 10, left: 24, right: 24, bottom: 10),
             child: Row(

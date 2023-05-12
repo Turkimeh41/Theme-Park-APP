@@ -16,11 +16,8 @@ class WalletScreen extends StatefulWidget {
 }
 
 class _WalletScreenState extends State<WalletScreen> {
-  late PageController controller;
-  int currentIndex = 0;
   @override
   void initState() {
-    controller = PageController(viewportFraction: 0.6);
     super.initState();
   }
 
@@ -35,7 +32,7 @@ class _WalletScreenState extends State<WalletScreen> {
           padding: const EdgeInsets.only(left: 24, top: 24.0, bottom: 24.0),
           child: Text(
             'My Wallet',
-            style: GoogleFonts.signika(color: Colors.black, fontSize: 32),
+            style: GoogleFonts.signika(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold),
           ),
         ),
         SizedBox(
@@ -170,7 +167,7 @@ class _WalletScreenState extends State<WalletScreen> {
                 )),
             const SizedBox(height: 40),
             Text(
-              "a QR Code, dedicated with your balance,\n    let a manager scan you now, for easier payments!",
+              "a QR Code, dedicated for your account,\n    let a manager scan you now for easier payments!",
               style: GoogleFonts.signika(color: const Color.fromARGB(255, 109, 56, 81), fontSize: 12),
             ),
             const SizedBox(height: 140)

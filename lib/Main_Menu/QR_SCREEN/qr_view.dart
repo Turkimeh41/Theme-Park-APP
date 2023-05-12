@@ -1,5 +1,8 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'dart:math' as math;
+
+import 'package:chalkdart/chalk.dart';
 import 'package:final_project/Exception/balance_exception.dart';
 import 'package:final_project/Handler/firebase_handler.dart';
 import 'package:final_project/Provider/activites_provider.dart';
@@ -19,12 +22,35 @@ class QRViewScreen extends StatefulWidget {
   State<QRViewScreen> createState() => _QRViewScreenState();
 }
 
-class _QRViewScreenState extends State<QRViewScreen> with SingleTickerProviderStateMixin {
+class _QRViewScreenState extends State<QRViewScreen> with TickerProviderStateMixin {
+  ColorFilter greyscale = const ColorFilter.matrix(<double>[
+    0.2126,
+    0.7152,
+    0.0722,
+    0,
+    0,
+    0.2126,
+    0.7152,
+    0.0722,
+    0,
+    0,
+    0.2126,
+    0.7152,
+    0.0722,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+  ]);
   Barcode? result;
   QRViewController? qrcontroller;
   bool status = false;
   final GlobalKey qrKey = GlobalKey();
   late AnimationController scanController;
+  late AnimationController flashController;
 
   // In order to get hot reload to work we need to pause the camera if the platform
   // is android, or resume the camera if the platform is iOS.
@@ -36,12 +62,20 @@ class _QRViewScreenState extends State<QRViewScreen> with SingleTickerProviderSt
   @override
   void initState() {
     scanController = AnimationController(vsync: this, duration: const Duration(seconds: 3))..repeat();
+    flashController = AnimationController(vsync: this, duration: const Duration(seconds: 2), value: 0.1);
+
+    flashController.addListener(() {
+      setState(() {
+        log(chalk.green.bold('Value of the animation is now: ${flashController.value}'));
+      });
+    });
     super.initState();
   }
 
   @override
   dispose() {
     scanController.dispose();
+    flashController.dispose();
     qrcontroller!.dispose();
     super.dispose();
   }
@@ -100,19 +134,29 @@ class _QRViewScreenState extends State<QRViewScreen> with SingleTickerProviderSt
             onPermissionSet: (ctrl, p) => _onPermissionSet(context, ctrl, p),
           ),
           Positioned(
-              bottom: dh * 0.15,
-              child: IconButton(
-                onPressed: () async {
-                  log('flash toggled');
-                  await qrcontroller?.toggleFlash();
-                  setState(() {
-                    status = !status;
-                  });
-                },
-                icon: Icon(
-                  Icons.flashlight_on_sharp,
-                  color: status ? Colors.amber : Colors.grey,
-                  size: status ? 48 : 36,
+              bottom: 50,
+              child: Transform.rotate(
+                angle: 270 * math.pi / 180,
+                child: ImageFiltered(
+                  imageFilter: status
+                      ? const ColorFilter.mode(
+                          Colors.transparent,
+                          BlendMode.saturation,
+                        )
+                      : greyscale,
+                  child: GestureDetector(
+                      onTap: () async {
+                        await qrcontroller?.toggleFlash();
+                        if (status) {
+                          log('reversing');
+                          flashController.animateBack(0.1, duration: const Duration(milliseconds: 50));
+                        } else {
+                          log('forwarding');
+                          flashController.animateTo(0.5, duration: const Duration(seconds: 2));
+                        }
+                        status = !status;
+                      },
+                      child: Lottie.asset('assets/animations/flash.json', controller: flashController)),
                 ),
               )),
           Positioned(child: Lottie.asset('assets/animations/scan_red.json', controller: scanController)),

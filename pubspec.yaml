@@ -62,6 +62,9 @@ dependencies:
   align_positioned: ^3.0.0
   chalkdart: ^2.0.9
   flutter_svg: ^2.0.5
+  pretty_qr_code: ^2.0.3
+  mobile_scanner: ^3.2.0
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:

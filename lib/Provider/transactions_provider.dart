@@ -19,7 +19,7 @@ class Transactions with ChangeNotifier {
     log('fetching transactions..');
     List<Transaction> loadedTransactions = [];
     final documentReferenceTransactions =
-        await firestore.FirebaseFirestore.instance.collection("Users").doc(FirebaseAuth.instance.currentUser!.uid).collection('Transactions').orderBy('transaction_date').get();
+        await firestore.FirebaseFirestore.instance.collection("Users").doc(FirebaseAuth.instance.currentUser!.uid).collection('Transactions').orderBy('transaction_date', descending: true).get();
     if (documentReferenceTransactions.size == 0) {
       log('no transactions...');
       return;
@@ -30,6 +30,7 @@ class Transactions with ChangeNotifier {
       data = transactionDocs[i].data();
       loadedTransactions.add(Transaction(
           transID: transactionDocs[i].id,
+          actIMG: data["actIMG"],
           actName: data["actName"],
           transaction_date: (data["transaction_date"] as firestore.Timestamp).toDate(),
           actAmount: data["actAmount"],
@@ -41,12 +42,25 @@ class Transactions with ChangeNotifier {
     log('fetched transations!');
   }
 
+  List<Transaction> filter(bool ascending, String search) {
+    final filteredTransactions = _userTransactions.where((element) => element.actName.toLowerCase().startsWith(search.toLowerCase())).toList();
+
+    if (ascending) {
+      filteredTransactions.sort((a, b) => a.transaction_date.compareTo(b.transaction_date));
+    } else {
+      filteredTransactions.sort((a, b) => b.transaction_date.compareTo(a.transaction_date));
+    }
+
+    return filteredTransactions;
+  }
+
   Future<void> addTransaction(Activity activity) async {
     //add the transaction of the user inside the database
     final transID = await FirebaseHandler.newTransaction(activity);
 
 //reflect the new transaction in runtime
-    _userTransactions.add(Transaction(transID: transID, actName: activity.name, transaction_date: DateTime.now(), actAmount: activity.price, actType: activity.type, actDuration: activity.duration));
+    _userTransactions.add(Transaction(
+        transID: transID, actName: activity.name, transaction_date: DateTime.now(), actIMG: activity.img, actAmount: activity.price, actType: activity.type, actDuration: activity.duration));
     notifyListeners();
   }
 
@@ -66,5 +80,13 @@ class Transactions with ChangeNotifier {
       log(chalk.green.bold("Type: ${_userTransactions[i].actType}"));
     }
     log(chalk.yellowBright.bold("=================================================="));
+  }
+
+  double get totalExpenses {
+    double total = 0;
+    for (var transaction in _userTransactions) {
+      total += transaction.actAmount;
+    }
+    return total;
   }
 }

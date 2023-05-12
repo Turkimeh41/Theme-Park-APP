@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:developer';
+import 'package:chalkdart/chalk.dart';
 import 'package:final_project/data_container.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -21,8 +22,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   ValueNotifier dotNotifier = ValueNotifier<String>('.');
   @override
   void initState() {
-    rocketNotifier.addListener(() {
-      if (rocketNotifier.value == 1) {
+    log(chalk.cyan.bold('init state!'));
+    widget.rocketNotifier.addListener(() {
+      if (widget.rocketNotifier.value == 1) {
+        log(chalk.yellowBright.bold('Controller of animation forwarded'));
         controller.forward();
       }
     });
@@ -55,6 +58,12 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   }
 
   @override
+  void didUpdateWidget(widget) {
+    log(chalk.blue.red('widget updated'));
+    super.didUpdateWidget(widget);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final dw = MediaQuery.of(context).size.width;
     final dh = MediaQuery.of(context).size.height;
@@ -71,7 +80,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           alignment: Alignment.center,
           children: [
             ValueListenableBuilder(
-                valueListenable: rocketNotifier,
+                valueListenable: widget.rocketNotifier,
                 builder: (context, choice, child) {
                   if (choice == 0) {
                     return Positioned(bottom: 0.45 * dh, child: Lottie.asset('assets/animations/rocket_loading.json', width: 384));
@@ -81,11 +90,12 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             Positioned(
                 bottom: dh * 0.3,
                 child: ValueListenableBuilder(
-                  valueListenable: textNotifier,
+                  valueListenable: widget.textNotifier,
                   builder: (context, text, child) {
+                    dotNotifier.value = '.';
                     return ValueListenableBuilder(
                       builder: (context, dot, child) {
-                        return rocketNotifier.value != 1
+                        return widget.rocketNotifier.value != 1
                             ? Container(
                                 alignment: Alignment.center,
                                 width: 300,

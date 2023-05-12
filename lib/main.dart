@@ -1,9 +1,6 @@
 import 'dart:developer';
 
-import 'package:final_project/Auth_Screens/Login_Screen/forget_password.dart';
 import 'package:final_project/Auth_Screens/Login_Screen/login_screen.dart';
-import 'package:final_project/Main_Menu/ACCOUNT_SCREEN/account_screen.dart';
-import 'package:final_project/Main_Menu/TRANSACTION_SCREEN/transaction_screen.dart';
 import 'package:final_project/data_container.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -62,13 +59,8 @@ class MyApp extends StatelessWidget {
         )
       ],
       child: GetMaterialApp(
-          routes: {
-            ForgetPassword.routeName: (context) => const ForgetPassword(),
-            AccountScreen.routeName: (context) => const AccountScreen(),
-            TransactionScreen.route: (context) => const TransactionScreen()
-          },
           debugShowCheckedModeBanner: false,
-          title: 'SWIPEZ',
+          title: 'SwipeNpay',
           theme: ThemeData(
               focusColor: const Color.fromARGB(255, 87, 0, 41),
               appBarTheme: const AppBarTheme(
@@ -78,7 +70,9 @@ class MyApp extends StatelessWidget {
           home: StreamBuilder<User?>(
             stream: FirebaseAuth.instance.authStateChanges(),
             builder: (context, snapshot) {
-              if (snapshot.hasData) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const CircularProgressIndicator();
+              } else if (snapshot.hasData) {
                 return const DataContainer();
               } else {
                 return const LoginScreen();

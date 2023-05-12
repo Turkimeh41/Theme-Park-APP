@@ -1,7 +1,8 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, unused_import
 
 import 'package:final_project/Main_Menu/HOME_SCREEN/home_screen.dart';
 import 'package:final_project/Main_Menu/QR_SCREEN/qr_view.dart';
+import 'package:final_project/Main_Menu/QR_SCREEN/qr_view_v2.dart';
 import 'package:final_project/Main_Menu/WALLET_SCREEN/wallet_screen.dart';
 import 'package:final_project/Main_Menu/drawer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -19,7 +20,28 @@ class TabScreen extends StatefulWidget {
   State<TabScreen> createState() => _TabScreenState();
 }
 
-class _TabScreenState extends State<TabScreen> {
+class _TabScreenState extends State<TabScreen> with TickerProviderStateMixin {
+  late AnimationController controller;
+  late Animation<Offset> offsetAnimation;
+  late Animation<double> fadeAnimation;
+  @override
+  void initState() {
+    controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 450));
+    offsetAnimation = Tween<Offset>(begin: const Offset(0, 0.02), end: const Offset(0, 0)).animate(controller);
+    fadeAnimation = Tween<double>(begin: 0.0, end: 1).animate(controller);
+
+    controller.addListener(() {
+      setState(() {});
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
   int navChoice = 0;
   @override
   Widget build(BuildContext context) {
@@ -85,27 +107,41 @@ class _TabScreenState extends State<TabScreen> {
             children: [
               // NAVIGATION TO THE OTHER SCREENS
               if (navChoice == 0)
-                Container(padding: const EdgeInsets.only(bottom: 60), child: const HomeScreen())
+                Container(padding: const EdgeInsets.only(bottom: 60), child: SlideTransition(position: offsetAnimation, child: FadeTransition(opacity: fadeAnimation, child: const HomeScreen())))
               else if (navChoice == 1)
-                Container(padding: const EdgeInsets.only(bottom: 60), child: const WalletScreen()),
+                Container(padding: const EdgeInsets.only(bottom: 60), child: SlideTransition(position: offsetAnimation, child: FadeTransition(opacity: fadeAnimation, child: const WalletScreen()))),
 
 //CONTAINER THAT DOES THE SHADERMASK
               Positioned(
                   bottom: 0,
                   width: dw,
-                  height: 120,
+                  height: 100,
                   child: ShaderMask(
                     shaderCallback: (bounds) {
-                      return const LinearGradient(colors: [Color.fromARGB(255, 87, 0, 41), Color.fromARGB(255, 39, 1, 19), Color.fromARGB(255, 87, 0, 41)]).createShader(bounds);
+                      return const LinearGradient(
+                              colors: [Color.fromARGB(255, 87, 0, 41), Color.fromARGB(255, 71, 1, 34), Color.fromARGB(255, 48, 4, 25), Color.fromARGB(255, 71, 1, 34), Color.fromARGB(255, 87, 0, 41)])
+                          .createShader(bounds);
                     },
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
                         Positioned(
+                          right: dw * 0.32,
+                          bottom: dh * 0.04,
+                          child: Container(
+                            width: 20,
+                            height: 20,
+                            decoration: const BoxDecoration(
+                              borderRadius: BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8)),
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        Positioned(
                           bottom: 0,
                           child: Container(
                             width: dw,
-                            height: 60,
+                            height: 55,
                             decoration: const BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
@@ -131,16 +167,18 @@ class _TabScreenState extends State<TabScreen> {
                 child: Padding(
                   padding: const EdgeInsets.only(left: 50, right: 50),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       InkWell(
                           onTap: () {
                             setState(() {
+                              controller.reset();
                               navChoice = 0;
+                              controller.forward();
                             });
                           },
                           child: SizedBox(
-                            height: 75,
                             width: 50,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.end,
@@ -159,23 +197,28 @@ class _TabScreenState extends State<TabScreen> {
                                           width: 22,
                                         ),
                                 ),
-                                const SizedBox(height: 5),
-                                Text(
-                                  'Home',
-                                  style: GoogleFonts.signika(fontSize: navChoice == 0 ? 16 : 13, color: navChoice == 0 ? Colors.white : const Color.fromARGB(255, 173, 170, 170)),
+                                const SizedBox(
+                                  height: 3,
                                 ),
-                                const SizedBox(height: 5)
+                                SizedBox(
+                                  height: 20,
+                                  child: Text(
+                                    'Home',
+                                    style: GoogleFonts.signika(fontSize: navChoice == 0 ? 16 : 13, color: navChoice == 0 ? Colors.white : const Color.fromARGB(255, 173, 170, 170)),
+                                  ),
+                                ),
                               ],
                             ),
                           )),
                       InkWell(
                           onTap: () {
                             setState(() {
+                              controller.reset();
                               navChoice = 1;
+                              controller.forward();
                             });
                           },
                           child: SizedBox(
-                            height: 75,
                             width: 50,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.end,
@@ -194,12 +237,16 @@ class _TabScreenState extends State<TabScreen> {
                                           width: 22,
                                         ),
                                 ),
-                                const SizedBox(height: 5),
-                                Text(
-                                  'Wallet',
-                                  style: GoogleFonts.signika(fontSize: navChoice == 1 ? 16 : 13, color: navChoice == 1 ? Colors.white : const Color.fromARGB(255, 134, 132, 132)),
+                                const SizedBox(
+                                  height: 3,
                                 ),
-                                const SizedBox(height: 5)
+                                SizedBox(
+                                  height: 20,
+                                  child: Text(
+                                    'Wallet',
+                                    style: GoogleFonts.signika(fontSize: navChoice == 1 ? 16 : 13, color: navChoice == 1 ? Colors.white : const Color.fromARGB(255, 134, 132, 132)),
+                                  ),
+                                ),
                               ],
                             ),
                           )),
@@ -210,27 +257,18 @@ class _TabScreenState extends State<TabScreen> {
 
               //QR SCAN
               Positioned(
-                  bottom: 25,
+                  bottom: 20,
                   child: GestureDetector(
                       onTap: () {
-                        Get.to(const QRViewScreen());
+                        Get.to(const QRViewScreen(), transition: Transition.upToDown);
                       },
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Image.asset(
-                            width: 60,
-                            height: 60,
-                            color: Colors.blue,
-                            'assets/images/qr.png',
-                          ),
-                        ],
+                      child: Image.asset(
+                        width: 76,
+                        height: 76,
+                        'assets/images/scanning.png',
                       ))),
             ],
           ),
         ));
   }
 }
- /*      */
-
-   /*   , */

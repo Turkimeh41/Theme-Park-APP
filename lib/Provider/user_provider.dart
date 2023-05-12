@@ -113,7 +113,6 @@ class User with ChangeNotifier {
         loading = true;
       });
       final name = uuid.v4();
-      log(userImg_link);
       if (userImg_link.length > 6) {
         log('deleting old picture...');
         await FirebaseStorage.instance.refFromURL(userImg_link).delete();

@@ -4,7 +4,6 @@ import 'package:final_project/Auth_Screens/Login_Screen/login_textfields.dart';
 import 'package:final_project/Auth_Screens/Register_Screen/register_screen.dart';
 import 'package:final_project/Handler/firebase_handler.dart';
 import 'package:final_project/Provider/auth_provider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nice_buttons/nice_buttons.dart';
@@ -180,7 +179,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                       });
                                       log('Success!');
                                       await storeRememberMe();
-                                      await FirebaseAuth.instance.signInWithCustomToken(token);
+                                      await FirebaseHandler.loginToken(token);
                                       FirebaseHandler.setLastLogin();
                                     } on FirebaseFunctionsException catch (error) {
                                       setState(() {
