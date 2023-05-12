@@ -1,6 +1,6 @@
 # final_project
 
-A flutter project that is excepted to be delivered for the CSC497 PROJECT IN KSU UNIVERSITY
+A flutter project that is expected to be delivered for the CSC497 PROJECT IN KSU UNIVERSITY
 
 
 
