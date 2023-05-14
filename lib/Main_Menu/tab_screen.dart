@@ -27,7 +27,7 @@ class _TabScreenState extends State<TabScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 450));
-    offsetAnimation = Tween<Offset>(begin: const Offset(0, 0.02), end: const Offset(0, 0)).animate(controller);
+    offsetAnimation = Tween<Offset>(begin: const Offset(0, 0.03), end: const Offset(0, 0)).animate(controller);
     fadeAnimation = Tween<double>(begin: 0.0, end: 1).animate(controller);
 
     controller.addListener(() {
@@ -89,7 +89,7 @@ class _TabScreenState extends State<TabScreen> with TickerProviderStateMixin {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 const Icon(Icons.logout_outlined, color: Colors.white),
-                                Text('Logout', style: GoogleFonts.acme(color: const Color.fromARGB(255, 255, 255, 255), fontSize: 16)),
+                                Text('Logout', style: GoogleFonts.acme(color: Colors.white, fontSize: 16)),
                               ],
                             )),
                       ];
@@ -173,9 +173,11 @@ class _TabScreenState extends State<TabScreen> with TickerProviderStateMixin {
                       InkWell(
                           onTap: () {
                             setState(() {
-                              controller.reset();
-                              navChoice = 0;
-                              controller.forward();
+                              if (navChoice != 0) {
+                                controller.reset();
+                                navChoice = 0;
+                                controller.forward();
+                              }
                             });
                           },
                           child: SizedBox(
@@ -213,9 +215,11 @@ class _TabScreenState extends State<TabScreen> with TickerProviderStateMixin {
                       InkWell(
                           onTap: () {
                             setState(() {
-                              controller.reset();
-                              navChoice = 1;
-                              controller.forward();
+                              if (navChoice != 1) {
+                                controller.reset();
+                                navChoice = 1;
+                                controller.forward();
+                              }
                             });
                           },
                           child: SizedBox(

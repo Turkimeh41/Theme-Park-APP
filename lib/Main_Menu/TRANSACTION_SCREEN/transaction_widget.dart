@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:final_project/Model/transaction.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -15,15 +16,34 @@ class TransactionWidget extends StatelessWidget {
             height: 90,
             decoration: const BoxDecoration(color: Color.fromARGB(255, 230, 208, 205)),
             child: Stack(
+              alignment: Alignment.center,
               children: [
                 Positioned(
                     top: 0,
                     left: 0,
-                    child: Text(
-                      transaction.actName,
-                      style: GoogleFonts.signika(color: const Color.fromARGB(255, 32, 31, 31), fontSize: 18),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: CachedNetworkImage(
+                              width: 96,
+                              imageUrl: transaction.actIMG,
+                              fit: BoxFit.cover,
+                            )),
+                        const SizedBox(width: 5),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              transaction.actName,
+                              style: GoogleFonts.signika(color: const Color.fromARGB(255, 32, 31, 31), fontSize: 18),
+                            ),
+                            Text((" ${transaction.actType}"), style: GoogleFonts.signika(color: const Color.fromARGB(255, 119, 109, 109), fontSize: 13)),
+                          ],
+                        )
+                      ],
                     )),
-                Positioned(top: 22, left: 5, child: Text((" ${transaction.actType}"), style: GoogleFonts.signika(color: const Color.fromARGB(255, 119, 109, 109), fontSize: 13))),
                 Positioned(
                     top: 0,
                     right: 0,

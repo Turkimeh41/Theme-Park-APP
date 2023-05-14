@@ -21,9 +21,10 @@ class UserDrawer extends StatelessWidget {
           height: 168,
           decoration: const BoxDecoration(color: Color.fromARGB(255, 102, 5, 50), borderRadius: BorderRadius.only(bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10))),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              const SizedBox(height: 10),
               user.userImg_link.length < 7
                   ? const CircleAvatar(radius: 36, backgroundImage: AssetImage('assets/images/placeholder.png'))
                   : CircleAvatar(
@@ -33,6 +34,10 @@ class UserDrawer extends StatelessWidget {
               Text(
                 "${user.first_name} ${user.last_name}",
                 style: GoogleFonts.signika(color: Colors.white, fontSize: 24),
+              ),
+              Text(
+                '@${user.username}',
+                style: GoogleFonts.signika(color: Colors.blue[600], fontWeight: FontWeight.bold, fontSize: 12),
               )
             ],
           ),

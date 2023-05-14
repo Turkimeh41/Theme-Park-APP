@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'dart:developer';
 
+import 'package:chalkdart/chalk.dart';
 import 'package:final_project/Auth_Screens/Login_Screen/login_screen.dart';
+import 'package:final_project/Provider/mode_provider.dart' as mode;
 import 'package:final_project/data_container.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -19,6 +22,7 @@ Future<void> main() async {
   await Firebase.initializeApp();
   await checkPref();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
   runApp(const MyApp());
 }
 
@@ -38,8 +42,22 @@ Future<void> checkPref() async {
   }
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late StreamSubscription subscription;
+  @override
+  void initState() {
+    subscription = FirebaseAuth.instance.authStateChanges().listen((user) {
+      setState(() {});
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,29 +74,40 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (context) => Participations(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => mode.ThemeMode(),
         )
       ],
-      child: GetMaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'SwipeNpay',
-          theme: ThemeData(
-              focusColor: const Color.fromARGB(255, 87, 0, 41),
-              appBarTheme: const AppBarTheme(
-                  backgroundColor: Color.fromARGB(255, 87, 0, 41), shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15), bottomRight: Radius.circular(15)))),
-              textSelectionTheme:
-                  const TextSelectionThemeData(cursorColor: Color.fromARGB(255, 100, 21, 62), selectionColor: Color.fromARGB(255, 78, 23, 51), selectionHandleColor: Color.fromARGB(255, 78, 23, 51))),
-          home: StreamBuilder<User?>(
-            stream: FirebaseAuth.instance.authStateChanges(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const CircularProgressIndicator();
-              } else if (snapshot.hasData) {
-                return const DataContainer();
-              } else {
-                return const LoginScreen();
-              }
-            },
-          )),
+      child: Consumer<mode.ThemeMode>(
+        builder: (context, schemeMode, child) {
+          return GetMaterialApp(
+              themeMode: schemeMode.currentTheme,
+              debugShowCheckedModeBanner: false,
+              title: 'SwipeNpay',
+              darkTheme: ThemeData(),
+              theme: ThemeData(
+                  focusColor: const Color.fromARGB(255, 87, 0, 41),
+                  appBarTheme: const AppBarTheme(
+                      backgroundColor: Color.fromARGB(255, 87, 0, 41),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15), bottomRight: Radius.circular(15)))),
+                  textSelectionTheme: const TextSelectionThemeData(
+                      cursorColor: Color.fromARGB(255, 100, 21, 62), selectionColor: Color.fromARGB(255, 78, 23, 51), selectionHandleColor: Color.fromARGB(255, 78, 23, 51))),
+              home: StreamBuilder<User?>(
+                stream: FirebaseAuth.instance.authStateChanges(),
+                builder: (context, snapshot) {
+                  log(chalk.yellowBright.bold('StreamAuthStateChanged!'));
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  } else if (snapshot.hasData) {
+                    return const DataContainer();
+                  } else {
+                    return const LoginScreen();
+                  }
+                },
+              ));
+        },
+      ),
     );
   }
 }

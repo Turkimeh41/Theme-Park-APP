@@ -31,7 +31,6 @@ class User with ChangeNotifier {
 //handle the loading for bottomsheet when selecting a gallery
   bool loading = false;
   Future<void> setUser() async {
-    log('setting user');
     final documentReference = await FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid).get();
     username = documentReference['username'];
     emailAddress = documentReference['email_address'];
@@ -90,14 +89,10 @@ class User with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> updateUser({required String first_name, required String last_name, required String phone, required String emailAddress}) async {
-    await FirebaseFirestore.instance
-        .collection('Users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .update({"first_name": first_name, "last_name": last_name, "email_address": emailAddress, "phone_number": phone});
+  Future<void> updateUser({required String first_name, required String last_name, required String emailAddress}) async {
+    await FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid).update({"first_name": first_name, "last_name": last_name, "email_address": emailAddress});
     this.first_name = first_name;
     this.last_name = last_name;
-    phone_number = phone;
     this.emailAddress = emailAddress;
     notifyListeners();
   }
@@ -249,7 +244,7 @@ class User with ChangeNotifier {
         });
   }
 
-  Future<void> confirmEditDialog(BuildContext context, String first_name, String last_name, String email_address, String phone_number) async {
+  Future<void> confirmEditDialog(BuildContext context, String first_name, String last_name, String email_address) async {
     await showDialog(
         context: context,
         builder: (context) {
@@ -311,7 +306,7 @@ class User with ChangeNotifier {
                                   setStateful(() {
                                     loading = true;
                                   });
-                                  await updateUser(first_name: first_name, last_name: last_name, phone: phone_number, emailAddress: emailAddress);
+                                  await updateUser(first_name: first_name, last_name: last_name, emailAddress: emailAddress);
                                   setStateful(() {
                                     loading = false;
                                   });

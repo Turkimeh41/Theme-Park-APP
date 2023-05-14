@@ -24,7 +24,6 @@ class _AccountScreenState extends State<AccountScreen> with SingleTickerProvider
   late FocusNode lastnameNode;
   late TextEditingController emailAddressController;
   late FocusNode emailAddressNode;
-  late TextEditingController phoneController;
   late FocusNode phoneNode;
   late GlobalKey<FormState> formKey = GlobalKey();
   var maskFormatter = MaskTextInputFormatter(mask: '## ### ####');
@@ -38,13 +37,12 @@ class _AccountScreenState extends State<AccountScreen> with SingleTickerProvider
     firstnameController = TextEditingController(text: user.first_name);
     lastnameController = TextEditingController(text: user.last_name);
     emailAddressController = TextEditingController(text: user.emailAddress);
-    phoneController = TextEditingController(text: user.phone_number);
     phoneNode = FocusNode();
     emailAddressNode = FocusNode();
     firstNameNode = FocusNode();
     lastnameNode = FocusNode();
     editController = AnimationController(vsync: this, duration: const Duration(milliseconds: 650));
-    colorAnimation = ColorTween(begin: const Color.fromARGB(255, 216, 216, 216), end: const Color.fromARGB(255, 230, 208, 205)).animate(editController);
+    colorAnimation = ColorTween(begin: const Color.fromARGB(255, 230, 208, 205), end: Color.fromARGB(255, 221, 178, 171)).animate(editController);
     opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(editController);
 
     editController.addListener(() {
@@ -139,7 +137,7 @@ class _AccountScreenState extends State<AccountScreen> with SingleTickerProvider
                               enabled: false,
                               decoration: InputDecoration(
                                   filled: true,
-                                  fillColor: const Color.fromARGB(255, 223, 205, 205),
+                                  fillColor: const Color.fromARGB(255, 230, 208, 205),
                                   disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(9), borderSide: BorderSide.none)),
                             )),
                         Row(
@@ -222,56 +220,11 @@ class _AccountScreenState extends State<AccountScreen> with SingleTickerProvider
                             ),
                           ],
                         ),
-                        // PHONE
 
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 5.0, top: 15),
-                          child: Text(
-                            'Phone',
-                            style: GoogleFonts.signika(color: Colors.black, fontSize: 15.5),
-                          ),
-                        ),
-                        Container(
-                            margin: const EdgeInsets.only(bottom: 35),
-                            width: dw * 0.9,
-                            height: 45,
-                            child: TextFormField(
-                              autovalidateMode: AutovalidateMode.onUserInteraction,
-                              keyboardType: TextInputType.phone,
-                              validator: (_) {
-                                if (phoneController.text.isEmpty) {
-                                  return 'Please fill in the Phone Number field.';
-                                }
-                                if (phoneController.text.length != 11) {
-                                  return 'Please Enter a number with 9 digits.';
-                                }
-                                if (phoneController.text.isNumericOnly) {
-                                  return 'ERROR, ONLY NUMBERS ARE ACCEPTED.';
-                                }
-
-                                return null;
-                              },
-                              inputFormatters: [maskFormatter],
-                              style: GoogleFonts.signika(color: edit ? Colors.black : const Color.fromARGB(255, 116, 114, 114), fontSize: 16),
-                              controller: phoneController,
-                              enabled: edit,
-                              decoration: InputDecoration(
-                                  focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(9), borderSide: BorderSide.none),
-                                  errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(9), borderSide: BorderSide.none),
-                                  prefix: Text(
-                                    '+966  ',
-                                    style: GoogleFonts.signika(color: const Color.fromARGB(255, 110, 30, 63), fontWeight: FontWeight.bold, fontSize: 18),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(9), borderSide: BorderSide.none),
-                                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(9), borderSide: BorderSide.none),
-                                  filled: true,
-                                  fillColor: colorAnimation.value,
-                                  disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(9), borderSide: BorderSide.none)),
-                            )),
                         // EMAIL
 
                         Padding(
-                          padding: const EdgeInsets.only(bottom: 6.0),
+                          padding: const EdgeInsets.only(bottom: 6.0, top: 25),
                           child: Text(
                             'Email Address',
                             style: GoogleFonts.signika(color: Colors.black, fontSize: 15.5),
@@ -303,6 +256,39 @@ class _AccountScreenState extends State<AccountScreen> with SingleTickerProvider
                                   filled: true,
                                   fillColor: colorAnimation.value,
                                   disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none)),
+                            )),
+
+                        // PHONE
+
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 6.0),
+                          child: Text(
+                            'Phone',
+                            style: GoogleFonts.signika(color: Colors.black, fontSize: 15.5),
+                          ),
+                        ),
+                        Container(
+                            margin: const EdgeInsets.only(bottom: 30),
+                            width: dw * 0.9,
+                            height: 45,
+                            child: TextFormField(
+                              initialValue: user.phone_number,
+                              autovalidateMode: AutovalidateMode.onUserInteraction,
+                              keyboardType: TextInputType.phone,
+                              style: GoogleFonts.signika(color: const Color.fromARGB(255, 116, 114, 114), fontSize: 16),
+                              enabled: false,
+                              decoration: InputDecoration(
+                                  focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(9), borderSide: BorderSide.none),
+                                  errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(9), borderSide: BorderSide.none),
+                                  prefix: Text(
+                                    '+966  ',
+                                    style: GoogleFonts.signika(color: const Color.fromARGB(255, 110, 30, 63), fontWeight: FontWeight.bold, fontSize: 18),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(9), borderSide: BorderSide.none),
+                                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(9), borderSide: BorderSide.none),
+                                  filled: true,
+                                  fillColor: const Color.fromARGB(255, 230, 208, 205),
+                                  disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(9), borderSide: BorderSide.none)),
                             )),
                         Center(
                             child: NiceButtons(
@@ -373,7 +359,7 @@ class _AccountScreenState extends State<AccountScreen> with SingleTickerProvider
                                   return;
                                 }
                                 try {
-                                  user.confirmEditDialog(context, firstnameController.text, lastnameController.text, emailAddressController.text, phoneController.text);
+                                  user.confirmEditDialog(context, firstnameController.text, lastnameController.text, emailAddressController.text);
                                 } catch (error) {
                                   log('ERROR: $error');
                                 }

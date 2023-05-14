@@ -1,3 +1,4 @@
+import 'package:final_project/Exception/sms_exception.dart';
 import 'package:final_project/data_container.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer';
@@ -126,6 +127,7 @@ class VerifyHandler {
         setState(() {
           loading = false;
         });
+        throw SmsException(code: 'invalid-code', details: "The code that you entered is invalid");
       }
     }
   }

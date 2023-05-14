@@ -1,7 +1,3 @@
-import 'dart:developer';
-
-import 'package:chalkdart/chalk.dart';
-import 'package:chalkdart/chalk_x11.dart';
 import 'package:final_project/Main_Menu/TRANSACTION_SCREEN/transaction_widget.dart';
 import 'package:final_project/Provider/transactions_provider.dart';
 import 'package:flutter/material.dart';

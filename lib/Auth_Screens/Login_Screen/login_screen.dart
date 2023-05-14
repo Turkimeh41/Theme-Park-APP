@@ -174,12 +174,14 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                     });
                                     try {
                                       String token = await FirebaseHandler.loginUser(logUser.username!, logUser.password!);
+
+                                      log('Success!');
+                                      await storeRememberMe();
                                       builderState(() {
                                         loading = false;
                                       });
-                                      log('Success!');
-                                      await storeRememberMe();
                                       await FirebaseHandler.loginToken(token);
+
                                       FirebaseHandler.setLastLogin();
                                     } on FirebaseFunctionsException catch (error) {
                                       setState(() {

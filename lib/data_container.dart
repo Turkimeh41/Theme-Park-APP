@@ -10,6 +10,7 @@ import 'Provider/transactions_provider.dart';
 import 'Provider/user_provider.dart' as u;
 import 'dart:developer';
 import 'splash_screen.dart';
+import './Provider/mode_provider.dart';
 
 class DataContainer extends StatefulWidget {
   const DataContainer({super.key});

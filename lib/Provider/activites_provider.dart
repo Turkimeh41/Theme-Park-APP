@@ -16,7 +16,6 @@ class Activites with ChangeNotifier {
   }
 
   Future<void> fetchActivites() async {
-    log('fetching activity');
     final List<Activity> loadedActivites = [];
 
     final documentReference = await FirebaseFirestore.instance.collection('Activites').orderBy('name').get();

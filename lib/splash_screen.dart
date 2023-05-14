@@ -22,7 +22,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   ValueNotifier dotNotifier = ValueNotifier<String>('.');
   @override
   void initState() {
-    log(chalk.cyan.bold('init state!'));
     widget.rocketNotifier.addListener(() {
       if (widget.rocketNotifier.value == 1) {
         log(chalk.yellowBright.bold('Controller of animation forwarded'));

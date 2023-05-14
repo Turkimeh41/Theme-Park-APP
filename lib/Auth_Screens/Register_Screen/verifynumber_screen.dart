@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:final_project/Exception/sms_exception.dart';
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'dart:developer';
@@ -121,21 +122,16 @@ class _VerifyNumberState extends State<VerifyNumber> with TickerProviderStateMix
                   ],
                 ),
               ), //Illustration
-              AnimatedBuilder(
-                animation: fadeController,
-                builder: (context, child) {
-                  return Positioned(
-                      top: dh * 0.1,
-                      left: dw * 0.18,
-                      child: FadeTransition(
-                        opacity: fadeAnimation,
-                        child: Image.asset(
-                          'assets/images/Enter_OTP.png',
-                          width: dw * 0.6,
-                        ),
-                      ));
-                },
-              ),
+              Positioned(
+                  top: dh * 0.1,
+                  left: dw * 0.18,
+                  child: FadeTransition(
+                    opacity: fadeAnimation,
+                    child: Image.asset(
+                      'assets/images/Enter_OTP.png',
+                      width: dw * 0.6,
+                    ),
+                  )),
               //Verifcation code text
               AnimatedBuilder(
                   animation: sizeController,
@@ -309,7 +305,20 @@ class _VerifyNumberState extends State<VerifyNumber> with TickerProviderStateMix
                                   'Submit',
                                   style: GoogleFonts.acme(color: Colors.white, fontSize: 28),
                                 ),
-                                onTap: (_) => VerifyHandler.verify(builderState, setState),
+                                onTap: (_) async {
+                                  try {
+                                    await VerifyHandler.verify(builderState, setState);
+                                  } on SmsException catch (error) {
+                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                      content: Text(
+                                        error.details,
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.signika(color: Colors.red, fontSize: 24),
+                                      ),
+                                      backgroundColor: const Color.fromARGB(255, 19, 18, 18),
+                                    ));
+                                  }
+                                },
                               )
                             : Lottie.asset('assets/animations/linear_loading_amber.json', width: 140, height: 140),
                       );
