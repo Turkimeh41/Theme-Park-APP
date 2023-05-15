@@ -4,7 +4,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:get/get.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 import 'package:provider/provider.dart';
 import 'package:final_project/Provider/user_provider.dart' as u;
@@ -332,7 +331,6 @@ class _AccountScreenState extends State<AccountScreen> with SingleTickerProvider
                                 setState(() {
                                   firstnameController.text = user.first_name;
                                   lastnameController.text = user.last_name;
-                                  phoneController.text = user.phone_number;
                                   emailAddressController.text = user.emailAddress;
                                 });
                                 await editController.reverse();
@@ -359,6 +357,7 @@ class _AccountScreenState extends State<AccountScreen> with SingleTickerProvider
                                   return;
                                 }
                                 try {
+                                  log(emailAddressController.text);
                                   user.confirmEditDialog(context, firstnameController.text, lastnameController.text, emailAddressController.text);
                                 } catch (error) {
                                   log('ERROR: $error');

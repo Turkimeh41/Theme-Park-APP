@@ -306,7 +306,7 @@ class User with ChangeNotifier {
                                   setStateful(() {
                                     loading = true;
                                   });
-                                  await updateUser(first_name: first_name, last_name: last_name, emailAddress: emailAddress);
+                                  await updateUser(first_name: first_name, last_name: last_name, emailAddress: email_address);
                                   setStateful(() {
                                     loading = false;
                                   });

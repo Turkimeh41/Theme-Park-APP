@@ -1,8 +1,10 @@
 // ignore_for_file: unused_local_variable
 
+import 'package:final_project/Handler/firebase_handler.dart';
 import 'package:final_project/Provider/activites_provider.dart';
 import 'package:final_project/Provider/participations_provider.dart';
 import 'package:final_project/Provider/transactions_provider.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -32,7 +34,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Text(
                 'Welcome',
                 style: GoogleFonts.signika(color: Colors.black),
-              ))
+              )),
+              ElevatedButton(
+                  onPressed: () async {
+                    await user.attemptPayment(activity.activites.first);
+                    await FirebaseHandler.newParticipation(activity.activites.first);
+                    await FirebaseHandler.newTransaction(activity.activites.first);
+                    await transaction.addTransaction(activity.activites.first);
+                    await participation.addParticipation(activity.activites.first);
+                    await FirebaseHandler.incrementOnePlayedActivity(activity.activites.first.id);
+                  },
+                  child: const Text('Attempt payment'))
             ],
           ),
         )

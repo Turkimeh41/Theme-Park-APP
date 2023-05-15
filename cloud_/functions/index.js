@@ -344,9 +344,9 @@ exports.sendEmailForgetHTML = functions.region("europe-west1").https.onCall(asyn
   const documentRef = await admin.firestore().collection("Users").where("email_address", "==", data["email_address"]).limit(1).get();
   if (documentRef.empty) {
     console.log("email doesn't exists");
-    throw new functions.https
-        .HttpsError("not-found", "Email doesn't exists.");
+    throw new functions.https.HttpsError("not-found", "Email doesn't exists.");
   }
+
   const documentSnap = documentRef.docs[0].data();
   const id = documentRef.docs[0].id;
   const email = documentSnap["email_address"];
@@ -355,7 +355,7 @@ exports.sendEmailForgetHTML = functions.region("europe-west1").https.onCall(asyn
   const html = template({id: id});
   const transporter = nodeMailer.createTransport(sendgridTransport({auth: {api_key: "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"}}));
 
-  const mailOptions = {from: "Themepark@forget-password.com", to: email, subject: "Testing an email send", html: html};
+  const mailOptions = {from: "trky-almhini@hotmail.com", to: email, subject: "Testing an email send", html: html};
 
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
