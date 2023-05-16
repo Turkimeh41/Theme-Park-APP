@@ -2,6 +2,7 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:final_project/Main_Menu/WALLET_SCREEN/add_money_screen.dart';
+import 'package:final_project/Main_Menu/WALLET_SCREEN/balanceEntrywidget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -26,32 +27,19 @@ class _WalletScreenState extends State<WalletScreen> {
     final user = Provider.of<u.User>(context);
     final dh = MediaQuery.of(context).size.height;
     final dw = MediaQuery.of(context).size.width;
+    final entryList = user.getEntries;
     return ListView(
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 24, top: 24.0, bottom: 24.0),
-          child: Text(
-            'My Wallet',
-            style: GoogleFonts.signika(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-        ),
         SizedBox(
             width: dw,
-            height: 300,
-            child: Stack(
-              alignment: Alignment.center,
+            height: 500,
+            child: Column(
               children: [
-                Positioned(
-                    top: 10,
-                    child: Container(
-                      width: 310,
-                      height: 70,
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(15), gradient: const LinearGradient(colors: [Color.fromARGB(255, 95, 3, 46), Color.fromARGB(255, 51, 3, 25)])),
-                    )),
-                Positioned(
-                  top: 20,
+                Container(
+                  margin: const EdgeInsets.only(top: 32, bottom: 32),
+                  width: 310,
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(15), gradient: const LinearGradient(colors: [Color.fromARGB(255, 95, 3, 46), Color.fromARGB(255, 51, 3, 25)])),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'Balance',
@@ -63,27 +51,59 @@ class _WalletScreenState extends State<WalletScreen> {
                           color: const Color.fromARGB(255, 255, 255, 255),
                           fontSize: 24.5,
                         ),
+                      ),
+                    ],
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.center,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Deposit History",
+                        style: GoogleFonts.signika(color: const Color.fromARGB(255, 27, 27, 27), fontSize: 24),
+                      ),
+                      const Icon(
+                        Icons.find_in_page_sharp,
+                        color: Color.fromARGB(255, 18, 118, 199),
+                        size: 34,
                       )
                     ],
                   ),
                 ),
-                Positioned(
-                  bottom: 0,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 15),
-                    child: ElevatedButton(
-                        style: ButtonStyle(
-                            shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(4))),
-                            backgroundColor: const MaterialStatePropertyAll(Color.fromARGB(255, 95, 3, 46)),
-                            fixedSize: const MaterialStatePropertyAll(Size(285, 30))),
-                        onPressed: () => Get.to(() => const AddMoneyScreen(), transition: Transition.leftToRightWithFade),
-                        child: RichText(
-                            textAlign: TextAlign.center,
-                            text: TextSpan(
-                                style: GoogleFonts.signika(color: Colors.white, fontSize: 24),
-                                text: '+',
-                                children: [TextSpan(text: " Add Balance", style: GoogleFonts.signika(color: Colors.white, fontSize: 16))]))),
+                Expanded(
+                    child: Container(
+                  margin: const EdgeInsets.only(top: 10, bottom: 18, left: 28, right: 28),
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: const Color.fromARGB(255, 230, 208, 205)),
+                  child: ListView.separated(
+                    separatorBuilder: (context, index) {
+                      return const Divider(
+                        height: 1,
+                        color: Color.fromARGB(255, 238, 229, 228),
+                        thickness: 2,
+                      );
+                    },
+                    itemBuilder: (context, index) {
+                      return AmountEntryWidget(entry: entryList[index]);
+                    },
+                    itemCount: entryList.length,
                   ),
+                )),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 15),
+                  child: ElevatedButton(
+                      style: ButtonStyle(
+                          shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(4))),
+                          backgroundColor: const MaterialStatePropertyAll(Color.fromARGB(255, 95, 3, 46)),
+                          fixedSize: const MaterialStatePropertyAll(Size(285, 30))),
+                      onPressed: () => Get.to(() => const AddMoneyScreen(), transition: Transition.leftToRightWithFade),
+                      child: RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                              style: GoogleFonts.signika(color: Colors.white, fontSize: 24),
+                              text: '+',
+                              children: [TextSpan(text: " Add Balance", style: GoogleFonts.signika(color: Colors.white, fontSize: 16))]))),
                 ),
               ],
             )),
@@ -177,46 +197,3 @@ class _WalletScreenState extends State<WalletScreen> {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* 
-        SizedBox(
-          width: dw,
-          height: 300,
-          child: PageView.custom(
-            onPageChanged: (index) {
-              setState(() {
-                currentIndex = index;
-              });
-            },
-            controller: controller,
-            childrenDelegate: SliverChildBuilderDelegate((context, index) {
-              double scale = index == currentIndex ? 1.25 : 0.8;
-              return TweenAnimationBuilder<double>(
-                tween: Tween(begin: scale, end: scale),
-                duration: const Duration(milliseconds: 250),
-                builder: (context, value, child) {
-                  return Transform.scale(scale: value, child: child);
-                },
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 32.0),
-                  color: index % 2 == 0 ? Colors.red : Colors.black,
-                  width: 64,
-                  height: 64,
-                ),
-              );
-            }, childCount: 4),
-            scrollDirection: Axis.horizontal,
-          ),
-        ) */

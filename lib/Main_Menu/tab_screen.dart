@@ -29,6 +29,7 @@ class _TabScreenState extends State<TabScreen> with TickerProviderStateMixin {
     controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 450));
     offsetAnimation = Tween<Offset>(begin: const Offset(0, 0.03), end: const Offset(0, 0)).animate(controller);
     fadeAnimation = Tween<double>(begin: 0.0, end: 1).animate(controller);
+    controller.animateTo(1.0);
 
     controller.addListener(() {
       setState(() {});
@@ -42,6 +43,8 @@ class _TabScreenState extends State<TabScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  String wallet = 'Wallet';
+  String home = 'Home';
   int navChoice = 0;
   @override
   Widget build(BuildContext context) {
@@ -55,6 +58,11 @@ class _TabScreenState extends State<TabScreen> with TickerProviderStateMixin {
           child: UserDrawer(),
         ),
         appBar: AppBar(
+          centerTitle: true,
+          title: Text(
+            navChoice == 0 ? home : wallet,
+            style: GoogleFonts.signika(color: Colors.white, fontSize: 32),
+          ),
           actions: [
             Theme(
               data: Theme.of(context).copyWith(

@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_project/Exception/balance_exception.dart';
 import 'package:final_project/Handler/firebase_handler.dart';
 import 'package:final_project/Model/activity.dart';
+import 'package:final_project/Model/balance_entry.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -16,22 +17,38 @@ import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
 class User with ChangeNotifier {
-  late final String username;
+  late String username;
   late int points;
   late String first_name;
   late String last_name;
   late double balance;
   late String emailAddress;
   late String phone_number;
-  late final DateTime registered;
-  late final int gender;
-  late final String qr_link;
+  late DateTime registered;
+  late int gender;
+  late String qr_link;
   late String userImg_link;
-
+  List<AmountEntry> entries = [];
 //handle the loading for bottomsheet when selecting a gallery
   bool loading = false;
   Future<void> setUser() async {
-    final documentReference = await FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid).get();
+    log(FirebaseAuth.instance.currentUser!.uid);
+    final futures = await Future.wait([
+      FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid).get(),
+      FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid).collection("AmountEntry").get()
+    ]);
+    final documentReference = futures[0] as DocumentSnapshot<Map<String, dynamic>>;
+    final balanceEntries = (futures[1] as QuerySnapshot<Map<String, dynamic>>);
+    log(balanceEntries.docs.length.toString());
+    if (balanceEntries.size != 0) {
+      final enteries = balanceEntries.docs;
+      final List<AmountEntry> loadedEnteries = [];
+      for (int i = 0; i < enteries.length; i++) {
+        final data = enteries[i].data();
+        loadedEnteries.add(AmountEntry(id: enteries[i].id, amount: data['amount'], date: (data['date'] as Timestamp).toDate()));
+      }
+      entries = loadedEnteries;
+    }
     username = documentReference['username'];
     emailAddress = documentReference['email_address'];
     first_name = documentReference['first_name'];
@@ -50,6 +67,10 @@ class User with ChangeNotifier {
     registered = (documentReference['registered'] as Timestamp).toDate();
     gender = documentReference['gender'];
     log('user\'s been set');
+  }
+
+  List<AmountEntry> get getEntries {
+    return [...entries];
   }
 
   Future<void> switchEngagement(int duration) async {
@@ -86,7 +107,15 @@ class User with ChangeNotifier {
   Future<void> rechargeBalance(double amount) async {
     await FirebaseFirestore.instance.collection("Users").doc(FirebaseAuth.instance.currentUser!.uid).update({"balance": balance + amount});
     balance = balance + amount;
+    await newAmountEntry(amount);
     notifyListeners();
+  }
+
+  Future<void> newAmountEntry(double amount) async {
+    final timestamp = Timestamp.now();
+    final response = await FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid).collection('AmountEntry').add({"amount": amount, "date": timestamp});
+    //run time add
+    entries.add(AmountEntry(id: response.id, amount: amount, date: timestamp.toDate()));
   }
 
   Future<void> updateUser({required String first_name, required String last_name, required String emailAddress}) async {

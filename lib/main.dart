@@ -87,6 +87,9 @@ class _MyAppState extends State<MyApp> {
               title: 'SwipeNpay',
               darkTheme: ThemeData(),
               theme: ThemeData(
+                  primaryColor: const Color.fromARGB(255, 95, 3, 46),
+                  dividerColor: const Color.fromARGB(255, 211, 198, 198),
+                  secondaryHeaderColor: const Color.fromARGB(255, 109, 56, 81),
                   focusColor: const Color.fromARGB(255, 87, 0, 41),
                   appBarTheme: const AppBarTheme(
                       backgroundColor: Color.fromARGB(255, 87, 0, 41),
