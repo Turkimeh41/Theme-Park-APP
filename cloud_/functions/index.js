@@ -334,6 +334,72 @@ exports.editActivity = functions.region("europe-west1").https.onRequest(async (r
   }
 });
 
+
+exports.addManager = functions.region("europe-west1").https.onRequest(async (req, res) => {
+  const hash = require("crypto-js/sha256");
+  const {v4: uuidv4} = require("uuid");
+  const request = JSON.parse(req.body);
+  const imgBytes = Buffer.from(request["img_link"], "base64");
+  const username = request["username"];
+  const first_name = request["first_name"];
+  const last_name = request["last_name"];
+  const email_address = request["email_address"];
+  const password = hash(request["password"]).toString();
+  const phone = request["phone"];
+  const imgname = uuidv4() + ".png";
+
+  const added = admin.firestore.FieldValue.serverTimestamp();
+  const response = await admin.firestore().collection("Managers").
+      add({first_name: first_name, username: username, last_name: last_name,
+        email_address: email_address, password: password, phone: phone, added: added, enabled: true});
+
+  const file = admin.storage().bucket().file("managers/managers_images/"+response.id+"/"+imgname);
+
+  const writestream = file.createWriteStream({metadata: {contentType: "image/png"}});
+  writestream.end(imgBytes);
+  await new Promise((resolve, reject) => {
+    writestream.on("finish", resolve);
+    writestream.on("error", reject);
+  });
+  await file.makePublic();
+  const imgURL = file.publicUrl();
+  await admin.firestore().collection("Managers").doc(response.id).set({img_link: imgURL}, {merge: true});
+  res.status(200).send({success: true, id: response.id, imgURL: imgURL});
+});
+
+exports.loginManager = functions.region("europe-west1")
+    .https.onCall(async (data, context) => {
+      const hash = require("crypto-js/sha256");
+      const username = data.username;
+      const password = data.password;
+
+      const document = await admin.firestore()
+          .collection("Managers").where("username", "==", username).get();
+      if (document.empty) {
+        throw new functions.https
+            .HttpsError("not-found", "Username doesn't exists.");
+      }
+      const managerDoc = document.docs[0].data();
+      const encryptedpass = hash(password).toString();
+      if (managerDoc["password"] != encryptedpass) {
+        throw new functions.https.
+            HttpsError("invalid-argument",
+                "Password incorrect.");
+      }
+
+      if (managerDoc["enabled"] == false) {
+        throw new functions.https.
+            HttpsError("permission-denied",
+                "Permission denied, manager's has been disabled.");
+      }
+
+      const customtoken = await admin.auth()
+          .createCustomToken(document.docs[0].id);
+      return {sucess: true, token: customtoken};
+    },
+    );
+
+
 exports.sendEmailForgetHTML = functions.region("europe-west1").https.onCall(async (data, context) =>{
   const nodeMailer = require("nodemailer");
   const sendgridTransport = require("nodemailer-sendgrid-transport");
@@ -368,6 +434,31 @@ exports.sendEmailForgetHTML = functions.region("europe-west1").https.onCall(asyn
 });
 
 
+exports.generateAnonyQR = functions.region("europe-west1").https.onRequest(async (req, res) => {
+  const {v4: uuidv4} = require("uuid");
+  const QRCode = require("qrcode");
+  const providerAccountID = "null";
+  const label = "null";
+  const balance = 0.0;
+  const response = await admin.firestore().collection("Anonymous_Users").add({label: label,
+    providerAccountID: providerAccountID, balance: balance, assignedDate: null});
+  const qrdata = await QRCode.toDataURL("ANONY-"+response.id, {margin: 2, scale: 10});
+  const qrCodebuffer = Buffer.from(qrdata.split(",")[1], "base64");
+  const filename = uuidv4() + ".png";
+  const file = admin.storage().bucket().file("anony_users/qr_codes/"+response.id+"/"+filename);
+  const writestream = file.createWriteStream({metadata: {contentType: "image/png"}});
+  writestream.end(qrCodebuffer);
+  await new Promise((resolve, reject) => {
+    writestream.on("finish", resolve);
+    writestream.on("error", reject);
+  });
+  await file.makePublic();
+  const qrURL = file.publicUrl();
+  await admin.firestore().collection("Anonymous_Users").doc(response.id).set({qr_link: qrURL}, {merge: true});
+  res.status(200).send({"success": true, "anonyID": response.id, "qrURL": qrURL});
+});
+
+
 exports.resetPasswordHTML = functions.region("europe-west1").https.onRequest(async (req, res) =>{
   const handlebars = require("handlebars");
 
@@ -388,12 +479,6 @@ exports.resetPassword = functions.region("europe-west1").https.onRequest(async (
   const encryptedpass = hash(password).toString();
   await admin.firestore().collection("Users").doc(id).update({password: encryptedpass});
   res.status(200).send({success: true});
-});
-
-
-exports.addManager = functions.region("europe-west1").https.onRequest(async (req, res) => {
-
-
 });
 
 

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:chalkdart/chalk.dart';
 import 'package:final_project/Auth_Screens/Login_Screen/login_screen.dart';
 import 'package:final_project/Provider/mode_provider.dart' as mode;
 import 'package:final_project/data_container.dart';
@@ -20,6 +19,7 @@ import 'package:final_project/Provider/participations_provider.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await FirebaseAuth.instance.signOut();
   await checkPref();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
@@ -99,7 +99,6 @@ class _MyAppState extends State<MyApp> {
               home: StreamBuilder<User?>(
                 stream: FirebaseAuth.instance.authStateChanges(),
                 builder: (context, snapshot) {
-                  log(chalk.yellowBright.bold('StreamAuthStateChanged!'));
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const CircularProgressIndicator();
                   } else if (snapshot.hasData) {
