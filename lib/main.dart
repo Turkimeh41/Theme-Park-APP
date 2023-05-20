@@ -19,7 +19,6 @@ import 'package:final_project/Provider/participations_provider.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await FirebaseAuth.instance.signOut();
   await checkPref();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 

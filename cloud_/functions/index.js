@@ -437,11 +437,9 @@ exports.sendEmailForgetHTML = functions.region("europe-west1").https.onCall(asyn
 exports.generateAnonyQR = functions.region("europe-west1").https.onRequest(async (req, res) => {
   const {v4: uuidv4} = require("uuid");
   const QRCode = require("qrcode");
-  const providerAccountID = "null";
-  const label = "null";
   const balance = 0.0;
-  const response = await admin.firestore().collection("Anonymous_Users").add({label: label,
-    providerAccountID: providerAccountID, balance: balance, assignedDate: null});
+  const response = await admin.firestore().collection("Anonymous_Users").add({label: null,
+    providerAccountID: null, balance: balance, assignedDate: null});
   const qrdata = await QRCode.toDataURL("ANONY-"+response.id, {margin: 2, scale: 10});
   const qrCodebuffer = Buffer.from(qrdata.split(",")[1], "base64");
   const filename = uuidv4() + ".png";

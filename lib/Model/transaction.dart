@@ -8,5 +8,16 @@ class Transaction {
   final double actAmount;
   final String actType;
   final int actDuration;
-  Transaction({required this.transID, required this.actName, required this.actIMG, required this.transaction_date, required this.actAmount, required this.actType, required this.actDuration});
+  String? label;
+  String? anonymousID;
+  Transaction(
+      {required this.transID,
+      required this.actName,
+      required this.actIMG,
+      required this.transaction_date,
+      required this.actAmount,
+      required this.actType,
+      required this.actDuration,
+      this.label,
+      this.anonymousID});
 }

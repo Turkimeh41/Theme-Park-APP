@@ -4,10 +4,12 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:chalkdart/chalk.dart';
+import 'package:chalkdart/chalk_x11.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_project/Exception/balance_exception.dart';
 import 'package:final_project/Handler/firebase_handler.dart';
 import 'package:final_project/Model/activity.dart';
+import 'package:final_project/Model/anonymous_user.dart';
 import 'package:final_project/Model/balance_entry.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -28,18 +30,21 @@ class User with ChangeNotifier {
   late int gender;
   late String qr_link;
   late String userImg_link;
-  List<AmountEntry> entries = [];
-//handle the loading for bottomsheet when selecting a gallery
+  List<AmountEntry> _entries = [];
+  List<AnonymousUser> _anonyUsers = [];
   bool loading = false;
+//bool loading handler for the bottomsheet, it will be accessed through this user instance
+
   Future<void> setUser() async {
-    log(FirebaseAuth.instance.currentUser!.uid);
+    log(chalk.lightGoldenrodYellow.bold('fetching and setting user data...'));
     final futures = await Future.wait([
       FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid).get(),
-      FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid).collection("AmountEntry").get()
+      FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid).collection("AmountEntry").orderBy("date", descending: true).get(),
+      FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid).collection("Anonymous_Users").orderBy('label').get()
     ]);
     final documentReference = futures[0] as DocumentSnapshot<Map<String, dynamic>>;
     final balanceEntries = (futures[1] as QuerySnapshot<Map<String, dynamic>>);
-    log(balanceEntries.docs.length.toString());
+    final anonymousUsers = (futures[2] as QuerySnapshot<Map<String, dynamic>>);
     if (balanceEntries.size != 0) {
       final enteries = balanceEntries.docs;
       final List<AmountEntry> loadedEnteries = [];
@@ -47,7 +52,17 @@ class User with ChangeNotifier {
         final data = enteries[i].data();
         loadedEnteries.add(AmountEntry(id: enteries[i].id, amount: data['amount'], date: (data['date'] as Timestamp).toDate()));
       }
-      entries = loadedEnteries;
+      _entries = loadedEnteries;
+    }
+    if (anonymousUsers.size != 0) {
+      final anonymousDocs = anonymousUsers.docs;
+      final List<AnonymousUser> loadedAnonyUsers = [];
+      for (int i = 0; i < anonymousDocs.length; i++) {
+        final id = anonymousDocs[i].id;
+        final data = anonymousDocs[i].data();
+        loadedAnonyUsers.add(AnonymousUser(id: id, assignedDate: (data['assignedDate'] as Timestamp).toDate(), qrURL: data['qrURL'], label: data['label']));
+      }
+      _anonyUsers = loadedAnonyUsers;
     }
     username = documentReference['username'];
     emailAddress = documentReference['email_address'];
@@ -66,11 +81,15 @@ class User with ChangeNotifier {
     phone_number = documentReference['phone_number'];
     registered = (documentReference['registered'] as Timestamp).toDate();
     gender = documentReference['gender'];
-    log('user\'s been set');
+    log(chalk.lightGoldenrodYellow.bold('User has been set'));
+  }
+
+  List<AnonymousUser> get getAnonymousUsers {
+    return [..._anonyUsers];
   }
 
   List<AmountEntry> get getEntries {
-    return [...entries];
+    return [..._entries];
   }
 
   Future<void> switchEngagement(int duration) async {
@@ -115,7 +134,7 @@ class User with ChangeNotifier {
     final timestamp = Timestamp.now();
     final response = await FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid).collection('AmountEntry').add({"amount": amount, "date": timestamp});
     //run time add
-    entries.add(AmountEntry(id: response.id, amount: amount, date: timestamp.toDate()));
+    _entries.insert(0, AmountEntry(id: response.id, amount: amount, date: timestamp.toDate()));
   }
 
   Future<void> updateUser({required String first_name, required String last_name, required String emailAddress}) async {

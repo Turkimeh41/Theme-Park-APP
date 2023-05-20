@@ -24,9 +24,8 @@ class _DataContainerState extends State<DataContainer> {
   ValueNotifier<String> textNotifier = ValueNotifier('Fetching Activites');
 
   Future<void> fetchDataContainers(BuildContext context) async {
-    log('Fetching Activites...');
     await Provider.of<Activites>(context, listen: false).fetchActivites();
-    log('Fetching Participations...');
+    await Provider.of<Activites>(context, listen: false).preloadImages(context);
     await Provider.of<Participations>(context, listen: false).fetchParticipations();
     await Future.delayed(const Duration(milliseconds: 1300));
     textNotifier.value = ("Fetching Transactions...");

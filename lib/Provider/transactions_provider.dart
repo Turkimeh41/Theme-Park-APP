@@ -16,12 +16,12 @@ class Transactions with ChangeNotifier {
   }
 
   Future<void> fetchTransactions() async {
-    log('fetching transactions..');
+    log(chalk.green.bold('fetching transactions..'));
     List<Transaction> loadedTransactions = [];
     final documentReferenceTransactions =
         await firestore.FirebaseFirestore.instance.collection("Users").doc(FirebaseAuth.instance.currentUser!.uid).collection('Transactions').orderBy('transaction_date', descending: true).get();
     if (documentReferenceTransactions.size == 0) {
-      log('no transactions...');
+      log(chalk.red.bold('no transactions...'));
       return;
     }
     final transactionDocs = documentReferenceTransactions.docs;
@@ -29,6 +29,8 @@ class Transactions with ChangeNotifier {
     for (int i = 0; i < transactionDocs.length; i++) {
       data = transactionDocs[i].data();
       loadedTransactions.add(Transaction(
+          anonymousID: data['anonyID'],
+          label: data['label'],
           transID: transactionDocs[i].id,
           actIMG: data["actIMG"],
           actName: data["actName"],
@@ -39,7 +41,7 @@ class Transactions with ChangeNotifier {
     }
 
     _userTransactions = loadedTransactions;
-    log('fetched transations!');
+    log(chalk.green.bold('fetching transactions..'));
   }
 
   List<Transaction> filter(bool ascending, String search) {
@@ -88,5 +90,17 @@ class Transactions with ChangeNotifier {
       total += transaction.actAmount;
     }
     return total;
+  }
+
+  List<double> getExpensesANDtransactionsByAnonymousID(String label) {
+    double total = 0;
+    double transactions = 0;
+    for (var transaction in _userTransactions) {
+      if (transaction.label == label) {
+        total += transaction.actAmount;
+        transactions++;
+      }
+    }
+    return [total, transactions];
   }
 }

@@ -41,7 +41,7 @@ class _AccountScreenState extends State<AccountScreen> with SingleTickerProvider
     firstNameNode = FocusNode();
     lastnameNode = FocusNode();
     editController = AnimationController(vsync: this, duration: const Duration(milliseconds: 650));
-    colorAnimation = ColorTween(begin: const Color.fromARGB(255, 230, 208, 205), end: Color.fromARGB(255, 221, 178, 171)).animate(editController);
+    colorAnimation = ColorTween(begin: const Color.fromARGB(255, 230, 208, 205), end: const Color.fromARGB(255, 221, 178, 171)).animate(editController);
     opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(editController);
 
     editController.addListener(() {

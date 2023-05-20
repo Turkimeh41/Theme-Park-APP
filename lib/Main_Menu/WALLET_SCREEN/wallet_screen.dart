@@ -2,7 +2,7 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:final_project/Main_Menu/WALLET_SCREEN/add_money_screen.dart';
-import 'package:final_project/Main_Menu/WALLET_SCREEN/balanceEntrywidget.dart';
+import 'package:final_project/Main_Menu/WALLET_SCREEN/balance_entrywidget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -80,8 +80,8 @@ class _WalletScreenState extends State<WalletScreen> {
                     separatorBuilder: (context, index) {
                       return const Divider(
                         height: 1,
-                        color: Color.fromARGB(255, 238, 229, 228),
-                        thickness: 2,
+                        color: Color.fromARGB(255, 185, 165, 162),
+                        thickness: 1.25,
                       );
                     },
                     itemBuilder: (context, index) {

@@ -2,6 +2,7 @@
 
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chalkdart/chalk_x11.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -17,11 +18,11 @@ class Activites with ChangeNotifier {
 
   Future<void> fetchActivites() async {
     final List<Activity> loadedActivites = [];
-
+    log(chalk.aqua.bold('fetching activites...'));
     final documentReference = await FirebaseFirestore.instance.collection('Activites').orderBy('name').get();
     final activityDoc = documentReference.docs;
     if (documentReference.size == 0) {
-      log('no activites...');
+      log(chalk.red.bold('no activites...'));
       return;
     }
     late Map<String, dynamic> data;
@@ -38,7 +39,7 @@ class Activites with ChangeNotifier {
     }
 
     _activites = loadedActivites;
-    log('fetched activites!');
+    log(chalk.aqua.bold('activites should be saved!'));
   }
 
   void printActivites() {
@@ -62,5 +63,9 @@ class Activites with ChangeNotifier {
     final activity = _activites.firstWhere((element) => element.id == id);
 
     return activity;
+  }
+
+  Future<void> preloadImages(BuildContext context) async {
+    await Future.wait(_activites.map((activity) => precacheImage(CachedNetworkImageProvider(activity.img), context)));
   }
 }

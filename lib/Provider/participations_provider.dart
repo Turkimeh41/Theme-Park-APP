@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:chalkdart/chalk.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_project/Handler/firebase_handler.dart';
 import 'package:final_project/Model/activity.dart';
@@ -37,7 +38,7 @@ class Participations with ChangeNotifier {
     final List<Participation> loadedParticipations = [];
     final querySnapshot = await FirebaseFirestore.instance.collection("Users").doc(FirebaseAuth.instance.currentUser!.uid).collection("Participations").get();
     if (querySnapshot.docs.isEmpty) {
-      log('no participations');
+      log(chalk.red.bold('no participations...'));
       return;
     }
     final docList = querySnapshot.docs;
