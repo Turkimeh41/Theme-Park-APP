@@ -2,14 +2,14 @@
 
 import 'dart:math' as math;
 
-import 'package:chalkdart/chalk.dart';
-import 'package:final_project/Exception/balance_exception.dart';
-import 'package:final_project/Handler/firebase_handler.dart';
+import 'package:final_project/Custom/color_filter_modes.dart';
+import 'package:final_project/Main_Menu/QR_SCREEN/qr_view_handler.dart';
 import 'package:final_project/Provider/activites_provider.dart';
 import 'package:final_project/Provider/participations_provider.dart';
 import 'package:final_project/Provider/transactions_provider.dart';
 import 'package:final_project/Provider/user_provider.dart' as u;
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'dart:developer';
@@ -23,35 +23,12 @@ class QRViewScreen extends StatefulWidget {
 }
 
 class _QRViewScreenState extends State<QRViewScreen> with TickerProviderStateMixin {
-  ColorFilter greyscale = const ColorFilter.matrix(<double>[
-    0.2126,
-    0.7152,
-    0.0722,
-    0,
-    0,
-    0.2126,
-    0.7152,
-    0.0722,
-    0,
-    0,
-    0.2126,
-    0.7152,
-    0.0722,
-    0,
-    0,
-    0,
-    0,
-    0,
-    1,
-    0,
-  ]);
-  Barcode? result;
-  QRViewController? qrcontroller;
   bool status = false;
   final GlobalKey qrKey = GlobalKey();
   late AnimationController scanController;
   late AnimationController flashController;
-
+  QrViewHandler qrViewHandler = QrViewHandler();
+  ColorFilterModes modes = ColorFilterModes();
   // In order to get hot reload to work we need to pause the camera if the platform
   // is android, or resume the camera if the platform is iOS.
   @override
@@ -64,10 +41,11 @@ class _QRViewScreenState extends State<QRViewScreen> with TickerProviderStateMix
     scanController = AnimationController(vsync: this, duration: const Duration(seconds: 3))..repeat();
     flashController = AnimationController(vsync: this, duration: const Duration(seconds: 2), value: 0.1);
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      qrViewHandler.setState = setState;
+    });
     flashController.addListener(() {
-      setState(() {
-        log(chalk.green.bold('Value of the animation is now: ${flashController.value}'));
-      });
+      setState(() {});
     });
     super.initState();
   }
@@ -75,8 +53,9 @@ class _QRViewScreenState extends State<QRViewScreen> with TickerProviderStateMix
   @override
   dispose() {
     scanController.dispose();
+    qrViewHandler.cancelStream();
+    qrViewHandler.qrController.dispose();
     flashController.dispose();
-    qrcontroller!.dispose();
     super.dispose();
   }
 
@@ -84,10 +63,11 @@ class _QRViewScreenState extends State<QRViewScreen> with TickerProviderStateMix
   Widget build(BuildContext context) {
     final insActivites = Provider.of<Activites>(context, listen: false);
     final user = Provider.of<u.User>(context, listen: false);
-    final transaction = Provider.of<Transactions>(context, listen: false);
-    final participation = Provider.of<Participations>(context, listen: false);
+    final insTransactions = Provider.of<Transactions>(context, listen: false);
+    final insParticipations = Provider.of<Participations>(context, listen: false);
     final dw = MediaQuery.of(context).size.width;
     final dh = MediaQuery.of(context).size.height;
+
     var scanArea = (MediaQuery.of(context).size.width < 400 || MediaQuery.of(context).size.height < 400) ? 250.0 : 400.0;
     return Scaffold(
         body: SizedBox(
@@ -96,57 +76,49 @@ class _QRViewScreenState extends State<QRViewScreen> with TickerProviderStateMix
       child: Stack(
         alignment: Alignment.center,
         children: [
+          // BACK BUTTON RETURN
+
+          Visibility(
+            visible: qrViewHandler.attemptingPayment,
+            child: Positioned(
+                top: 50,
+                left: 0,
+                child: IconButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      color: Colors.white,
+                    ))),
+          ),
+
+          // QR VIEW
+
           QRView(
             key: qrKey,
-            onQRViewCreated: (p0) {
-              setState(() {
-                log('qr assigned');
-                qrcontroller = p0;
-              });
-              qrcontroller!.scannedDataStream.listen((scanData) async {
-                result = scanData;
-
-                if (result!.code!.substring(0, 5) == 'ACTV-') {
-                  final String prefix_ID = result!.code!;
-                  final actID = prefix_ID.substring(5);
-                  final activity = insActivites.getActivityByID(actID);
-
-                  try {
-                    await user.attemptPayment(activity);
-                    //payment should have deduced
-                    await user.switchEngagement(activity.duration);
-
-                    //we will attempt a payment first, if user has insufficent balance, a balanceException error will be thrown, where we won't add a transaction if that happened
-                    transaction.addTransaction(activity);
-                    participation.addParticipation(activity);
-                    //increment one played activity to activites database
-                    FirebaseHandler.incrementOnePlayedActivity(actID);
-                  } on BalanceException catch (e) {
-                    log(e.code);
-                    log(e.details);
-                  }
-                } else {
-                  //HANDLE ERROR IF QR CODE IS FROM OUR APP
-                }
-              });
+            onQRViewCreated: (controller) {
+              qrViewHandler.qrController = controller;
+              qrViewHandler.initStream(context: context, insActivites: insActivites, insParticipations: insParticipations, insTransactions: insTransactions, user: user);
             },
             overlay: QrScannerOverlayShape(borderColor: const Color.fromARGB(255, 97, 9, 31), cutOutSize: scanArea, borderRadius: 1.5, borderWidth: 7),
             onPermissionSet: (ctrl, p) => _onPermissionSet(context, ctrl, p),
           ),
+
+          //Scan Animation
+
+          Positioned(child: Lottie.asset('assets/animations/scan_red.json', controller: scanController)),
+
+          //TOGGLE FLASH
           Positioned(
               bottom: 50,
               child: Transform.rotate(
                 angle: 270 * math.pi / 180,
                 child: ImageFiltered(
-                  imageFilter: status
-                      ? const ColorFilter.mode(
-                          Colors.transparent,
-                          BlendMode.saturation,
-                        )
-                      : greyscale,
+                  imageFilter: status ? modes.normal : modes.greyscale,
                   child: GestureDetector(
                       onTap: () async {
-                        await qrcontroller?.toggleFlash();
+                        await qrViewHandler.qrController.toggleFlash();
                         if (status) {
                           log('reversing');
                           flashController.animateBack(0.1, duration: const Duration(milliseconds: 50));
@@ -159,18 +131,33 @@ class _QRViewScreenState extends State<QRViewScreen> with TickerProviderStateMix
                       child: Lottie.asset('assets/animations/flash.json', controller: flashController)),
                 ),
               )),
-          Positioned(child: Lottie.asset('assets/animations/scan_red.json', controller: scanController)),
+          // TEXT ERROR WRONG QR CODE
           Positioned(
-              top: 50,
-              left: 0,
-              child: IconButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  icon: const Icon(
-                    Icons.arrow_back,
-                    color: Colors.white,
+              bottom: 20,
+              child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 2000),
+                  opacity: qrViewHandler.opacityError,
+                  child: Text(
+                    'Error, Invalid QR CODE,\n make sure you scanned an activity!',
+                    style: GoogleFonts.signika(color: const Color.fromARGB(255, 165, 27, 17)),
                   ))),
+
+          Visibility(
+            visible: qrViewHandler.attemptingPayment,
+            child: Positioned.fill(
+                child: Container(
+              color: Colors.black.withOpacity(0.5),
+            )),
+          ),
+          Visibility(
+            visible: qrViewHandler.attemptingPayment,
+            child: const Positioned(
+                child: Center(
+              child: CircularProgressIndicator(
+                color: Color.fromARGB(255, 97, 9, 31),
+              ),
+            )),
+          ),
         ],
       ),
     ));

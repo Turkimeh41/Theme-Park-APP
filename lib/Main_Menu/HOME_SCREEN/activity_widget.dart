@@ -1,5 +1,3 @@
-
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:final_project/Model/activity.dart';
@@ -25,14 +23,14 @@ class ActivityWidget extends StatelessWidget {
           ),
           Positioned.fill(
               child: Container(
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.black.withOpacity(0.6)),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.black.withOpacity(0.2)),
           )),
           Positioned(
               top: 10,
               left: 10,
               child: Text(
                 activity.name,
-                style: GoogleFonts.signika(color: Colors.white, fontSize: 24),
+                style: GoogleFonts.signika(color: Colors.white, fontSize: 20),
               ))
         ],
       ),

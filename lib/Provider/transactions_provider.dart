@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'package:final_project/Handler/firebase_handler.dart';
 import 'package:final_project/Model/activity.dart';
 import 'package:flutter/material.dart';
 
@@ -35,13 +34,14 @@ class Transactions with ChangeNotifier {
           actIMG: data["actIMG"],
           actName: data["actName"],
           transaction_date: (data["transaction_date"] as firestore.Timestamp).toDate(),
-          actAmount: data["actAmount"],
+          actAmount: data["actAmount"] is int ? data['actAmount'].toDouble() : data['actAmount'],
           actType: data["actType"],
           actDuration: data["actDuration"]));
     }
 
     _userTransactions = loadedTransactions;
     log(chalk.green.bold('fetching transactions..'));
+    notifyListeners();
   }
 
   List<Transaction> filter(bool ascending, String search) {
@@ -56,10 +56,7 @@ class Transactions with ChangeNotifier {
     return filteredTransactions;
   }
 
-  Future<void> addTransaction(Activity activity) async {
-    //add the transaction of the user inside the database
-    final transID = await FirebaseHandler.newTransaction(activity);
-
+  void addTransaction(Activity activity, String transID) async {
 //reflect the new transaction in runtime
     _userTransactions.add(Transaction(
         transID: transID, actName: activity.name, transaction_date: DateTime.now(), actIMG: activity.img, actAmount: activity.price, actType: activity.type, actDuration: activity.duration));

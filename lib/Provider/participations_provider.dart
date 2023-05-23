@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:chalkdart/chalk.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:final_project/Handler/firebase_handler.dart';
 import 'package:final_project/Model/activity.dart';
 import 'package:final_project/Model/participation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,12 +14,10 @@ class Participations with ChangeNotifier {
     return [..._participations];
   }
 
-  Future<void> addParticipation(Activity activity) async {
-    //add to database
-    int played = await FirebaseHandler.newParticipation(activity);
+  Future<void> addParticipation(Activity activity, int played) async {
+    //added to database already by FirebaseHandler static methods
 
-//add it in the list as runtime
-
+//so now we just have to add it in the runtime
 //that means the user has played this game for the first time!
     if (played == 1) {
       _participations.add(Participation(activityID: activity.id, actName: activity.name, actDuration: activity.duration, actType: activity.type, actAmount: activity.price, userPlayed: played));
@@ -52,5 +49,6 @@ class Participations with ChangeNotifier {
     }
 
     _participations = loadedParticipations;
+    notifyListeners();
   }
 }

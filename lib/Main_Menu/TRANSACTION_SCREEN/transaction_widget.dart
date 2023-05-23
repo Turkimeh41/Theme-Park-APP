@@ -19,31 +19,27 @@ class TransactionWidget extends StatelessWidget {
               alignment: Alignment.center,
               children: [
                 Positioned(
-                    top: 0,
                     left: 0,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: CachedNetworkImage(
-                              width: 96,
-                              imageUrl: transaction.actIMG,
-                              fit: BoxFit.cover,
-                            )),
-                        const SizedBox(width: 5),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              transaction.actName,
-                              style: GoogleFonts.signika(color: const Color.fromARGB(255, 32, 31, 31), fontSize: 18),
-                            ),
-                            Text((" ${transaction.actType}"), style: GoogleFonts.signika(color: const Color.fromARGB(255, 119, 109, 109), fontSize: 13)),
-                          ],
-                        )
-                      ],
-                    )),
+                    child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: CachedNetworkImage(
+                          width: 96,
+                          imageUrl: transaction.actIMG,
+                          fit: BoxFit.cover,
+                        ))),
+                Positioned(
+                  bottom: 0,
+                  left: 105,
+                  child: Column(
+                    children: [
+                      Text(
+                        transaction.actName,
+                        style: GoogleFonts.signika(color: const Color.fromARGB(255, 32, 31, 31), fontSize: 18),
+                      ),
+                      Text((" ${transaction.actType}"), style: GoogleFonts.signika(color: const Color.fromARGB(255, 119, 109, 109), fontSize: 13)),
+                    ],
+                  ),
+                ),
                 Positioned(
                     top: 0,
                     right: 0,
@@ -55,6 +51,9 @@ class TransactionWidget extends StatelessWidget {
                           style: GoogleFonts.signika(color: const Color.fromARGB(255, 119, 109, 109), fontSize: 12),
                         ),
                         Text(DateFormat("MMMM d, y, h:mm a").format(transaction.transaction_date), style: GoogleFonts.signika(color: const Color.fromARGB(255, 119, 109, 109), fontSize: 12)),
+                        transaction.label != null
+                            ? Text("Transaction by: ${transaction.label!}", style: GoogleFonts.signika(color: const Color.fromARGB(255, 95, 3, 46), fontSize: 12, fontWeight: FontWeight.bold))
+                            : const SizedBox()
                       ],
                     )),
                 Positioned(

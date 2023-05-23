@@ -90,7 +90,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
                               child: RichText(
                                   text: TextSpan(
                                       style: GoogleFonts.signika(color: const Color.fromARGB(255, 109, 56, 81), fontSize: 14),
-                                      children: [TextSpan(text: '${transactions.totalExpenses.toString()} SAR', style: GoogleFonts.signika(fontSize: 18, fontWeight: FontWeight.bold))],
+                                      children: [TextSpan(text: '${transactions.totalExpenses.toStringAsFixed(2)} SAR', style: GoogleFonts.signika(fontSize: 18, fontWeight: FontWeight.bold))],
                                       text: 'Total Expenses: ')))
                         ],
                       )),

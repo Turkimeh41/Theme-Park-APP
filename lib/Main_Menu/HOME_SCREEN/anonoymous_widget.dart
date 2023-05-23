@@ -40,12 +40,12 @@ class AnonymousWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Procceed\nTransactions: ${array[0].toInt()}',
+              'Procceed\nTransactions: ${array[1].toInt()}',
               style: GoogleFonts.signika(fontSize: 10, color: Theme.of(context).secondaryHeaderColor, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
             Text(
-              'Total Expenses: ${array[1]}',
+              'Total Expenses: ${array[0].toDouble().toStringAsFixed(2)}',
               style: GoogleFonts.signika(fontSize: 10, color: Theme.of(context).secondaryHeaderColor, fontWeight: FontWeight.bold),
             )
           ],

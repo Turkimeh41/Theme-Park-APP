@@ -6,9 +6,6 @@ import 'dart:io';
 import 'package:chalkdart/chalk.dart';
 import 'package:chalkdart/chalk_x11.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:final_project/Exception/balance_exception.dart';
-import 'package:final_project/Handler/firebase_handler.dart';
-import 'package:final_project/Model/activity.dart';
 import 'package:final_project/Model/anonymous_user.dart';
 import 'package:final_project/Model/balance_entry.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -82,6 +79,7 @@ class User with ChangeNotifier {
     registered = (documentReference['registered'] as Timestamp).toDate();
     gender = documentReference['gender'];
     log(chalk.lightGoldenrodYellow.bold('User has been set'));
+    notifyListeners();
   }
 
   List<AnonymousUser> get getAnonymousUsers {
@@ -90,25 +88,6 @@ class User with ChangeNotifier {
 
   List<AmountEntry> get getEntries {
     return [..._entries];
-  }
-
-  Future<void> switchEngagement(int duration) async {
-    await FirebaseFirestore.instance.collection("User_Engaged").doc(FirebaseAuth.instance.currentUser!.uid).update({"engaged": true});
-    Future.delayed(Duration(minutes: duration), () {
-      FirebaseFirestore.instance.collection("User_Engaged").doc(FirebaseAuth.instance.currentUser!.uid).update({"engaged": false});
-    });
-  }
-
-  Future<void> attemptPayment(Activity activity) async {
-    if (balance >= activity.price) {
-      log('balance is sufficent!');
-      balance = balance - activity.price;
-      await FirebaseHandler.deduceBalance(FirebaseAuth.instance.currentUser!.uid, balance);
-      log('balance deduced!');
-    } else if (balance < activity.price) {
-      log('Error, insuffiecent balance, ask the user for balance add');
-      throw BalanceException();
-    }
   }
 
   void displayUser() {

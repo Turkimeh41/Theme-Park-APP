@@ -59,16 +59,16 @@ exports.onDeleteUserData = functions.region("europe-west1").firestore.document("
 
   if (data["imguser_link"] != "null") {
     await Promise.all([
-      admin.storage().bucket().deleteFiles({prefix: "users/qr-codes/" + id + "/"}),
+      admin.storage().bucket().deleteFiles({prefix: "users/qr_codes/" + id + "/"}),
       admin.storage().bucket().deleteFiles({prefix: "users/profile_images/" + id + "/"}),
     ]);
     await Promise.all([
-      admin.storage().bucket().delete({prefix: "users/qr-codes/" + id + "/"}),
+      admin.storage().bucket().delete({prefix: "users/qr_codes/" + id + "/"}),
       admin.storage().bucket().delete({prefix: "users/profile_images/" + id + "/"}),
     ]);
   } else {
-    await admin.storage().bucket().deleteFiles({prefix: "users/qr-codes/" + id + "/"});
-    admin.storage().bucket().delete({prefix: "users/qr-codes/" + id + "/"});
+    await admin.storage().bucket().deleteFiles({prefix: "users/qr_codes/" + id + "/"});
+    admin.storage().bucket().delete({prefix: "users/qr_codes/" + id + "/"});
   }
 });
 
@@ -188,13 +188,6 @@ exports.loginUser = functions.region("europe-west1")
             HttpsError("invalid-argument",
                 "Password incorrect.");
       }
-
-      if (userDoc["status"] == false) {
-        throw new functions.https.
-            HttpsError("permission-denied",
-                "Permission denied, user's has been banned.");
-      }
-
       const customtoken = await admin.auth()
           .createCustomToken(document.docs[0].id);
       return {sucess: true, token: customtoken};
@@ -365,6 +358,18 @@ exports.addManager = functions.region("europe-west1").https.onRequest(async (req
   const imgURL = file.publicUrl();
   await admin.firestore().collection("Managers").doc(response.id).set({img_link: imgURL}, {merge: true});
   res.status(200).send({success: true, id: response.id, imgURL: imgURL});
+});
+
+
+exports.onDeleteManagerData = functions.region("europe-west1").firestore.document("Managers/{managerID}").onDelete(async (snapshot, context) => {
+  const data = snapshot.data();
+  const id = snapshot.id;
+  console.log("context parameters: "+context.params.managerID);
+  console.log("id of the document: "+id);
+
+  if (data["img_link"] != "null") {
+    await admin.storage().bucket().deleteFiles({prefix: "managers/managers_images/" + id + "/"});
+  }
 });
 
 exports.loginManager = functions.region("europe-west1")

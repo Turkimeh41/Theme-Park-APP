@@ -1,9 +1,15 @@
 // ignore_for_file: non_constant_identifier_names, use_build_context_synchronously
 
+import 'dart:developer';
+
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:final_project/Exception/balance_exception.dart';
 import 'package:final_project/Model/activity.dart';
+import 'package:final_project/Provider/participations_provider.dart';
+import 'package:final_project/Provider/transactions_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:final_project/Provider/user_provider.dart' as u;
 
 //This is the instance of my firebase cloud functions object, which has all the functions i've created
 final function = FirebaseFunctions.instanceFor(region: "europe-west1");
@@ -39,11 +45,28 @@ class FirebaseHandler {
     await FirebaseFirestore.instance.collection("Users").doc(FirebaseAuth.instance.currentUser!.uid).set({"last_login": Timestamp.now()}, SetOptions(merge: true));
   }
 
-  static Future<void> deduceBalance(String userID, double balance) async {
+  static Future<void> _deduceBalance(String userID, double balance) async {
     await FirebaseFirestore.instance.collection("Users").doc(userID).update({"balance": balance});
   }
 
-  static Future<void> incrementOnePlayedActivity(String activityID) async {
+  static Future<void> attemptPayment(Activity activity, u.User user, Participations insParticipations, Transactions insTransactions) async {
+    if (user.balance >= activity.price) {
+      log('balance is sufficent!');
+      user.balance = user.balance - activity.price;
+      await Future.wait([
+        _deduceBalance(FirebaseAuth.instance.currentUser!.uid, user.balance),
+        _incrementOnePlayedActivity(activity.id),
+        _newParticipation(activity, insParticipations),
+        _newTransaction(activity, insTransactions),
+        _switchEngagement(activity.duration)
+      ]);
+    } else {
+      log('Error, insuffiecent balance, ask the user for balance add');
+      throw BalanceException();
+    }
+  }
+
+  static Future<void> _incrementOnePlayedActivity(String activityID) async {
     final documentReference = FirebaseFirestore.instance.collection("Activites").doc(activityID);
     FirebaseFirestore.instance.runTransaction((transaction) async {
       final snapshot = await transaction.get(documentReference);
@@ -53,7 +76,7 @@ class FirebaseHandler {
     });
   }
 
-  static Future<int> newParticipation(Activity activity) async {
+  static Future<void> _newParticipation(Activity activity, Participations insParticipations) async {
     final documentReference = FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid).collection('Participations').doc(activity.id);
     late int value;
     await FirebaseFirestore.instance.runTransaction((transaction) async {
@@ -71,16 +94,22 @@ class FirebaseHandler {
         transaction.set(documentReference, {"user_played": value}, SetOptions(merge: true));
       }
     });
-
-    return value;
+    insParticipations.addParticipation(activity, value);
   }
 
-  static Future<String> newTransaction(Activity activity) async {
+  static Future<void> _switchEngagement(int duration) async {
+    await FirebaseFirestore.instance.collection("User_Engaged").doc(FirebaseAuth.instance.currentUser!.uid).update({"engaged": true});
+    Future.delayed(Duration(minutes: duration), () {
+      FirebaseFirestore.instance.collection("User_Engaged").doc(FirebaseAuth.instance.currentUser!.uid).update({"engaged": false});
+    });
+  }
+
+  static Future<void> _newTransaction(Activity activity, Transactions transactions) async {
     final response = await FirebaseFirestore.instance
         .collection("Users")
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .collection("Transactions")
         .add({"actName": activity.name, "actAmount": activity.price, "transaction_date": Timestamp.now(), 'actType': activity.type, "actIMG": activity.img, "actDuration": activity.duration});
-    return response.id;
+    transactions.addTransaction(activity, response.id);
   }
 }
