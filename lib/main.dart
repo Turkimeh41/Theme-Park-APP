@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_project/Auth_Screens/Login_Screen/login_screen.dart';
 import 'package:final_project/Provider/mode_provider.dart' as mode;
 import 'package:final_project/data_container.dart';
@@ -21,7 +22,6 @@ Future<void> main() async {
   await Firebase.initializeApp();
   await checkPref();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-
   runApp(const MyApp());
 }
 
@@ -83,7 +83,7 @@ class _MyAppState extends State<MyApp> {
           return GetMaterialApp(
               themeMode: schemeMode.currentTheme,
               debugShowCheckedModeBanner: false,
-              title: 'SwipeNpay',
+              title: 'Swipe',
               darkTheme: ThemeData(),
               theme: ThemeData(
                   primaryColor: const Color.fromARGB(255, 95, 3, 46),
@@ -96,12 +96,35 @@ class _MyAppState extends State<MyApp> {
                   textSelectionTheme: const TextSelectionThemeData(
                       cursorColor: Color.fromARGB(255, 100, 21, 62), selectionColor: Color.fromARGB(255, 78, 23, 51), selectionHandleColor: Color.fromARGB(255, 78, 23, 51))),
               home: StreamBuilder<User?>(
-                stream: FirebaseAuth.instance.authStateChanges(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
+                stream: FirebaseAuth.instance.userChanges(),
+                builder: (context, streamSnapshot) {
+                  if (streamSnapshot.connectionState == ConnectionState.waiting) {
                     return const CircularProgressIndicator();
-                  } else if (snapshot.hasData) {
-                    return const DataContainer();
+                  } else if (streamSnapshot.hasData) {
+                    return StreamBuilder(
+                        stream: FirebaseFirestore.instance.collection("User_Enabled").doc(FirebaseAuth.instance.currentUser!.uid).snapshots(),
+                        builder: (context, streamSnapshot1) {
+                          if (streamSnapshot1.connectionState == ConnectionState.waiting) {
+                            log('waiting...');
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          } else if (streamSnapshot1.hasData) {
+                            final documentSnapshot = streamSnapshot1.data;
+                            final data = documentSnapshot!.data();
+                            bool enabled = data!['enabled'];
+                            if (enabled) {
+                              return const DataContainer();
+                            } else {
+                              if (FirebaseAuth.instance.currentUser != null) {
+                                FirebaseAuth.instance.signOut();
+                              }
+                              return const LoginScreen();
+                            }
+                          } else {
+                            return const LoginScreen();
+                          }
+                        });
                   } else {
                     return const LoginScreen();
                   }

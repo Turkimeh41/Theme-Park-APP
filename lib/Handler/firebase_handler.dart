@@ -21,13 +21,12 @@ class FirebaseHandler {
   }
 
   static Future<void> userExists(String username, String email, String phone) async {
-    await function.httpsCallable('existsUser').call({'username': username, 'emailAddress': email, 'number': phone});
+    await function.httpsCallable('existsUser').call({'username': username, 'email': email, 'phone': phone});
   }
 
   static Future<Map<String, dynamic>> addUser(String username, String password, String firstName, String lastName, String email, String phone, int gender) async {
-    final response = await function
-        .httpsCallable('addUser')
-        .call({'username': username, 'password': password, 'first_name': firstName, 'last_name': lastName, 'emailAddress': email, 'gender': gender, 'number': phone});
+    final response =
+        await function.httpsCallable('addUser').call({'username': username, 'password': password, 'first_name': firstName, 'last_name': lastName, 'email': email, 'gender': gender, 'phone': phone});
 
     return {'token': response.data['token']};
   }

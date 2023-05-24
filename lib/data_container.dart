@@ -1,8 +1,13 @@
 // ignore_for_file: unused_import, use_build_context_synchronously
 
 import 'package:chalkdart/chalk.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:final_project/Auth_Screens/Login_Screen/login_screen.dart';
 import 'package:final_project/Provider/participations_provider.dart';
 import 'package:final_project/stream_listener.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'Provider/activites_provider.dart';

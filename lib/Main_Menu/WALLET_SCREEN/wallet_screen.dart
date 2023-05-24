@@ -183,7 +183,7 @@ class _WalletScreenState extends State<WalletScreen> {
                       height: 132,
                       decoration: BoxDecoration(
                           color: const Color.fromARGB(255, 226, 205, 205), border: Border.all(color: const Color.fromARGB(255, 230, 204, 204), width: 3), borderRadius: BorderRadius.circular(8)),
-                      child: CachedNetworkImage(imageUrl: user.qr_link, width: 180, height: 180)),
+                      child: CachedNetworkImage(imageUrl: user.qrURL, width: 180, height: 180)),
                 )),
             const SizedBox(height: 40),
             Text(

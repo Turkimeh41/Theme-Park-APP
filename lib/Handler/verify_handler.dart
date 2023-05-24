@@ -6,7 +6,7 @@ import 'package:final_project/Handler/firebase_handler.dart';
 import 'package:final_project/Provider/auth_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:final_project/Page_View/pageview_screen.dart';
+import 'package:final_project/PAGEVIEW_SCREEN/pageview_screen.dart';
 import 'package:get/get.dart';
 
 class VerifyHandler {
@@ -121,7 +121,9 @@ class VerifyHandler {
             loading = false;
           });
         } catch (error) {
-          log(error.toString());
+          setState(() {
+            loading = false;
+          });
         }
       } else {
         setState(() {

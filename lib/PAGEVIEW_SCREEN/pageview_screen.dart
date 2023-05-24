@@ -29,7 +29,7 @@ class _PageViewScreenState extends State<PageViewScreen> {
     final dh = MediaQuery.of(context).size.height;
     final dw = MediaQuery.of(context).size.width;
     return Scaffold(
-      body: Stack(children: [
+      body: Stack(alignment: Alignment.center, children: [
         PageView.builder(
           itemCount: 3,
           onPageChanged: (value) {
@@ -72,16 +72,6 @@ class _PageViewScreenState extends State<PageViewScreen> {
                         ),
                       ),
                       Positioned(
-                        top: dh * 0.63,
-                        left: dw * 0.16,
-                        child: SizedBox(
-                            width: dw * 0.7,
-                            child: Text(
-                              'process payments without carrying money, recharge and your good to go!',
-                              style: GoogleFonts.acme(fontSize: 18, color: Colors.white),
-                            )),
-                      ),
-                      Positioned(
                         top: dh * 0.3,
                         left: dw * 0.35,
                         child: SizedBox(
@@ -101,11 +91,21 @@ class _PageViewScreenState extends State<PageViewScreen> {
                       ),
                       Positioned(
                           left: dw * 0.18,
-                          top: dh * 0.39,
+                          top: dh * 0.37,
                           child: Image.asset(
                             'assets/images/recharge.png',
                             width: dw * 0.6,
-                          ))
+                          )),
+                      Positioned(
+                        top: dh * 0.63,
+                        left: dw * 0.16,
+                        child: SizedBox(
+                            width: dw * 0.7,
+                            child: Text(
+                              'process payments without carrying money, recharge and your good to go!',
+                              style: GoogleFonts.acme(fontSize: 18, color: Colors.white),
+                            )),
+                      )
                     ],
                   )
                 : index == 1
@@ -155,10 +155,10 @@ class _PageViewScreenState extends State<PageViewScreen> {
                                 )),
                           ),
                           Positioned(
-                              left: dw * 0.10,
-                              top: dh * 0.35,
+                              left: dw * 0.15,
+                              top: dh * 0.38,
                               child: Image.asset(
-                                'assets/images/qr.png',
+                                'assets/images/transactionless.png',
                                 width: dw * 0.7,
                               )),
                           Positioned(
@@ -209,15 +209,15 @@ class _PageViewScreenState extends State<PageViewScreen> {
                             ),
                           ),
                           Positioned(
-                              bottom: dh * 0.65,
+                              bottom: dh * 0.67,
                               left: dw * 0.185,
                               child: Text(
                                 'And much more!',
                                 style: GoogleFonts.acme(color: Colors.white, fontSize: 36),
                               )),
                           Positioned(
-                              bottom: dh * 0.43,
-                              left: dw * 0.08,
+                              bottom: dh * 0.365,
+                              left: dw * 0.105,
                               child: Column(
                                 children: [
                                   SizedBox(
@@ -227,7 +227,7 @@ class _PageViewScreenState extends State<PageViewScreen> {
                                         const Icon(
                                           Icons.circle,
                                           color: Color.fromARGB(255, 245, 228, 172),
-                                          size: 12,
+                                          size: 10,
                                         ),
                                         SizedBox(
                                           width: dw * 0.03,
@@ -249,7 +249,7 @@ class _PageViewScreenState extends State<PageViewScreen> {
                                         const Icon(
                                           Icons.circle,
                                           color: Color.fromARGB(255, 245, 228, 172),
-                                          size: 12,
+                                          size: 10,
                                         ),
                                         SizedBox(
                                           width: dw * 0.03,
@@ -271,13 +271,13 @@ class _PageViewScreenState extends State<PageViewScreen> {
                                         const Icon(
                                           Icons.circle,
                                           color: Color.fromARGB(255, 245, 228, 172),
-                                          size: 12,
+                                          size: 10,
                                         ),
                                         SizedBox(
                                           width: dw * 0.03,
                                         ),
                                         Text(
-                                          'Track/keep up to date, ALL your transactions!',
+                                          'Track/keep up to date to all your transactions!',
                                           style: GoogleFonts.acme(color: Colors.white, fontSize: 16),
                                         )
                                       ],
@@ -293,20 +293,44 @@ class _PageViewScreenState extends State<PageViewScreen> {
                                         const Icon(
                                           Icons.circle,
                                           color: Color.fromARGB(255, 245, 228, 172),
-                                          size: 12,
+                                          size: 10,
                                         ),
                                         SizedBox(
                                           width: dw * 0.03,
                                         ),
                                         SizedBox(
                                           child: Text(
-                                            'View aviliable activites and their details\n in the park',
+                                            'View available activites and their details\n in the park',
                                             style: GoogleFonts.acme(color: Colors.white, fontSize: 16),
                                           ),
                                         )
                                       ],
                                     ),
-                                  )
+                                  ),
+                                  SizedBox(
+                                    height: dh * 0.015,
+                                  ),
+                                  SizedBox(
+                                    width: dw,
+                                    child: Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.circle,
+                                          color: Color.fromARGB(255, 245, 228, 172),
+                                          size: 10,
+                                        ),
+                                        SizedBox(
+                                          width: dw * 0.03,
+                                        ),
+                                        SizedBox(
+                                          child: Text(
+                                            'Share your account with family members\n to make payments even more cashless!',
+                                            style: GoogleFonts.acme(color: Colors.white, fontSize: 16),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               ))
                         ],
@@ -315,23 +339,17 @@ class _PageViewScreenState extends State<PageViewScreen> {
         ),
         Positioned(
             top: dh * 0.05,
-            left: dw * 0.03,
-            child: const Text(
-              'WELCOME TO',
-              style: TextStyle(color: Colors.white, fontSize: 42),
+            child: Text(
+              'Welcome to',
+              style: GoogleFonts.acme(color: Colors.white, fontSize: 42),
             )),
         Positioned(
             top: dh * 0.12,
-            left: dw * 0.3,
             child: Row(
               children: [
-                const Icon(
-                  Icons.place_outlined,
-                  size: 48,
-                ),
                 Text(
-                  'Swipe',
-                  style: GoogleFonts.kanit(color: Colors.white, fontSize: 36),
+                  'Swipe And Pay',
+                  style: GoogleFonts.acme(color: Colors.white, fontSize: 36),
                 )
               ],
             )),

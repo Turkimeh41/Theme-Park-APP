@@ -25,11 +25,11 @@ class UserDrawer extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 10),
-              user.userImg_link.length < 7
+              user.imgURL == null
                   ? const CircleAvatar(radius: 36, backgroundImage: AssetImage('assets/images/placeholder.png'))
                   : CircleAvatar(
                       radius: 36,
-                      backgroundImage: CachedNetworkImageProvider(user.userImg_link),
+                      backgroundImage: CachedNetworkImageProvider(user.imgURL!),
                     ),
               Text(
                 "${user.first_name} ${user.last_name}",

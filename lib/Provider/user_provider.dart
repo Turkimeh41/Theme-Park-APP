@@ -25,8 +25,8 @@ class User with ChangeNotifier {
   late String phone_number;
   late DateTime registered;
   late int gender;
-  late String qr_link;
-  late String userImg_link;
+  late String qrURL;
+  late String? imgURL;
   List<AmountEntry> _entries = [];
   List<AnonymousUser> _anonyUsers = [];
   bool loading = false;
@@ -61,23 +61,24 @@ class User with ChangeNotifier {
       }
       _anonyUsers = loadedAnonyUsers;
     }
-    username = documentReference['username'];
-    emailAddress = documentReference['email_address'];
-    first_name = documentReference['first_name'];
-    last_name = documentReference['last_name'];
-    if (documentReference['balance'] is int) {
-      balance = (documentReference['balance'] as int).toDouble();
+    final userData = documentReference.data();
+    username = userData!['username'];
+    emailAddress = userData['email'];
+    first_name = userData['first_name'];
+    last_name = userData['last_name'];
+    if (userData['balance'] is int) {
+      balance = (userData['balance'] as int).toDouble();
     } else {
-      balance = documentReference['balance'];
+      balance = userData['balance'];
     }
-    points = documentReference["points"];
+    points = userData["points"];
 
-    qr_link = documentReference['qr_link'];
+    qrURL = userData['qrURL'];
 
-    userImg_link = documentReference['imguser_link'];
-    phone_number = documentReference['phone_number'];
-    registered = (documentReference['registered'] as Timestamp).toDate();
-    gender = documentReference['gender'];
+    imgURL = userData['imgURL'];
+    phone_number = userData['phone'];
+    registered = (userData['registered'] as Timestamp).toDate();
+    gender = userData['gender'];
     log(chalk.lightGoldenrodYellow.bold('User has been set'));
     notifyListeners();
   }
@@ -135,23 +136,22 @@ class User with ChangeNotifier {
         loading = true;
       });
       final name = uuid.v4();
-      if (userImg_link.length > 6) {
+      if (imgURL != null) {
         log('deleting old picture...');
-        await FirebaseStorage.instance.refFromURL(userImg_link).delete();
+        await FirebaseStorage.instance.refFromURL(imgURL!).delete();
         log('done');
       }
 
       final db = FirebaseStorage.instance.ref("users/profile_images/${FirebaseAuth.instance.currentUser!.uid}/$name");
 
       await db.putFile(File(image!.path));
-      final link = await db.getDownloadURL();
-      await FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid).update({'imguser_link': link});
-      userImg_link = link;
+      final imgLink = await db.getDownloadURL();
+      await FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid).update({'imgURL': imgLink});
+      imgURL = imgLink;
       log('image has been set...');
       setStateful(() {
         loading = false;
       });
-
       notifyListeners();
     }
   }

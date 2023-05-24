@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:regexpattern/regexpattern.dart';
 
@@ -130,10 +131,13 @@ class LogUser with ChangeNotifier {
       passError = message;
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-        'Error: $message',
-        style: const TextStyle(color: Colors.red),
-      )));
+          backgroundColor: const Color.fromARGB(255, 22, 22, 22),
+          content: Center(
+            child: Text(
+              message,
+              style: GoogleFonts.signika(color: const Color.fromARGB(255, 126, 14, 6), fontSize: 16.5),
+            ),
+          )));
     }
   }
 

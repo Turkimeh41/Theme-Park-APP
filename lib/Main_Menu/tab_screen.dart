@@ -31,7 +31,6 @@ class _TabScreenState extends State<TabScreen> with TickerProviderStateMixin {
     offsetAnimation = Tween<Offset>(begin: const Offset(0, 0.03), end: const Offset(0, 0)).animate(controller);
     fadeAnimation = Tween<double>(begin: 0.0, end: 1).animate(controller);
     controller.animateTo(1.0);
-
     controller.addListener(() {
       setState(() {});
     });
@@ -214,7 +213,7 @@ class _TabScreenState extends State<TabScreen> with TickerProviderStateMixin {
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
                                         AnimatedSwitcher(
-                                          duration: const Duration(milliseconds: 250),
+                                          duration: const Duration(milliseconds: 500),
                                           transitionBuilder: (child, animation) {
                                             return ScaleTransition(scale: animation, child: child);
                                           },
@@ -256,7 +255,7 @@ class _TabScreenState extends State<TabScreen> with TickerProviderStateMixin {
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
                                         AnimatedSwitcher(
-                                          duration: const Duration(milliseconds: 250),
+                                          duration: const Duration(milliseconds: 500),
                                           transitionBuilder: (child, animation) {
                                             return ScaleTransition(scale: animation, child: child);
                                           },

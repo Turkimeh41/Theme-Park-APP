@@ -82,11 +82,11 @@ class _AccountScreenState extends State<AccountScreen> with SingleTickerProvider
                               onTap: () => user.showSheetImage(context),
                               child: Stack(
                                 children: [
-                                  user.userImg_link == "null"
+                                  user.imgURL == null
                                       ? const CircleAvatar(radius: 42, backgroundImage: AssetImage('assets/images/placeholder.png'))
                                       : CircleAvatar(
                                           radius: 42,
-                                          backgroundImage: CachedNetworkImageProvider(user.userImg_link),
+                                          backgroundImage: CachedNetworkImageProvider(user.imgURL!),
                                         ),
                                   const Positioned(
                                       bottom: 8,
