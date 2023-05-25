@@ -19,6 +19,7 @@ class Utility {
       return;
     } else if (!value) {
       await FirebaseAuth.instance.signOut();
+      currentUserType = '';
       pref.remove('remember-me');
     }
   }
