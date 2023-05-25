@@ -4,7 +4,6 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 admin.initializeApp();
-
 exports.sendSMSTwilio = functions.region("europe-west1").https.onCall(async (data, context)=>{
   const smsCode = (Math.floor(Math.random() * 9000) + 1000).toString();
   const accountSid = "AC488a4c5e74b1ceee7ebbe9a473aad978";
@@ -147,27 +146,51 @@ exports.restAddUser = functions.region("europe-west1")
       res.status(200).send({success: true, id: response.id});
     });
 
-exports.loginUser = functions.region("europe-west1")
+exports.login = functions.region("europe-west1")
     .https.onCall(async (data, context) => {
       const hash = require("crypto-js/sha256");
       const username = data.username;
       const password = data.password;
-
-      const document = await admin.firestore()
+      const userDocument = await admin.firestore()
           .collection("Users").where("username", "==", username).limit(1).get();
-      if (document.empty) {
-        throw new functions.https
-            .HttpsError("not-found", "Username doesn't exists.");
+
+      if (userDocument.empty) {
+        const managerDocument = await admin.firestore()
+            .collection("Managers").where("username", "==", username).limit(1).get();
+        if (managerDocument.empty) {
+          throw new functions.https
+              .HttpsError("not-found", "Username doesn't exists.");
+        }
+        const managerID = managerDocument.docs[0].id;
+        const managerData = managerDocument.docs[0].data();
+        const encryptedpass = hash(password).toString();
+        if (managerData["password"] != encryptedpass) {
+          throw new functions.https.
+              HttpsError("invalid-argument",
+                  "Password incorrect.");
+        }
+        const snapshot = await admin.firestore()
+            .collection("Manager_Enabled").doc(managerID).get();
+        const enabledData = snapshot.data();
+        if (enabledData["enabled"] == false) {
+          throw new functions.https.
+              HttpsError("permission-denied",
+                  "You're currently disabled.");
+        }
+
+        const customtoken = await admin.auth()
+            .createCustomToken(managerID);
+        return {type: "manager", token: customtoken};
       }
-      const userDoc = document.docs[0].data();
+      const userData = userDocument.docs[0].data();
       const encryptedpass = hash(password).toString();
-      if (userDoc["password"] != encryptedpass) {
+      if (userData["password"] != encryptedpass) {
         throw new functions.https.
             HttpsError("invalid-argument",
                 "Password incorrect.");
       }
       const snapshot = await admin.firestore()
-          .collection("User_Enabled").doc(document.docs[0].id).get();
+          .collection("User_Enabled").doc(userDocument.docs[0].id).get();
       const enabledData = snapshot.data();
       if (enabledData["enabled"] == false) {
         throw new functions.https.
@@ -175,10 +198,11 @@ exports.loginUser = functions.region("europe-west1")
                 "You're currently disabled, contact a manager for more information.");
       }
       const customtoken = await admin.auth()
-          .createCustomToken(document.docs[0].id);
-      return {sucess: true, token: customtoken};
+          .createCustomToken(userDocument.docs[0].id);
+      return {type: "user", token: customtoken};
     },
     );
+
 
 exports.onDeleteUserData = functions.region("europe-west1").firestore.document("Users/{userID}").onDelete(async (snapshot, context) => {
   const data = snapshot.data();
@@ -248,39 +272,6 @@ exports.addManager = functions.region("europe-west1").https.onRequest(async (req
   await admin.firestore().collection("Managers").doc(response.id).set({imgURL: imgURL}, {merge: true});
   res.status(200).send({success: true, id: response.id, imgURL: imgURL});
 });
-
-
-exports.loginManager = functions.region("europe-west1")
-    .https.onCall(async (data, context) => {
-      const hash = require("crypto-js/sha256");
-      const username = data.username;
-      const password = data.password;
-
-      const document = await admin.firestore()
-          .collection("Managers").where("username", "==", username).get();
-      if (document.empty) {
-        throw new functions.https
-            .HttpsError("not-found", "Username doesn't exists.");
-      }
-      const managerDoc = document.docs[0].data();
-      const encryptedpass = hash(password).toString();
-      if (managerDoc["password"] != encryptedpass) {
-        throw new functions.https.
-            HttpsError("invalid-argument",
-                "Password incorrect.");
-      }
-
-      if (managerDoc["enabled"] == false) {
-        throw new functions.https.
-            HttpsError("permission-denied",
-                "Permission denied, manager's has been disabled.");
-      }
-
-      const customtoken = await admin.auth()
-          .createCustomToken(document.docs[0].id);
-      return {sucess: true, token: customtoken};
-    },
-    );
 
 
 exports.adminLogin = functions.region("europe-west1")

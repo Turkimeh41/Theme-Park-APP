@@ -1,12 +1,13 @@
 import 'package:final_project/Exception/sms_exception.dart';
-import 'package:final_project/data_container.dart';
+import 'package:final_project/Handler/general_handler.dart';
+import 'package:final_project/Handler/user_firebase_handler.dart';
+import 'package:final_project/USERS/user_data_container.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer';
-import 'package:final_project/Handler/firebase_handler.dart';
-import 'package:final_project/Provider/auth_provider.dart';
+import 'package:final_project/AUTH_SCREEN/auth_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:final_project/PAGEVIEW_SCREEN/pageview_screen.dart';
+import 'package:final_project/USERS/PAGEVIEW_SCREEN/pageview_screen.dart';
 import 'package:get/get.dart';
 
 class VerifyHandler {
@@ -95,14 +96,14 @@ class VerifyHandler {
         log('adding User...');
         try {
           //add user function, will return
-          Map<String, dynamic> result = await FirebaseHandler.addUser(user.username!, user.password!, user.firstName!, user.lastName!, user.emailAddress!, user.phonenumber!, user.gender!);
+          Map<String, dynamic> result = await UserFirebaseHandler.addUser(user.username!, user.password!, user.firstName!, user.lastName!, user.emailAddress!, user.phonenumber!, user.gender!);
           log('Success!');
           builderState(() {
             loading = false;
           });
           log('Signing in...');
-          await FirebaseHandler.loginToken(result['token']!);
-          FirebaseHandler.setLastLogin();
+          await GeneralHandler.loginToken(result['token']!);
+          UserFirebaseHandler.setLastLogin();
 
           log('done!');
           final pref = await SharedPreferences.getInstance();
@@ -110,7 +111,7 @@ class VerifyHandler {
           bool intro_done = pref.getBool('intro-done') ?? false;
           log('intro-done: $intro_done');
           if (intro_done) {
-            Get.off(() => const DataContainer());
+            Get.off(() => const UserDataContainer());
           } else {
             Get.off(() => const PageViewScreen(), transition: Transition.fadeIn);
           }

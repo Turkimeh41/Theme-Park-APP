@@ -1,63 +1,34 @@
-import 'dart:async';
-import 'dart:developer';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:final_project/Auth_Screens/Login_Screen/login_screen.dart';
-import 'package:final_project/Provider/mode_provider.dart' as mode;
-import 'package:final_project/data_container.dart';
+import 'package:final_project/AUTH_SCREEN/LOGIN_SCREEN/login_screen.dart';
+import 'package:final_project/MANAGERS/Provider/anonymous_provider.dart';
+import 'package:final_project/MANAGERS/Provider/manager_provider.dart';
+import 'package:final_project/MANAGERS/manager_data_container.dart';
+import 'package:final_project/USERS/Provider/utility_provider.dart';
+import 'package:final_project/USERS/splash_screen.dart';
+import 'USERS/Provider/mode_theme_provider.dart';
+import 'package:final_project/USERS/user_data_container.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
-import 'package:final_project/Provider/user_provider.dart' as u;
-import 'package:final_project/Provider/activites_provider.dart';
-import 'package:final_project/Provider/transactions_provider.dart';
-import 'package:final_project/Provider/participations_provider.dart';
+import 'package:final_project/USERS/Provider/user_provider.dart' as u;
+import 'package:final_project/USERS/Provider/activites_provider.dart';
+import 'package:final_project/USERS/Provider/transactions_provider.dart';
+import 'package:final_project/USERS/Provider/participations_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await checkPref();
+  Utility utility = Utility()..checkRememberME();
+  utility.getCurrentUser();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  runApp(const MyApp());
+  runApp(MyApp(utility: utility));
 }
 
-Future<void> checkPref() async {
-  final pref = await SharedPreferences.getInstance();
-  bool? value = pref.getBool('remember-me') ?? true;
-  //remember me is true!
-  if (value) {
-    log('remember me is true or null');
-    log('no logging out');
-    return;
-  } else if (!value) {
-    log('remember me is false');
-    log('procceding, logging out..');
-    await FirebaseAuth.instance.signOut();
-    pref.remove('remember-me');
-  }
-}
-
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  late StreamSubscription subscription;
-  @override
-  void initState() {
-    subscription = FirebaseAuth.instance.authStateChanges().listen((user) {
-      setState(() {});
-    });
-    super.initState();
-  }
-
+class MyApp extends StatelessWidget {
+  const MyApp({super.key, required this.utility});
+  final Utility utility;
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -75,10 +46,19 @@ class _MyAppState extends State<MyApp> {
           create: (context) => Participations(),
         ),
         ChangeNotifierProvider(
-          create: (context) => mode.ThemeMode(),
-        )
+          create: (context) => ModeTheme(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => AnonymousUsers(),
+        ),
+        Provider(
+          create: (context) => Manager(),
+        ),
+        Provider(
+          create: (context) => utility,
+        ),
       ],
-      child: Consumer<mode.ThemeMode>(
+      child: Consumer<ModeTheme>(
         builder: (context, schemeMode, child) {
           return GetMaterialApp(
               themeMode: schemeMode.currentTheme,
@@ -95,39 +75,24 @@ class _MyAppState extends State<MyApp> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15), bottomRight: Radius.circular(15)))),
                   textSelectionTheme: const TextSelectionThemeData(
                       cursorColor: Color.fromARGB(255, 100, 21, 62), selectionColor: Color.fromARGB(255, 78, 23, 51), selectionHandleColor: Color.fromARGB(255, 78, 23, 51))),
-              home: StreamBuilder<User?>(
-                stream: FirebaseAuth.instance.userChanges(),
-                builder: (context, streamSnapshot) {
-                  if (streamSnapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
-                  } else if (streamSnapshot.hasData) {
-                    return StreamBuilder(
-                        stream: FirebaseFirestore.instance.collection("User_Enabled").doc(FirebaseAuth.instance.currentUser!.uid).snapshots(),
-                        builder: (context, streamSnapshot1) {
-                          if (streamSnapshot1.connectionState == ConnectionState.waiting) {
-                            log('waiting...');
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          } else if (streamSnapshot1.hasData) {
-                            final documentSnapshot = streamSnapshot1.data;
-                            final data = documentSnapshot!.data();
-                            bool enabled = data!['enabled'];
-                            if (enabled) {
-                              return const DataContainer();
-                            } else {
-                              if (FirebaseAuth.instance.currentUser != null) {
-                                FirebaseAuth.instance.signOut();
-                              }
-                              return const LoginScreen();
-                            }
-                          } else {
-                            return const LoginScreen();
-                          }
-                        });
-                  } else {
-                    return const LoginScreen();
-                  }
+              home: Consumer<Utility>(
+                builder: (context, utility, child) {
+                  return StreamBuilder<User?>(
+                    stream: FirebaseAuth.instance.userChanges(),
+                    builder: (context, streamSnapshot) {
+                      if (streamSnapshot.connectionState == ConnectionState.waiting) {
+                        return SplashScreen(rocketNotifier: ValueNotifier(0), textNotifier: ValueNotifier('Fetching Activites'));
+                      } else if (streamSnapshot.hasData) {
+                        return utility.currentUserType == "user"
+                            ? const UserDataContainer()
+                            : utility.currentUserType == "manager"
+                                ? const ManagerDataContainer()
+                                : const LoginScreen();
+                      } else {
+                        return const LoginScreen();
+                      }
+                    },
+                  );
                 },
               ));
         },

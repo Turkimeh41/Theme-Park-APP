@@ -1,9 +1,9 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:final_project/Provider/activites_provider.dart';
-import 'package:final_project/Provider/participations_provider.dart';
-import 'package:final_project/Provider/transactions_provider.dart';
-import 'package:final_project/Provider/user_provider.dart';
+import 'package:final_project/USERS/Provider/activites_provider.dart';
+import 'package:final_project/USERS/Provider/participations_provider.dart';
+import 'package:final_project/USERS/Provider/transactions_provider.dart';
+import 'package:final_project/USERS/Provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

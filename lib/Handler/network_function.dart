@@ -1,7 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:get/get.dart';
 
-import 'package:final_project/network_unaviliable.dart';
+import 'package:final_project/Handler/network_unaviliable.dart';
 
 class Network {
   static Future<bool> validateNetwork() async {
