@@ -22,8 +22,6 @@ class _DropDownMenuButtonActivityState extends State<DropDownMenuButtonActivity>
     dropdownFocus.addListener(() {
       setState(() {});
     });
-    final insActivites = Provider.of<Activites>(context, listen: false);
-    insActivites.selectedActivity = insActivites.activites.first;
     super.initState();
   }
 
@@ -40,11 +38,7 @@ class _DropDownMenuButtonActivityState extends State<DropDownMenuButtonActivity>
           disabledBorder: OutlineInputBorder(borderSide: BorderSide.none)),
       items: [for (int i = 0; i < activityList.length; i++) DropdownMenuItem<Activity>(value: activityList[i], child: DropDownItemActivity(activity: activityList[i]))],
       value: insActivites.selectedActivity,
-      onChanged: (activity) {
-        setState(() {
-          insActivites.selectedActivity = activity!;
-        });
-      },
+      onChanged: (activity) => insActivites.selectActivity(activity!),
       buttonStyleData: ButtonStyleData(
         height: 80,
         decoration: BoxDecoration(

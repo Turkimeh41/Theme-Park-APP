@@ -15,7 +15,7 @@ class ManagerDrawer extends StatelessWidget {
     final manager = Provider.of<Manager>(context, listen: true);
     return Drawer(
       width: 300,
-      backgroundColor: const Color.fromARGB(255, 230, 216, 216),
+      backgroundColor: const Color.fromARGB(255, 243, 235, 235),
       child: Column(
         children: [
           Container(

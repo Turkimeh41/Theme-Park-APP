@@ -1,10 +1,10 @@
 // ignore_for_file: use_build_context_synchronously, unused_import
 
-import 'package:final_project/Handler/utils_handler.dart';
 import 'package:final_project/USERS/MAIN_MENU/HOME_SCREEN/home_screen.dart';
 import 'package:final_project/USERS/MAIN_MENU/QR_SCREEN/qr_view.dart';
 import 'package:final_project/USERS/MAIN_MENU/WALLET_SCREEN/wallet_screen.dart';
 import 'package:final_project/USERS/MAIN_MENU/drawer.dart';
+import 'package:final_project/utility_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -50,19 +50,17 @@ class _TabScreenState extends State<TabScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     Provider.of<u.User>(context, listen: true);
+    final insUtility = Provider.of<Utility>(context);
     final dh = MediaQuery.of(context).size.height;
     final dw = MediaQuery.of(context).size.width;
+
     return Scaffold(
-        drawer: const Drawer(
-          backgroundColor: Color.fromARGB(255, 243, 235, 235),
-          width: 180,
-          child: UserDrawer(),
-        ),
+        drawer: const UserDrawer(),
         appBar: AppBar(
           centerTitle: true,
           title: Text(
             navChoice == 0 ? home : wallet,
-            style: GoogleFonts.signika(color: Colors.white, fontSize: 24),
+            style: GoogleFonts.signika(color: Colors.white, fontSize: 18),
           ),
           actions: [
             Theme(
@@ -89,11 +87,7 @@ class _TabScreenState extends State<TabScreen> with TickerProviderStateMixin {
                           height: 20,
                         ),
                         PopupMenuItem<int>(
-                            onTap: () async {
-                              final pref = await SharedPreferences.getInstance();
-                              await pref.remove('remember-me');
-                              await FirebaseAuth.instance.signOut();
-                            },
+                            onTap: () async => insUtility.userlogout(),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
@@ -113,7 +107,7 @@ class _TabScreenState extends State<TabScreen> with TickerProviderStateMixin {
             setState(() {
               loading = true;
             });
-            await UtilityHandler.refresh(context);
+            await insUtility.refesh(context);
             setState(() {
               loading = false;
             });

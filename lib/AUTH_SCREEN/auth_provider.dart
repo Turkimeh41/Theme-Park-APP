@@ -130,14 +130,14 @@ class LogUser with ChangeNotifier {
     } else if (message == "Password incorrect.") {
       passError = message;
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: const Color.fromARGB(255, 22, 22, 22),
-          content: Center(
-            child: Text(
-              message,
-              style: GoogleFonts.signika(color: const Color.fromARGB(255, 126, 14, 6), fontSize: 16.5),
-            ),
-          )));
+      Get.showSnackbar(GetSnackBar(
+        duration: const Duration(seconds: 2),
+        messageText: Text(
+          message,
+          style: GoogleFonts.signika(color: const Color.fromARGB(255, 212, 40, 28)),
+        ),
+        backgroundColor: const Color.fromARGB(255, 26, 25, 25),
+      ));
     }
   }
 

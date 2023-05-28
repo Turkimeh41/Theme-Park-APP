@@ -1,15 +1,17 @@
-import 'package:final_project/USERS/user_data_container.dart';
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:final_project/Handler/general_handler.dart';
+import 'package:final_project/Handler/user_firebase_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:get/get.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer';
 
 class PageViewScreen extends StatefulWidget {
-  const PageViewScreen({super.key});
-
+  const PageViewScreen({required this.customToken, super.key});
+  final String customToken;
   @override
   State<PageViewScreen> createState() => _PageViewScreenState();
 }
@@ -366,7 +368,10 @@ class _PageViewScreenState extends State<PageViewScreen> {
                 final pref = await SharedPreferences.getInstance();
                 pref.setBool('intro-done', true);
                 log('intro-done: ${true}');
-                Get.off(() => const UserDataContainer());
+                Navigator.of(context).popUntil((route) => route.isFirst);
+                await GeneralHandler.signInWithCustomToken(widget.customToken);
+
+                await UserFirebaseHandler.setLastLogin();
               },
               width: dw * 0.8,
               height: dh * 0.05,

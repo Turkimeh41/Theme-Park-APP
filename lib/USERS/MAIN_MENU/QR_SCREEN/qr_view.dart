@@ -3,6 +3,7 @@
 import 'dart:math' as math;
 
 import 'package:final_project/Custom/color_filter_modes.dart';
+import 'package:final_project/USERS/Provider/activity_engagement_provider.dart';
 import 'package:final_project/USERS/MAIN_MENU/QR_SCREEN/qr_view_handler.dart';
 import 'package:final_project/USERS/Provider/activites_provider.dart';
 import 'package:final_project/USERS/Provider/participations_provider.dart';
@@ -65,10 +66,10 @@ class _QRViewScreenState extends State<QRViewScreen> with TickerProviderStateMix
     final user = Provider.of<u.User>(context, listen: false);
     final insTransactions = Provider.of<Transactions>(context, listen: false);
     final insParticipations = Provider.of<Participations>(context, listen: false);
+    final insEngagement = Provider.of<ActivityEngagement>(context, listen: false);
     final dw = MediaQuery.of(context).size.width;
     final dh = MediaQuery.of(context).size.height;
 
-    var scanArea = (MediaQuery.of(context).size.width < 400 || MediaQuery.of(context).size.height < 400) ? 250.0 : 400.0;
     return Scaffold(
         body: SizedBox(
       width: dw,
@@ -99,9 +100,9 @@ class _QRViewScreenState extends State<QRViewScreen> with TickerProviderStateMix
             key: qrKey,
             onQRViewCreated: (controller) {
               qrViewHandler.qrController = controller;
-              qrViewHandler.initStream(context: context, insActivites: insActivites, insParticipations: insParticipations, insTransactions: insTransactions, user: user);
+              qrViewHandler.initStream(context: context, insActivites: insActivites, insParticipations: insParticipations, insTransactions: insTransactions, user: user, insEngagement: insEngagement);
             },
-            overlay: QrScannerOverlayShape(borderColor: const Color.fromARGB(255, 97, 9, 31), cutOutSize: scanArea, borderRadius: 1.5, borderWidth: 7),
+            overlay: QrScannerOverlayShape(borderColor: const Color.fromARGB(255, 97, 9, 31), cutOutSize: 250, borderRadius: 1.5, borderWidth: 7),
             onPermissionSet: (ctrl, p) => _onPermissionSet(context, ctrl, p),
           ),
 

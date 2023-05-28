@@ -70,7 +70,7 @@ exports.addUser = functions.region("europe-west1")
             gender: gender, balance: balance, registered: registerDate,
             phone: phone, email: emailAddress, imgURL: null, points: 0});
 
-      await Promise.all([admin.firestore().collection("User_Engaged").doc(response.id).set({engaged: false}),
+      await Promise.all([admin.firestore().collection("User_Engaged").doc(response.id).set({engaged: false, activityID: null}),
         admin.firestore().collection("User_Enabled").doc(response.id).set({enabled: true})]);
 
       const uuidname = uuidv4();
@@ -118,7 +118,7 @@ exports.restAddUser = functions.region("europe-west1")
           .add({username: username, password: encryptedpass, first_name: firstName, last_name: lastName,
             gender: gender, balance: balance, registered: registerDate,
             phone: phone, email: email, imgURL: null, points: 0});
-      await Promise.all([admin.firestore().collection("User_Engaged").doc(response.id).set({engaged: false}),
+      await Promise.all([admin.firestore().collection("User_Engaged").doc(response.id).set({engaged: false, activityID: null}),
         admin.firestore().collection("User_Enabled").doc(response.id).set({enabled: true})]);
 
       const filename = uuidv4() + ".png";
@@ -243,9 +243,8 @@ exports.addManager = functions.region("europe-west1").https.onRequest(async (req
   const hash = require("crypto-js/sha256");
   const {v4: uuidv4} = require("uuid");
   const request = JSON.parse(req.body);
-  const imgBytes = Buffer.from(request["imgURL"], "base64");
-  const username = request["username"];
 
+  const username = request["username"];
   const first_name = capitalizeFirstLetter(request["first_name"]);
   const last_name = capitalizeFirstLetter(request["last_name"]);
   const email = request["email"];
@@ -258,17 +257,20 @@ exports.addManager = functions.region("europe-west1").https.onRequest(async (req
       add({first_name: first_name, username: username, last_name: last_name,
         email: email, password: password, phone: phone, added: added});
   await admin.firestore().collection("Manager_Enabled").doc(response.id).set({enabled: true});
+  let imgURL = null;
+  if (request["imgURL"] != null) {
+    const imgBytes = Buffer.from(request["imgURL"], "base64");
+    const file = admin.storage().bucket().file("managers/managers_images/"+response.id+"/"+imgname);
 
-  const file = admin.storage().bucket().file("managers/managers_images/"+response.id+"/"+imgname);
-
-  const writestream = file.createWriteStream({metadata: {contentType: "image/png"}});
-  writestream.end(imgBytes);
-  await new Promise((resolve, reject) => {
-    writestream.on("finish", resolve);
-    writestream.on("error", reject);
-  });
-  await file.makePublic();
-  const imgURL = file.publicUrl();
+    const writestream = file.createWriteStream({metadata: {contentType: "image/png"}});
+    writestream.end(imgBytes);
+    await new Promise((resolve, reject) => {
+      writestream.on("finish", resolve);
+      writestream.on("error", reject);
+    });
+    await file.makePublic();
+    imgURL = file.publicUrl();
+  }
   await admin.firestore().collection("Managers").doc(response.id).set({imgURL: imgURL}, {merge: true});
   res.status(200).send({success: true, id: response.id, imgURL: imgURL});
 });
@@ -362,6 +364,8 @@ exports.addActivity = functions.region("europe-west1")
       await imageFile.makePublic();
       const qrURL = qrFile.publicUrl();
       const imgURL = imageFile.publicUrl();
+      await Promise.all([admin.firestore().collection("Activites").doc(response.id).set({qrURL: qrURL, imgURL: imgURL}, {merge: true}),
+        admin.firestore().collection("Activity_Started").doc(response.id).set({started: false})]);
       await admin.firestore().collection("Activites").doc(response.id).set({qrURL: qrURL, imgURL: imgURL}, {merge: true});
       res.status(200).send({success: true, id: response.id, imgURL: imgURL});
     });
@@ -405,6 +409,7 @@ exports.editActivity = functions.region("europe-west1").https.onRequest(async (r
   }
 });
 
+
 exports.sendEmailForgetHTML = functions.region("europe-west1").https.onCall(async (data, context) =>{
   const nodeMailer = require("nodemailer");
   const sendgridTransport = require("nodemailer-sendgrid-transport");
@@ -442,9 +447,8 @@ exports.sendEmailForgetHTML = functions.region("europe-west1").https.onCall(asyn
 exports.generateAnonyQR = functions.region("europe-west1").https.onRequest(async (req, res) => {
   const {v4: uuidv4} = require("uuid");
   const QRCode = require("qrcode");
-  const balance = 0.0;
   const response = await admin.firestore().collection("Anonymous_Users").add({label: null,
-    providerAccountID: null, balance: balance, assignedDate: null});
+    providerAccountID: null, balance: null, assignedDate: null});
   const qrdata = await QRCode.toDataURL("ANONY-"+response.id, {margin: 2, scale: 10});
   const qrCodebuffer = Buffer.from(qrdata.split(",")[1], "base64");
   const filename = uuidv4() + ".png";

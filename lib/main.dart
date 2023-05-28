@@ -1,8 +1,11 @@
+import 'dart:developer';
+
 import 'package:final_project/AUTH_SCREEN/LOGIN_SCREEN/login_screen.dart';
 import 'package:final_project/MANAGERS/Provider/anonymous_provider.dart';
 import 'package:final_project/MANAGERS/Provider/manager_provider.dart';
 import 'package:final_project/MANAGERS/manager_data_container.dart';
-import 'package:final_project/USERS/Provider/utility_provider.dart';
+import 'package:final_project/USERS/Provider/activity_engagement_provider.dart';
+import 'package:final_project/utility_provider.dart';
 import 'package:final_project/USERS/splash_screen.dart';
 import 'USERS/Provider/mode_theme_provider.dart';
 import 'package:final_project/USERS/user_data_container.dart';
@@ -21,7 +24,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   Utility utility = Utility()..checkRememberME();
-  utility.getCurrentUser();
+  utility.setPrefLastUser();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(MyApp(utility: utility));
 }
@@ -51,6 +54,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => AnonymousUsers(),
         ),
+        ChangeNotifierProvider(
+          create: (context) => ActivityEngagement(),
+        ),
         Provider(
           create: (context) => Manager(),
         ),
@@ -66,6 +72,7 @@ class MyApp extends StatelessWidget {
               title: 'Swipe',
               darkTheme: ThemeData(),
               theme: ThemeData(
+                  scaffoldBackgroundColor: const Color.fromARGB(255, 243, 235, 235),
                   primaryColor: const Color.fromARGB(255, 95, 3, 46),
                   dividerColor: const Color.fromARGB(255, 211, 198, 198),
                   secondaryHeaderColor: const Color.fromARGB(255, 109, 56, 81),
@@ -80,6 +87,7 @@ class MyApp extends StatelessWidget {
                   return StreamBuilder<User?>(
                     stream: FirebaseAuth.instance.userChanges(),
                     builder: (context, streamSnapshot) {
+                      log('userChanges Stream Changed!');
                       if (streamSnapshot.connectionState == ConnectionState.waiting) {
                         return SplashScreen(rocketNotifier: ValueNotifier(0), textNotifier: ValueNotifier('Fetching Activites'));
                       } else if (streamSnapshot.hasData) {

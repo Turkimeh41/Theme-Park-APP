@@ -609,8 +609,8 @@ class _RegisterTextFieldsState extends State<RegisterTextFields> with TickerProv
               state == 1
                   ? StatefulBuilder(builder: (context, changeLoading) {
                       return Positioned(
-                          bottom: loading == false ? dh * 0.10 : dh * 0.05,
-                          right: loading == false ? dw * 0.07 : dw * 0.1,
+                          bottom: loading == false ? dh * 0.10 : dh * 0.04,
+                          right: loading == false ? dw * 0.07 : dw * 0.155,
                           child: loading == false
                               ? NiceButtons(
                                   progress: false,

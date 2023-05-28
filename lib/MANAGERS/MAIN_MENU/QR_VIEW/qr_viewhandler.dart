@@ -48,7 +48,7 @@ class QrViewHandler {
         setState(() {
           isAttemptingPayment = true;
         });
-        await ManagerFirebaseHandler.attemptUserPayment(userID, insActivites.selectedActivity, insManager);
+        await ManagerFirebaseHandler.attemptUserPayment(userID, insActivites, insManager);
         Navigator.of(context).pop();
       } on BalanceException catch (_) {
         setState(() {
@@ -61,6 +61,7 @@ class QrViewHandler {
             style: GoogleFonts.signika(color: const Color.fromARGB(255, 129, 30, 23), fontSize: 16),
           ),
         )));
+        resumeStream();
       }
     } else if (barcode.code!.substring(0, 6) == 'ANONY-') {
       pauseStream();
@@ -69,7 +70,7 @@ class QrViewHandler {
         isAttemptingPayment = true;
       });
       try {
-        await ManagerFirebaseHandler.attemptAnonyPayment(anonyID, insActivites.selectedActivity, insManager);
+        await ManagerFirebaseHandler.attemptAnonyPayment(anonyID, insActivites, insManager);
         Navigator.of(context).pop();
       } on BalanceException catch (_) {
         setState(() {

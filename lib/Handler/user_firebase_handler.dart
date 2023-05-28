@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:final_project/Exception/balance_exception.dart';
 import 'package:final_project/Model/activity.dart';
+import 'package:final_project/USERS/Provider/activity_engagement_provider.dart';
 import 'package:final_project/USERS/Provider/participations_provider.dart';
 import 'package:final_project/USERS/Provider/transactions_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -31,25 +32,29 @@ class UserFirebaseHandler {
     return {'token': response.data['token']};
   }
 
+  static Future<void> sendMessage(u.User user, String message, String activityID) async {
+    await FirebaseFirestore.instance.collection("Activites").doc(activityID).collection("Chat").add({"message": message, "userID": FirebaseAuth.instance.currentUser!.uid});
+  }
+
   static Future<void> setLastLogin() async {
     await FirebaseFirestore.instance.collection("Users").doc(FirebaseAuth.instance.currentUser!.uid).set({"last_login": Timestamp.now()}, SetOptions(merge: true));
   }
 
-  static Future<void> _deduceBalance(String userID, double balance) async {
-    await FirebaseFirestore.instance.collection("Users").doc(userID).update({"balance": balance});
+  static Future<void> _deduceBalance(String userID, double balance, double activityAmount) async {
+    double newBalance = balance - activityAmount;
+    await FirebaseFirestore.instance.collection("Users").doc(userID).update({"balance": newBalance});
   }
 
-  static Future<void> attemptPayment(Activity activity, u.User user, Participations insParticipations, Transactions insTransactions) async {
+  static Future<void> attemptPayment(Activity activity, u.User user, Participations insParticipations, Transactions insTransactions, ActivityEngagement insEngagement) async {
     if (user.balance >= activity.price) {
-      log('balance is sufficent!');
-      user.balance = user.balance - activity.price;
       await Future.wait([
-        _deduceBalance(FirebaseAuth.instance.currentUser!.uid, user.balance),
+        _deduceBalance(FirebaseAuth.instance.currentUser!.uid, user.balance, activity.price),
         _incrementOnePlayedActivity(activity.id),
-        _newParticipation(activity, insParticipations),
+        _newParticipation(activity.id, insParticipations),
         _newTransaction(activity, insTransactions),
-        _switchEngagement(activity.duration)
+        _addUserEngagement(user, activity.id)
       ]);
+      await _turnEngagement(activity.id);
     } else {
       log('Error, insuffiecent balance, ask the user for balance add');
       throw BalanceException();
@@ -66,8 +71,17 @@ class UserFirebaseHandler {
     });
   }
 
-  static Future<void> _newParticipation(Activity activity, Participations insParticipations) async {
-    final documentReference = FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid).collection('Participations').doc(activity.id);
+  static Future<void> _addUserEngagement(u.User user, String activityID) async {
+    await FirebaseFirestore.instance.collection("Activites").doc(activityID).collection("Current_Users").doc(FirebaseAuth.instance.currentUser!.uid).set({
+      "username": user.username,
+      "imgURL": user.imgURL,
+      "first_name": user.first_name,
+      "last_name": user.last_name,
+    });
+  }
+
+  static Future<void> _newParticipation(String activityID, Participations insParticipations) async {
+    final documentReference = FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid).collection('Participations').doc(activityID);
     late int value;
     await FirebaseFirestore.instance.runTransaction((transaction) async {
       final snapshot = await transaction.get(documentReference);
@@ -75,8 +89,7 @@ class UserFirebaseHandler {
       // if it's the first time the user played this game
       if (data == null) {
         value = 1;
-        transaction.set(
-            documentReference, {"actName": activity.name, "actAmount": activity.price, 'actType': activity.type, "user_played": value, "actDuration": activity.duration}, SetOptions(merge: true));
+        transaction.set(documentReference, {"user_played": value}, SetOptions(merge: true));
 // if the user has played the same game previously
       } else {
         value = data['user_played'] + 1;
@@ -84,14 +97,11 @@ class UserFirebaseHandler {
         transaction.set(documentReference, {"user_played": value}, SetOptions(merge: true));
       }
     });
-    insParticipations.addParticipation(activity, value);
+    insParticipations.addParticipation(activityID, value);
   }
 
-  static Future<void> _switchEngagement(int duration) async {
-    await FirebaseFirestore.instance.collection("User_Engaged").doc(FirebaseAuth.instance.currentUser!.uid).update({"engaged": true});
-    Future.delayed(Duration(minutes: duration), () {
-      FirebaseFirestore.instance.collection("User_Engaged").doc(FirebaseAuth.instance.currentUser!.uid).update({"engaged": false});
-    });
+  static Future<void> _turnEngagement(String activityID) async {
+    await FirebaseFirestore.instance.collection("User_Engaged").doc(FirebaseAuth.instance.currentUser!.uid).update({"engaged": true, "activityID": activityID});
   }
 
   static Future<void> _newTransaction(Activity activity, Transactions transactions) async {

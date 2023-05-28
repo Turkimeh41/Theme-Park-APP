@@ -1,6 +1,5 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class GeneralHandler {
   static Future<Map<String, dynamic>> login(String username, String password) async {
@@ -8,12 +7,7 @@ class GeneralHandler {
     return {"customToken": result.data['token'], "type": result.data['type']};
   }
 
-  static Future<void> loginToken(String token) async {
+  static Future<void> signInWithCustomToken(String token) async {
     await FirebaseAuth.instance.signInWithCustomToken(token);
-  }
-
-  static Future<void> setCurrentUser(String type) async {
-    final pref = await SharedPreferences.getInstance();
-    await pref.setString('type', type);
   }
 }

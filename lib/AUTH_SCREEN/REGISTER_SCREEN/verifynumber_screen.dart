@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:final_project/Exception/sms_exception.dart';
+import 'package:final_project/utility_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'dart:developer';
@@ -11,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'dart:ui';
 import 'dart:async';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:provider/provider.dart';
 import '../../Handler/verify_handler.dart';
 
 class VerifyNumber extends StatefulWidget {
@@ -86,6 +88,7 @@ class _VerifyNumberState extends State<VerifyNumber> with TickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
+    final insUtility = Provider.of<Utility>(context);
     final dh = MediaQuery.of(context).size.height;
     final dw = MediaQuery.of(context).size.width;
     return Scaffold(
@@ -307,7 +310,7 @@ class _VerifyNumberState extends State<VerifyNumber> with TickerProviderStateMix
                                 ),
                                 onTap: (_) async {
                                   try {
-                                    await VerifyHandler.verify(builderState, setState);
+                                    await VerifyHandler.verify(builderState, setState, insUtility, context);
                                   } on SmsException catch (error) {
                                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                       content: Text(

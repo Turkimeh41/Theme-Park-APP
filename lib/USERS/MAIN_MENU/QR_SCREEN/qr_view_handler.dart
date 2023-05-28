@@ -5,6 +5,7 @@ import 'dart:developer';
 
 import 'package:final_project/Exception/balance_exception.dart';
 import 'package:final_project/Handler/user_firebase_handler.dart';
+import 'package:final_project/USERS/Provider/activity_engagement_provider.dart';
 import 'package:final_project/USERS/Provider/activites_provider.dart';
 import 'package:final_project/USERS/Provider/participations_provider.dart';
 import 'package:final_project/USERS/Provider/transactions_provider.dart';
@@ -19,9 +20,15 @@ class QrViewHandler {
   late void Function(void Function()) setState;
   bool attemptingPayment = false;
   double opacityError = 0;
-  void initStream({required User user, required Activites insActivites, required Participations insParticipations, required Transactions insTransactions, required BuildContext context}) {
-    stream = qrController.scannedDataStream
-        .listen((barcode) async => scanData(barcode, context, insActivites: insActivites, insParticipations: insParticipations, insTransactions: insTransactions, user: user));
+  void initStream(
+      {required User user,
+      required Activites insActivites,
+      required Participations insParticipations,
+      required Transactions insTransactions,
+      required ActivityEngagement insEngagement,
+      required BuildContext context}) {
+    stream = qrController.scannedDataStream.listen(
+        (barcode) async => scanData(barcode, context, insActivites: insActivites, insParticipations: insParticipations, insTransactions: insTransactions, user: user, insEngagement: insEngagement));
   }
 
   void pauseStream() {
@@ -43,7 +50,7 @@ class QrViewHandler {
   }
 
   Future<void> scanData(Barcode barcode, BuildContext context,
-      {required User user, required Activites insActivites, required Participations insParticipations, required Transactions insTransactions}) async {
+      {required User user, required Activites insActivites, required Participations insParticipations, required Transactions insTransactions, required ActivityEngagement insEngagement}) async {
     if (barcode.code!.substring(0, 5) == 'ACTV-') {
       pauseStream();
 
@@ -56,12 +63,16 @@ class QrViewHandler {
         attemptingPayment = true;
       });
       try {
-        await UserFirebaseHandler.attemptPayment(activity, user, insParticipations, insTransactions);
+        await UserFirebaseHandler.attemptPayment(activity, user, insParticipations, insTransactions, insEngagement);
         setState(() {
           attemptingPayment = false;
         });
         Navigator.of(context).pop();
       } on BalanceException catch (balanceException) {
+        setState(() {
+          attemptingPayment = false;
+        });
+
         log(balanceException.code);
         log(balanceException.details);
 //my idea is it show dialog, where it asks for the user if he wants to recharge, and transfer him to the recharge page

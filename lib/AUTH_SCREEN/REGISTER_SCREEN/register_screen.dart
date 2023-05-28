@@ -60,26 +60,17 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                     end: Alignment.bottomRight),
               ),
               child: Stack(
+                alignment: Alignment.center,
                 children: [
                   Positioned(
-                      top: 0,
-                      left: dw * 0.135,
-                      child: Container(
-                        width: dh * 0.35,
-                        height: dh * 0.35,
-                        decoration: const BoxDecoration(shape: BoxShape.circle, color: Color.fromARGB(255, 240, 228, 218)),
-                      )),
-                  Positioned(
-                      left: dw * 0.05,
-                      top: dw * -0.02,
-                      width: 350,
+                      top: dw * -0.03,
+                      width: 320,
                       child: Image.asset(
                         'assets/images/add.png',
                       )),
                   //the White Container
                   Positioned(
                       bottom: dh * 0.09,
-                      left: dw * 0.035,
                       child: SlideTransition(
                         position: slideAnimation,
                         child: Container(
@@ -98,7 +89,6 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                   //Change to LoginPage
                   Positioned(
                     bottom: dh * 0.03,
-                    left: dw * 0.04,
                     child: FadeTransition(
                       opacity: fadeAnimation,
                       child: InkWell(
@@ -106,8 +96,8 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                           Get.off(() => const LoginScreen(), transition: Transition.downToUp);
                         },
                         child: Text(
-                          'already have an account?, Click here to Login now!',
-                          style: GoogleFonts.acme(fontSize: 18, color: Colors.white, decoration: TextDecoration.underline),
+                          'already have an account?,  Click here to Login now!',
+                          style: GoogleFonts.acme(fontSize: 16, color: Colors.white, decoration: TextDecoration.underline),
                         ),
                       ),
                     ),

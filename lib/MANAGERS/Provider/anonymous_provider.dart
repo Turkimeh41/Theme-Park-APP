@@ -16,23 +16,12 @@ class AnonymousUsers with ChangeNotifier {
   int? userAnonymousLength;
   Future<void> fetchAnonymousUnassignedQR() async {
     final List<AnonymousUser> loadedAnonymousUsers = [];
-    final futures = await Future.wait([
-      FirebaseFirestore.instance.collection("Anonymous_Users").where("label", isNull: true).get(),
-      FirebaseFirestore.instance.collection("Users").doc(currentUserID).collection("Anonymous_Users").get()
-    ]);
-    final response = futures[0];
-    final docsProivderAnonySnapshot = futures[1];
-    if (docsProivderAnonySnapshot.size == 0) {
-      userAnonymousLength = 0;
-    } else {
-      userAnonymousLength = docsProivderAnonySnapshot.size;
-    }
-
+    await Future.delayed(const Duration(milliseconds: 400));
+    final response = await FirebaseFirestore.instance.collection("Anonymous_Users").where("label", isNull: true).get();
     if (response.size == 0) {
       log(chalk.red.bold('THERES NO QR CODES THAT ARE AVAILIABLE, ask the admin to generate new ones!'));
       return;
     }
-
     final querySnapshotList = response.docs;
     for (int i = 0; i < querySnapshotList.length; i++) {
       final id = querySnapshotList[i].id;
@@ -41,8 +30,6 @@ class AnonymousUsers with ChangeNotifier {
       loadedAnonymousUsers.add(AnonymousUser(id: id, assignedDate: null, qrURL: qrURL, providerAccountID: null, label: null));
     }
     _anonymousUsers = loadedAnonymousUsers;
-    confirm = true;
-    notifyListeners();
   }
 
   void removeByID(String anonyID) {
@@ -52,6 +39,19 @@ class AnonymousUsers with ChangeNotifier {
         break;
       }
     }
+    notifyListeners();
+  }
+
+  Future<void> setCurrentUser(String userID) async {
+    currentUserID = userID;
+    final response = await FirebaseFirestore.instance.collection("Users").doc(currentUserID).collection("Anonymous_Users").get();
+    final docsProivderAnonySnapshot = response;
+    if (docsProivderAnonySnapshot.size == 0) {
+      userAnonymousLength = 0;
+    } else {
+      userAnonymousLength = docsProivderAnonySnapshot.size;
+    }
+    confirm = true;
     notifyListeners();
   }
 }

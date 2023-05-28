@@ -71,7 +71,7 @@ class _LoginTextFieldsState extends State<LoginTextFields> {
                     focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(25), borderSide: const BorderSide(color: Colors.red, width: 0.8)),
                     errorStyle: GoogleFonts.signika(fontSize: 11.5),
                     labelText: 'Username',
-                    labelStyle: GoogleFonts.signika(fontSize: userFocus.hasFocus ? 28 : 20, color: userFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : Colors.grey),
+                    labelStyle: GoogleFonts.acme(fontSize: userFocus.hasFocus ? 22 : 18, color: userFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100)),
                   )),
             ),
             SizedBox(
@@ -108,7 +108,7 @@ class _LoginTextFieldsState extends State<LoginTextFields> {
                     focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(25), borderSide: const BorderSide(color: Colors.red, width: 0.8)),
                     errorStyle: GoogleFonts.signika(fontSize: 11.5),
                     labelText: 'Password',
-                    labelStyle: GoogleFonts.signika(fontSize: passFocus.hasFocus ? 26 : 20, color: passFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : Colors.grey),
+                    labelStyle: GoogleFonts.acme(fontSize: passFocus.hasFocus ? 22 : 18, color: passFocus.hasFocus ? const Color.fromARGB(255, 110, 30, 63) : const Color.fromARGB(255, 102, 100, 100)),
                   )),
             ),
           ],

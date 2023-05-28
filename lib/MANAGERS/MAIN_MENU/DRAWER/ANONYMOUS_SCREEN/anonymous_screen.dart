@@ -34,68 +34,8 @@ class _AnonymousScreenState extends State<AnonymousScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final anonymous = Provider.of<AnonymousUsers>(context);
-    final anonymousList = anonymous.anonymousUsers;
+    final insAnonymous = Provider.of<AnonymousUsers>(context);
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 243, 235, 235),
-      body: Stack(alignment: Alignment.center, children: [
-        Positioned(
-            top: 75,
-            left: 30,
-            child: RichText(
-                text: TextSpan(
-              text: 'Anonymous Users\n',
-              style: GoogleFonts.signika(color: Colors.grey[800], fontSize: 22.5, fontWeight: FontWeight.bold),
-              children: [
-                TextSpan(
-                    text: anonymous.confirm
-                        ? ' Tap any Anonymous QR code to assign\n to that provider account depending\n to how many that user wants, Maximum 3 Allowed!'
-                        : ' Start by scanning a qr code of a user,\n  then check if it\'s applicable to add\n  more users to that account',
-                    style: GoogleFonts.signika(fontSize: 13, color: Colors.grey[600])),
-              ],
-            ))),
-        Positioned(
-          top: 175,
-          child: anonymous.confirm
-              ? Column(
-                  children: [
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        '${3 - anonymous.userAnonymousLength!}/3 ${anonymous.userAnonymousLength == 3 ? 'Unavailiable, Can\'t assign more\n Anonymous QRs to that Account!' : 'Availiable, The User account\n can be assigned with QR codes'}',
-                        style: GoogleFonts.signika(
-                            color: anonymous.userAnonymousLength == 3 ? const Color.fromARGB(255, 141, 26, 18) : const Color.fromARGB(255, 26, 148, 30), fontSize: 17, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    Container(
-                      decoration: BoxDecoration(color: const Color.fromARGB(255, 136, 135, 135), borderRadius: BorderRadius.circular(12)),
-                      height: 300,
-                      width: 250,
-                      child: ListView.separated(
-                        itemBuilder: (context, index) {
-                          return AnonymousWidget(anonymous: anonymousList[index]);
-                        },
-                        itemCount: anonymousList.length,
-                        separatorBuilder: (context, index) {
-                          return Divider(height: 1, color: Colors.grey[300]);
-                        },
-                      ),
-                    ),
-                  ],
-                )
-              : const SizedBox(),
-        ),
-        Positioned(
-            bottom: 25,
-            child: GestureDetector(
-              onTap: () => Get.to(() => const QrViewScreen2()),
-              child: Image.asset(
-                'assets/images/scanning.png',
-                width: 82,
-                height: 82,
-              ),
-            )),
-      ]),
       appBar: AppBar(
         shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12), bottomRight: Radius.circular(12))),
         centerTitle: true,
@@ -103,6 +43,97 @@ class _AnonymousScreenState extends State<AnonymousScreen> {
           'Anonymous Users',
           style: GoogleFonts.signika(color: Colors.white, fontSize: 24),
         ),
+      ),
+      backgroundColor: const Color.fromARGB(255, 243, 235, 235),
+      body: RefreshIndicator(
+        color: Colors.amber,
+        onRefresh: () async {
+          setState(() {});
+        },
+        child: FutureBuilder(
+            future: insAnonymous.fetchAnonymousUnassignedQR(),
+            builder: (context, futureSnapshot) {
+              if (futureSnapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: CircularProgressIndicator(color: Theme.of(context).primaryColor),
+                );
+              } else {
+                final anonymousList = insAnonymous.anonymousUsers;
+
+                return ListView(padding: const EdgeInsets.only(top: 36, left: 12, right: 12), children: [
+                  Text('Anonymous QR codes', style: GoogleFonts.signika(color: Theme.of(context).primaryColor, fontSize: 22.5, fontWeight: FontWeight.bold)),
+                  Text(
+                    'Assign a new dedicated anonymous\n   with his balance and name from here!',
+                    style: GoogleFonts.signika(color: Theme.of(context).secondaryHeaderColor, fontSize: 14),
+                  ),
+                  const SizedBox(height: 40),
+                  Container(
+                    decoration: BoxDecoration(color: const Color.fromARGB(255, 228, 216, 216), borderRadius: BorderRadius.circular(12)),
+                    height: 300,
+                    child: ListView.separated(
+                      itemCount: anonymousList.length,
+                      separatorBuilder: (context, index) {
+                        return const Divider(height: 1, color: Color.fromARGB(255, 136, 127, 127));
+                      },
+                      itemBuilder: (context, index) => AnonymousWidget(anonymous: anonymousList[index], type: 'normal'),
+                    ),
+                  ),
+                  const SizedBox(height: 75),
+                  RichText(
+                      text: TextSpan(
+                    text: 'Family/Friends QR codes\n',
+                    style: GoogleFonts.signika(color: Theme.of(context).primaryColor, fontSize: 22.5, fontWeight: FontWeight.bold),
+                    children: [
+                      TextSpan(
+                          text: insAnonymous.confirm
+                              ? ' Tap any Anonymous QR code to assign\n to that provider account depending\n to how many that user wants, Maximum 4 Allowed!'
+                              : ' Start by scanning a qr code of a user,\n  then check if it\'s applicable to add\n  more users to that account',
+                          style: GoogleFonts.signika(fontSize: 13, color: Theme.of(context).secondaryHeaderColor)),
+                    ],
+                  )),
+                  const SizedBox(height: 40),
+                  insAnonymous.confirm
+                      ? Column(
+                          children: [
+                            Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                '${4 - insAnonymous.userAnonymousLength!}/4 ${insAnonymous.userAnonymousLength == 4 ? 'Unavailiable, Can\'t assign more\n Anonymous QRs to that Account!' : 'Availiable, The User account can be\n    assigned with QR codes'}',
+                                style: GoogleFonts.signika(
+                                    color: insAnonymous.userAnonymousLength == 4 ? const Color.fromARGB(255, 141, 26, 18) : const Color.fromARGB(255, 26, 148, 30),
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            const SizedBox(height: 15),
+                            Container(
+                              decoration: BoxDecoration(color: const Color.fromARGB(255, 228, 216, 216), borderRadius: BorderRadius.circular(12)),
+                              height: 300,
+                              child: ListView.separated(
+                                itemBuilder: (context, index) {
+                                  return AnonymousWidget(anonymous: anonymousList[index], type: "provider");
+                                },
+                                itemCount: anonymousList.length,
+                                separatorBuilder: (context, index) {
+                                  return const Divider(height: 1, color: Color.fromARGB(255, 136, 127, 127));
+                                },
+                              ),
+                            ),
+                          ],
+                        )
+                      : const SizedBox(height: 350),
+                  GestureDetector(
+                    onTap: () => Get.to(() => const QrViewScreen2()),
+                    child: Image.asset(
+                      'assets/images/scanning.png',
+                      width: 82,
+                      height: 82,
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                ]);
+              }
+            }),
       ),
     );
   }

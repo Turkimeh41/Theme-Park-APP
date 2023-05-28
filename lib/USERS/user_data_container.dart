@@ -6,7 +6,7 @@ import 'package:final_project/AUTH_SCREEN/LOGIN_SCREEN/login_screen.dart';
 import 'package:final_project/Handler/general_handler.dart';
 import 'package:final_project/Handler/user_firebase_handler.dart';
 import 'package:final_project/USERS/Provider/participations_provider.dart';
-import 'package:final_project/USERS/Provider/utility_provider.dart';
+import 'package:final_project/utility_provider.dart';
 import 'package:final_project/USERS/stream_listener.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -31,8 +31,7 @@ class _UserDataContainerState extends State<UserDataContainer> {
   ValueNotifier<int> rocketNotifier = ValueNotifier(0);
   ValueNotifier<String> textNotifier = ValueNotifier('Fetching Activites');
 
-  Future<void> fetchDataContainers(BuildContext context) async {
-    await GeneralHandler.setCurrentUser('user');
+  Future<void> _fetchData(BuildContext context) async {
     await UserFirebaseHandler.setLastLogin();
     await Provider.of<Activites>(context, listen: false).fetchActivites();
     await Provider.of<Activites>(context, listen: false).preloadImages(context);
@@ -53,34 +52,14 @@ class _UserDataContainerState extends State<UserDataContainer> {
   @override
   Widget build(BuildContext context) {
     final utility = Provider.of<Utility>(context);
-    return StreamBuilder(
-        stream: FirebaseFirestore.instance.collection("User_Enabled").doc(FirebaseAuth.instance.currentUser!.uid).snapshots(),
-        builder: (context, streamSnapshot) {
-          if (streamSnapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (streamSnapshot.hasData) {
-            log(FirebaseAuth.instance.currentUser!.uid);
-
-            final enabledDoc = streamSnapshot.data!.data();
-            if (enabledDoc!['enabled'] == true) {
-              return FutureBuilder(
-                  future: fetchDataContainers(context),
-                  builder: (context, futureSnapshot) {
-                    if (futureSnapshot.connectionState == ConnectionState.waiting) {
-                      return SplashScreen(rocketNotifier: rocketNotifier, textNotifier: textNotifier);
-                    } else {
-                      return const StreamListener();
-                    }
-                  });
-            } else {
-              if (FirebaseAuth.instance.currentUser != null) {
-                FirebaseAuth.instance.signOut();
-                utility.clearCurrentUser();
-              }
-              return const LoginScreen();
-            }
+    utility.initializeUserENABLEDStream();
+    return FutureBuilder(
+        future: _fetchData(context),
+        builder: (context, futureSnapshot) {
+          if (futureSnapshot.connectionState == ConnectionState.waiting) {
+            return SplashScreen(rocketNotifier: rocketNotifier, textNotifier: textNotifier);
           } else {
-            return const LoginScreen();
+            return const StreamListener();
           }
         });
   }

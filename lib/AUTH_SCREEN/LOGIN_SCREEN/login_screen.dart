@@ -4,7 +4,7 @@ import 'package:final_project/AUTH_SCREEN/LOGIN_SCREEN/login_textfields.dart';
 import 'package:final_project/AUTH_SCREEN/Register_Screen/register_screen.dart';
 import 'package:final_project/AUTH_SCREEN/auth_provider.dart';
 import 'package:final_project/Handler/general_handler.dart';
-import 'package:final_project/USERS/Provider/utility_provider.dart';
+import 'package:final_project/utility_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nice_buttons/nice_buttons.dart';
@@ -58,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   Widget build(BuildContext context) {
     final dh = MediaQuery.of(context).size.height;
     final dw = MediaQuery.of(context).size.width;
-    final utility = Provider.of<Utility>(context);
+    final utility = Provider.of<Utility>(context, listen: false);
     return ChangeNotifierProvider(
       create: (context) => LogUser(),
       builder: (context, child) => Scaffold(
@@ -75,9 +75,9 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
           ),
           child: Consumer<LogUser>(
             builder: (context, logUser, child) => Stack(
+              alignment: Alignment.center,
               children: [
                 Positioned(
-                  left: dw * 0.16,
                   bottom: dh * 0.92,
                   child: Text(
                     'We\'re happy to see you back!',
@@ -85,8 +85,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                   ),
                 ),
                 Positioned(
-                  left: dw * 0.31,
-                  bottom: dh * 0.75,
+                  bottom: dh * 0.72,
                   child: Row(
                     children: [
                       Text(
@@ -102,8 +101,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                   ),
                 ),
                 Positioned(
-                    bottom: dh * 0.385,
-                    left: dw * 0.07,
+                    bottom: dh * 0.36,
                     child: SlideTransition(
                       position: slideAnimation,
                       child: Container(
@@ -116,8 +114,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                       ),
                     )),
                 Positioned(
-                    bottom: dh * 0.41,
-                    left: dw * 0.11,
+                    bottom: dh * 0.38,
                     child: SlideTransition(
                         position: slideAnimation,
                         child: Column(
@@ -156,7 +153,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                 ),
                 StatefulBuilder(builder: (context, builderState) {
                   return Positioned(
-                      bottom: loading ? dh * 0.24 : dh * 0.36,
+                      bottom: loading ? dh * 0.23 : dh * 0.32,
                       left: loading ? dw * 0.27 : dw * 0.141,
                       child: SlideTransition(
                         position: slideAnimation,
@@ -181,8 +178,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                       builderState(() {
                                         loading = false;
                                       });
-                                      utility.currentUserType = map['type'];
-                                      await GeneralHandler.loginToken(map['customToken']);
+                                      await utility.setCurrentUser(map['type']);
+                                      await GeneralHandler.signInWithCustomToken(map['customToken']);
                                     } on FirebaseFunctionsException catch (error) {
                                       setState(() {
                                         loading = false;
@@ -203,13 +200,12 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                 }),
                 Positioned(
                   bottom: dh * 0.2,
-                  left: dw * 0.24,
                   child: FadeTransition(
                     opacity: fadeAnimation,
                     child: InkWell(
                       onTap: () => Get.to(() => const ForgetPassword(), transition: Transition.zoom),
                       child: Text(
-                        'Forgot password?, Click here',
+                        'Forgot password?,  Click here',
                         style: GoogleFonts.acme(fontSize: 18, color: Colors.white, decoration: TextDecoration.underline),
                       ),
                     ),
@@ -217,15 +213,14 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                 ),
                 Positioned(
                   bottom: dh * 0.06,
-                  left: dw * 0.1,
                   child: FadeTransition(
                     opacity: fadeAnimation,
                     child: InkWell(
                       onTap: () {
-                        Get.off(() => const RegisterScreen(), transition: Transition.upToDown);
+                        Get.to(() => const RegisterScreen(), transition: Transition.upToDown);
                       },
                       child: Text(
-                        'Not Registered?, Click here to Register now!',
+                        'Not Registered?,  Click here to Register now!',
                         style: GoogleFonts.acme(fontSize: 18, color: Colors.white, decoration: TextDecoration.underline),
                       ),
                     ),

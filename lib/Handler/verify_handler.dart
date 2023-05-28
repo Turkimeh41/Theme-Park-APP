@@ -1,7 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:final_project/Exception/sms_exception.dart';
 import 'package:final_project/Handler/general_handler.dart';
 import 'package:final_project/Handler/user_firebase_handler.dart';
-import 'package:final_project/USERS/user_data_container.dart';
+
+import 'package:final_project/utility_provider.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer';
 import 'package:final_project/AUTH_SCREEN/auth_provider.dart';
@@ -86,7 +89,7 @@ class VerifyHandler {
     return '$asterisks$last4Digits';
   }
 
-  static Future<void> verify(StateSetter builderState, Function setState) async {
+  static Future<void> verify(StateSetter builderState, Function setState, Utility utility, BuildContext context) async {
     if (validate()) {
       builderState(() {
         loading = true;
@@ -102,18 +105,20 @@ class VerifyHandler {
             loading = false;
           });
           log('Signing in...');
-          await GeneralHandler.loginToken(result['token']!);
-          UserFirebaseHandler.setLastLogin();
 
           log('done!');
           final pref = await SharedPreferences.getInstance();
           // ignore: non_constant_identifier_names
           bool intro_done = pref.getBool('intro-done') ?? false;
           log('intro-done: $intro_done');
+          await utility.setCurrentUser("user");
           if (intro_done) {
-            Get.off(() => const UserDataContainer());
+            Navigator.of(context).popUntil((route) => route.isFirst);
+            await GeneralHandler.signInWithCustomToken(result['token']!);
+
+            await UserFirebaseHandler.setLastLogin();
           } else {
-            Get.off(() => const PageViewScreen(), transition: Transition.fadeIn);
+            Get.off(() => PageViewScreen(customToken: result['token'] as String), transition: Transition.fadeIn);
           }
         } on FirebaseAuthException catch (error) {
           setState(() {

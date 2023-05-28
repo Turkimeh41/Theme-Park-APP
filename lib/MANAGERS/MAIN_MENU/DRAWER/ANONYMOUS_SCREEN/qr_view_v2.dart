@@ -80,14 +80,13 @@ class _QRViewScreenState extends State<QrViewScreen2> with TickerProviderStateMi
                   final String prefix_ID = result!.code!;
                   final userID = prefix_ID.substring(5);
                   try {
-                    insAnonymousUsers.currentUserID = userID;
-                    await insAnonymousUsers.fetchAnonymousUnassignedQR();
+                    await insAnonymousUsers.setCurrentUser(userID);
                     Navigator.of(context).pop();
                   } catch (e) {
                     log(e.toString());
                   }
                 } else {
-                  //HANDLE ERROR IF QR CODE IS FROM OUR APP
+                  //HANDLE ERROR IF QR CODE IS NOT FROM OUR APP
                 }
               });
             },
