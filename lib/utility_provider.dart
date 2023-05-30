@@ -120,8 +120,8 @@ class Utility {
     g.Get.showSnackbar(g.GetSnackBar(
       duration: const Duration(seconds: 2),
       messageText: Text(
-        'LOGUOUT SUCCESSFUL!.',
-        style: GoogleFonts.signika(color: const Color.fromARGB(255, 52, 184, 56)),
+        'LOGOUT SUCCESSFUL!.',
+        style: GoogleFonts.signika(color: const Color.fromARGB(255, 52, 184, 56), fontSize: 17),
       ),
       backgroundColor: const Color.fromARGB(255, 26, 25, 25),
     ));
@@ -135,8 +135,8 @@ class Utility {
     g.Get.showSnackbar(g.GetSnackBar(
       duration: const Duration(seconds: 2),
       messageText: Text(
-        'LOGUOUT SUCCESSFUL!.',
-        style: GoogleFonts.signika(color: const Color.fromARGB(255, 52, 184, 56)),
+        'LOGOUT SUCCESSFUL!.',
+        style: GoogleFonts.signika(color: const Color.fromARGB(255, 52, 184, 56), fontSize: 17),
       ),
       backgroundColor: const Color.fromARGB(255, 26, 25, 25),
     ));

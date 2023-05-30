@@ -1,4 +1,4 @@
-import 'package:final_project/USERS/MAIN_MENU/TRANSACTION_SCREEN/transaction_widget.dart';
+import 'package:final_project/USERS/MAIN_MENU/DRAWER/TRANSACTION_SCREEN/transaction_widget.dart';
 import 'package:final_project/USERS/Provider/transactions_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -31,7 +31,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
           centerTitle: true,
           title: Text(
             'Transactions',
-            style: GoogleFonts.signika(color: Colors.white, fontSize: 24),
+            style: GoogleFonts.signika(color: Colors.white, fontSize: 18),
           ),
         ),
         body: Container(

@@ -56,7 +56,10 @@ class _AccountScreenState extends State<AccountScreen> with SingleTickerProvider
     final dh = MediaQuery.of(context).size.height;
     final dw = MediaQuery.of(context).size.width;
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text('Account', style: GoogleFonts.signika(color: Colors.white, fontSize: 18)),
+      ),
       body: Form(
         key: formKey,
         child: Stack(

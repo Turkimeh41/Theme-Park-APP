@@ -3,7 +3,7 @@
 import 'package:final_project/USERS/MAIN_MENU/HOME_SCREEN/home_screen.dart';
 import 'package:final_project/USERS/MAIN_MENU/QR_SCREEN/qr_view.dart';
 import 'package:final_project/USERS/MAIN_MENU/WALLET_SCREEN/wallet_screen.dart';
-import 'package:final_project/USERS/MAIN_MENU/drawer.dart';
+import 'package:final_project/USERS/MAIN_MENU/DRAWER/drawer.dart';
 import 'package:final_project/utility_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

@@ -72,7 +72,6 @@ class ManagerFirebaseHandler {
       } else {
         throw BalanceException();
       }
-//if the anony has a balance of his own we handle it here
     }
   }
 

@@ -28,8 +28,8 @@ class DropDownItemActivity extends StatelessWidget {
           ],
         ),
         Text(
-          '\$${activity.price}',
-          style: GoogleFonts.signika(color: const Color.fromARGB(255, 32, 143, 35), fontSize: 16, fontWeight: FontWeight.bold),
+          '  ${activity.price} SAR',
+          style: GoogleFonts.signika(color: const Color.fromARGB(255, 32, 143, 35), fontSize: 14, fontWeight: FontWeight.bold),
         ),
       ],
     );

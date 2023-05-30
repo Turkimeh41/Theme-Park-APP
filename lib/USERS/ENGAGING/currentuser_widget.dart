@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:final_project/Model/current_user_model.dart';
 import 'package:final_project/USERS/ENGAGING/message_bubble.dart';
 import 'package:flutter/material.dart';
@@ -28,15 +29,9 @@ class _CurrentUserWidgetState extends State<CurrentUserWidget> {
             left: 15,
             child: Row(
               children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      image: widget.user.imgURL == null
-                          ? const DecorationImage(image: AssetImage('assets/images/placeholder.png'))
-                          : DecorationImage(image: NetworkImage(widget.user.imgURL!), fit: BoxFit.cover)),
-                ),
+                widget.user.imgURL == null
+                    ? const CircleAvatar(radius: 28, backgroundImage: AssetImage('assets/images/placeholder.png'))
+                    : CircleAvatar(radius: 28, backgroundImage: CachedNetworkImageProvider(widget.user.imgURL!)),
                 const SizedBox(width: 10),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,14 +41,14 @@ class _CurrentUserWidgetState extends State<CurrentUserWidget> {
                           Text("${widget.user.label}", style: GoogleFonts.signika(color: Colors.black, fontSize: 15)),
                           Text(
                             "@ANONY-${widget.user.id}",
-                            style: GoogleFonts.signika(color: const Color.fromARGB(255, 19, 92, 151), fontSize: 11, fontWeight: FontWeight.bold),
+                            style: GoogleFonts.signika(color: const Color.fromARGB(255, 19, 92, 151), fontSize: 8, fontWeight: FontWeight.bold),
                           )
                         ]
                       : [
                           Text("${widget.user.first_name} ${widget.user.last_name}", style: GoogleFonts.signika(color: Colors.black, fontSize: 15)),
                           Text(
                             "@${widget.user.username}",
-                            style: GoogleFonts.signika(color: const Color.fromARGB(255, 19, 92, 151), fontSize: 11, fontWeight: FontWeight.bold),
+                            style: GoogleFonts.signika(color: const Color.fromARGB(255, 19, 92, 151), fontSize: 10.5, fontWeight: FontWeight.bold),
                           )
                         ],
                 )

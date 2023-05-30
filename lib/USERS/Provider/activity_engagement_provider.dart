@@ -82,8 +82,8 @@ class ActivityEngagement with ChangeNotifier {
   void reset() {
     initialStream = true;
     if (usersSubscription != null) {
-      usersSubscription!.cancel();
-      messageSubscription!.cancel();
+      usersSubscription = null;
+      messageSubscription = null;
     }
   }
 

@@ -87,6 +87,7 @@ class _EngagingScreenState extends State<EngagingScreen> {
                           child: Padding(
                         padding: const EdgeInsets.only(left: 32, top: 16, bottom: 16, right: 8),
                         child: TextField(
+                            focusNode: handler.messageFocus,
                             controller: handler.messageController,
                             style: GoogleFonts.signika(color: Colors.black, fontSize: 18),
                             decoration: InputDecoration(

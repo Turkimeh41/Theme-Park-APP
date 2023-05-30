@@ -26,12 +26,12 @@ class _TransactionScreenState extends State<TransactionScreen> {
     final manager = Provider.of<Manager>(context);
     final transactionList = manager.transactions;
     return Scaffold(
-      backgroundColor: Colors.grey[300],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         centerTitle: true,
         title: Text(
           'Transactions',
-          style: GoogleFonts.signika(color: Colors.white, fontSize: 24),
+          style: GoogleFonts.signika(color: Colors.white, fontSize: 18),
         ),
       ),
       body: Column(
@@ -47,7 +47,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
           ),
           const Divider(
             height: 1,
-            color: Color.fromARGB(255, 185, 185, 185),
+            color: Color.fromARGB(255, 199, 167, 167),
             thickness: 2,
           ),
           Expanded(

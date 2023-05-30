@@ -133,10 +133,11 @@ class Activites with ChangeNotifier {
       // Delete each document one by one
       final deletePromises = snapshot.docs.map((document) async {
         final id = document.id;
-        await Future.wait([
-          document.reference.delete(),
-          FirebaseFirestore.instance.collection("User_Engaged").doc(id).set({"engaged": false, "activityID": null})
-        ]);
+        final data = document.data();
+        await document.reference.delete();
+        if (data['username'] != null) {
+          await FirebaseFirestore.instance.collection("User_Engaged").doc(id).set({"engaged": false, "activityID": null});
+        }
       });
       await Future.wait(deletePromises);
       await FirebaseFirestore.instance.collection("Activity_Started").doc(selectedActivity.id).set({'started': false});

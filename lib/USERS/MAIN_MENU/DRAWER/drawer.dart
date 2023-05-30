@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:final_project/USERS/MAIN_MENU/ACCOUNT_SCREEN/account_screen.dart';
-import 'package:final_project/USERS/MAIN_MENU/TRANSACTION_SCREEN/transaction_screen.dart';
+import 'package:final_project/USERS/MAIN_MENU/DRAWER/ACCOUNT_SCREEN/account_screen.dart';
+import 'package:final_project/USERS/MAIN_MENU/DRAWER/STATISTICS_SCREEN/statistics_screen.dart';
+import 'package:final_project/USERS/MAIN_MENU/DRAWER/TRANSACTION_SCREEN/transaction_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:final_project/USERS/Provider/user_provider.dart' as u;
 import 'package:get/get.dart';
@@ -69,7 +70,7 @@ class UserDrawer extends StatelessWidget {
             thickness: 1.25,
           ),
           InkWell(
-            onTap: () {},
+            onTap: () => Get.to(() => const StatisticsScreen(), transition: Transition.leftToRight),
             child: Padding(
               padding: const EdgeInsets.only(top: 10, left: 24, right: 24, bottom: 10),
               child: Row(

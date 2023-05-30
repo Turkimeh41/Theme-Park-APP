@@ -80,7 +80,7 @@ class _ManagerMainMenuState extends State<ManagerMainMenu> {
                             margin: EdgeInsets.only(top: 12),
                             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
                             height: 250,
-                            width: 250,
+                            width: 320,
                             child: ListView.separated(
                                 padding: EdgeInsets.only(top: 8, left: 8, right: 8),
                                 separatorBuilder: (context, index) => SizedBox(height: 10),

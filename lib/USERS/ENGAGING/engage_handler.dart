@@ -16,11 +16,11 @@ class EngageHandler {
     if (!valid) {
       return;
     }
-
-    await UserFirebaseHandler.sendMessage(currentUser, messageController.text, insEngagement.currentActivity!.id);
     setState(() {
       messageController.text = '';
+      messageFocus.unfocus();
     });
+    await UserFirebaseHandler.sendMessage(currentUser, messageController.text, insEngagement.currentActivity!.id);
   }
 
   bool _validateMessage() {
