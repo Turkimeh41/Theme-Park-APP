@@ -9,14 +9,14 @@ import 'package:nice_buttons/nice_buttons.dart';
 import 'package:provider/provider.dart';
 import 'package:final_project/USERS/Provider/user_provider.dart' as u;
 
-class AddMoneyScreen extends StatefulWidget {
-  const AddMoneyScreen({super.key});
+class AddBalanceScreen extends StatefulWidget {
+  const AddBalanceScreen({super.key});
 
   @override
-  State<AddMoneyScreen> createState() => _AddMoneyScreenState();
+  State<AddBalanceScreen> createState() => _AddBalanceScreenState();
 }
 
-class _AddMoneyScreenState extends State<AddMoneyScreen> {
+class _AddBalanceScreenState extends State<AddBalanceScreen> {
   late TextEditingController amountController;
   String? amountError;
 

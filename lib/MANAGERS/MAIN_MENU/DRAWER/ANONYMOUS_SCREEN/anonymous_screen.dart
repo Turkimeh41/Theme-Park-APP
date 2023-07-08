@@ -41,7 +41,7 @@ class _AnonymousScreenState extends State<AnonymousScreen> {
         centerTitle: true,
         title: Text(
           'Anonymous Users',
-          style: GoogleFonts.signika(color: Colors.white, fontSize: 24),
+          style: GoogleFonts.signika(color: Colors.white, fontSize: 18),
         ),
       ),
       backgroundColor: const Color.fromARGB(255, 243, 235, 235),

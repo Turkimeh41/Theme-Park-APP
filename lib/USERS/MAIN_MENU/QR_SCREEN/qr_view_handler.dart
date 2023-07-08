@@ -5,6 +5,7 @@ import 'dart:developer';
 
 import 'package:final_project/Exception/balance_exception.dart';
 import 'package:final_project/Handler/user_firebase_handler.dart';
+import 'package:final_project/USERS/DIALOG/user_dialog.dart';
 import 'package:final_project/USERS/Provider/activity_engagement_provider.dart';
 import 'package:final_project/USERS/Provider/activites_provider.dart';
 import 'package:final_project/USERS/Provider/participations_provider.dart';
@@ -27,8 +28,46 @@ class QrViewHandler {
       required Transactions insTransactions,
       required ActivityEngagement insEngagement,
       required BuildContext context}) {
-    stream = qrController.scannedDataStream.listen(
-        (barcode) async => scanData(barcode, context, insActivites: insActivites, insParticipations: insParticipations, insTransactions: insTransactions, user: user, insEngagement: insEngagement));
+    stream = qrController.scannedDataStream.listen((barcode) async {
+      if (barcode.code!.substring(0, 5) == 'ACTV-') {
+        pauseStream();
+
+        final String prefix_ID = barcode.code!;
+        final activityID = prefix_ID.substring(5);
+
+        final activity = insActivites.getActivityByID(activityID);
+
+        setState(() {
+          attemptingPayment = true;
+        });
+        try {
+          await UserFirebaseHandler.attemptPayment(activity, user, insParticipations, insTransactions, insEngagement);
+          setState(() {
+            attemptingPayment = false;
+          });
+          Navigator.of(context).pop();
+        } on BalanceException catch (balanceException) {
+          setState(() {
+            attemptingPayment = false;
+          });
+          log(balanceException.code);
+          log(balanceException.details);
+          UserDialog.balanceDialog(context);
+
+//my idea is it show dialog, where it asks for the user if he wants to recharge, and transfer him to the recharge page
+        }
+
+        //payment should have deduced
+      } else {
+        setState(() {
+          opacityError = 1.0;
+        });
+        await pause3pointHalfSecondsStream();
+        setState(() {
+          opacityError = 0.0;
+        });
+      }
+    });
   }
 
   void pauseStream() {
@@ -47,46 +86,5 @@ class QrViewHandler {
     stream.pause();
     await Future.delayed(const Duration(milliseconds: 2000));
     stream.resume();
-  }
-
-  Future<void> scanData(Barcode barcode, BuildContext context,
-      {required User user, required Activites insActivites, required Participations insParticipations, required Transactions insTransactions, required ActivityEngagement insEngagement}) async {
-    if (barcode.code!.substring(0, 5) == 'ACTV-') {
-      pauseStream();
-
-      final String prefix_ID = barcode.code!;
-      final activityID = prefix_ID.substring(5);
-
-      final activity = insActivites.getActivityByID(activityID);
-
-      setState(() {
-        attemptingPayment = true;
-      });
-      try {
-        await UserFirebaseHandler.attemptPayment(activity, user, insParticipations, insTransactions, insEngagement);
-        setState(() {
-          attemptingPayment = false;
-        });
-        Navigator.of(context).pop();
-      } on BalanceException catch (balanceException) {
-        setState(() {
-          attemptingPayment = false;
-        });
-
-        log(balanceException.code);
-        log(balanceException.details);
-//my idea is it show dialog, where it asks for the user if he wants to recharge, and transfer him to the recharge page
-      }
-
-      //payment should have deduced
-    } else {
-      setState(() {
-        opacityError = 1.0;
-      });
-      await pause3pointHalfSecondsStream();
-      setState(() {
-        opacityError = 0.0;
-      });
-    }
   }
 }

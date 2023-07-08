@@ -52,6 +52,7 @@ class UserFirebaseHandler {
         _incrementOnePlayedActivity(activity.id),
         _newParticipation(activity.id, insParticipations),
         _newTransaction(activity, insTransactions),
+        _addPoints(user, activity.price),
         _addUserEngagement(user, activity.id)
       ]);
       await _turnEngagement(activity.id);
@@ -69,6 +70,13 @@ class UserFirebaseHandler {
       int played = data!['played'];
       transaction.set(documentReference, {"played": played + 1}, SetOptions(merge: true));
     });
+  }
+
+  static Future<void> _addPoints(u.User user, double amount) async {
+    int currentPoints = user.points;
+    currentPoints += currentPoints + amount.toInt();
+    FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid).update({"points": currentPoints});
+    user.points = currentPoints;
   }
 
   static Future<void> _addUserEngagement(u.User user, String activityID) async {

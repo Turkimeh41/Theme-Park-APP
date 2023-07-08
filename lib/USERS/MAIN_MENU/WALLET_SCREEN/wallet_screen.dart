@@ -97,7 +97,7 @@ class _WalletScreenState extends State<WalletScreen> {
                           shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(4))),
                           backgroundColor: const MaterialStatePropertyAll(Color.fromARGB(255, 95, 3, 46)),
                           fixedSize: const MaterialStatePropertyAll(Size(285, 30))),
-                      onPressed: () => Get.to(() => const AddMoneyScreen(), transition: Transition.leftToRightWithFade),
+                      onPressed: () => Get.to(() => const AddBalanceScreen(), transition: Transition.leftToRightWithFade),
                       child: RichText(
                           textAlign: TextAlign.center,
                           text: TextSpan(

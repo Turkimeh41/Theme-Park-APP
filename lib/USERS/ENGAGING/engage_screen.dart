@@ -31,8 +31,7 @@ class _EngagingScreenState extends State<EngagingScreen> {
     final insEngagement = Provider.of<ActivityEngagement>(context);
     final currentUsersList = insEngagement.currentusers;
     return Scaffold(
-        resizeToAvoidBottomInset: true,
-        backgroundColor: const Color.fromARGB(255, 252, 242, 242),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Padding(
           padding: const EdgeInsets.only(top: 40),
           child: Column(

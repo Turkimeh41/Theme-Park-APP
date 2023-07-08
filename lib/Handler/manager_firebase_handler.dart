@@ -20,6 +20,8 @@ class ManagerFirebaseHandler {
     if (insActivites.selectedActivity.price <= data!['balance']) {
       //deduce balance
       await _deduceUserBalance(userID, data['balance'], insActivites.selectedActivity.price);
+      //add points for user
+      await _addPoints(userID, insActivites.selectedActivity.price);
       //new transaction for that user
       await _newUserTransaction(insActivites.selectedActivity, userID);
       //new participation for that user
@@ -115,6 +117,16 @@ class ManagerFirebaseHandler {
   static Future<void> _deduceUserBalance(String userID, double balance, double activityAmount) async {
     double newBalance = balance = activityAmount;
     await FirebaseFirestore.instance.collection("Users").doc(userID).update({"balance": newBalance});
+  }
+
+  static Future<void> _addPoints(String userID, double amount) async {
+    final documentReference = FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid);
+    FirebaseFirestore.instance.runTransaction((transaction) async {
+      final snapshot = await transaction.get(documentReference);
+      final data = snapshot.data();
+      int currentPoints = data!['points'];
+      transaction.set(documentReference, {"played": currentPoints + amount.toInt()}, SetOptions(merge: true));
+    });
   }
 
   static Future<int> _newUserParticipation(String activityID, String userID) async {
